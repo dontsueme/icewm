@@ -44,23 +44,25 @@ WorkspaceButton::WorkspaceButton(long ws, YWindow *parent): YButton(parent, 0)
     //setDND(true);
 }
 
-void WorkspaceButton::handleClick(const XButtonEvent &/*up*/, int /*count*/) {
+void WorkspaceButton::handleClick(const XButtonEvent &up, int count) {
+    if (up.button == 3 && count == 1 && IS_BUTTON(up.state, Button3Mask))
+        taskBar->contextMenu(up.x_root, up.y_root);
 }
 
 void WorkspaceButton::handleDNDEnter() {
     if (fRaiseTimer == 0)
         fRaiseTimer = new YTimer(autoRaiseDelay);
     if (fRaiseTimer) {
-        fRaiseTimer->setTimerListener(this);
-        fRaiseTimer->startTimer();
+        fRaiseTimer->timerListener(this);
+        fRaiseTimer->start();
     }
     repaint();
 }
 
 void WorkspaceButton::handleDNDLeave() {
-    if (fRaiseTimer && fRaiseTimer->getTimerListener() == this) {
-        fRaiseTimer->stopTimer();
-        fRaiseTimer->setTimerListener(0);
+    if (fRaiseTimer && fRaiseTimer->timerListener() == this) {
+        fRaiseTimer->stop();
+        fRaiseTimer->timerListener(NULL);
     }
     repaint();
 }

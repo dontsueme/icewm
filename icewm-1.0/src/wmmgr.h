@@ -31,7 +31,9 @@ class YWindowManager;
 class YFrameClient;
 class YFrameWindow;
 
-class EdgeSwitch: public YWindow, public YTimerListener {
+class EdgeSwitch:
+public YWindow,
+public YTimer::Listener {
 public:
     EdgeSwitch(YWindowManager *manager, int delta, bool vertical);
     virtual ~EdgeSwitch();
@@ -59,6 +61,9 @@ public:
     YWindowManager(YWindow *parent, Window win = 0);
     virtual ~YWindowManager();
 
+    void registerProtocols();
+    void unregisterProtocols();
+    void initWorkspaces();
     void grabKeys();
 
     virtual void handleButton(const XButtonEvent &button);
@@ -86,10 +91,10 @@ public:
 			bool reparent = true);
     void destroyedClient(Window win);
     YFrameWindow *mapClient(Window win);
-    
+
     void setFocus(YFrameWindow *f, bool canWarp = false);
     YFrameWindow *getFocus() { return fFocusWin; }
-    
+
     void loseFocus(YFrameWindow *window);
     void loseFocus(YFrameWindow *window,
                    YFrameWindow *next,
@@ -126,12 +131,17 @@ public:
     void placeWindow(YFrameWindow *frame, int x, int y, bool newClient, bool &canActivate);
 
     YFrameWindow *top(long layer) const { return fTop[layer]; }
-    void setTop(long layer, YFrameWindow *top);
+    void top(long layer, YFrameWindow *top);
     YFrameWindow *bottom(long layer) const { return fBottom[layer]; }
-    void setBottom(long layer, YFrameWindow *bottom) { fBottom[layer] = bottom; }
+    void bottom(long layer, YFrameWindow *bottom) { fBottom[layer] = bottom; }
 
     YFrameWindow *topLayer(long layer = WinLayerCount - 1);
     YFrameWindow *bottomLayer(long layer = 0);
+
+    YFrameWindow *firstCreated() const { return fFirstCreated; }
+    YFrameWindow *lastCreated() const { return fLastCreated; }
+    void firstCreated(YFrameWindow *first) { fFirstCreated = first; }
+    void lastCreated(YFrameWindow *last) { fLastCreated = last; }
 
     void restackWindows(YFrameWindow *win);
     void focusTopWindow();
@@ -199,6 +209,12 @@ public:
     void removeLRUProcess();
 #endif
 
+    static char const * getName();
+
+public:
+    static XContext frameContext;
+    static XContext clientContext;
+
 private:
     struct WindowPosState {
         int x, y, w, h;
@@ -206,21 +222,28 @@ private:
         YFrameWindow *frame;
     };
 
+    bool fShuttingDown;
+    bool fWorkAreaMoveWindows;
+
     YFrameWindow *fFocusWin;
     YFrameWindow *fTop[WinLayerCount];
     YFrameWindow *fBottom[WinLayerCount];
+    YFrameWindow *fFirstCreated;
+    YFrameWindow *fLastCreated;
+    YFrameWindow *fColormapWindow;
+    YProxyWindow *fRootProxy;
+    YWindow *fTopWin;
+
     long fActiveWorkspace;
     long fLastWorkspace;
-    YFrameWindow *fColormapWindow;
     int fMinX, fMinY, fMaxX, fMaxY;
-    EdgeSwitch *fLeftSwitch, *fRightSwitch, *fTopSwitch, *fBottomSwitch;
-    bool fShuttingDown;
+
+    EdgeSwitch *fLeftSwitch, *fRightSwitch;
+    EdgeSwitch *fTopSwitch, *fBottomSwitch;
+
     int fArrangeCount;
     WindowPosState *fArrangeInfo;
-    YProxyWindow *rootProxy;
-    YWindow *fTopWin;
-    bool fWorkAreaMoveWindows;
-    
+
 #ifdef CONFIG_WM_SESSION
     YStackSet<pid_t> fProcessList;
 #endif
@@ -229,31 +252,6 @@ private:
 extern YWindowManager *manager;
 
 void dumpZorder(const char *oper, YFrameWindow *w, YFrameWindow *a = 0);
-
-extern Atom _XA_WIN_PROTOCOLS;
-extern Atom _XA_WIN_WORKSPACE;
-extern Atom _XA_WIN_WORKSPACE_COUNT;
-extern Atom _XA_WIN_WORKSPACE_NAMES;
-extern Atom _XA_WIN_WORKAREA;
-extern Atom _XA_WIN_LAYER;
-#ifdef CONFIG_TRAY
-extern Atom _XA_WIN_TRAY;
-#endif
-extern Atom _XA_WIN_ICONS;
-extern Atom _XA_WIN_HINTS;
-extern Atom _XA_WIN_STATE;
-extern Atom _XA_WIN_SUPPORTING_WM_CHECK;
-extern Atom _XA_WIN_CLIENT_LIST;
-extern Atom _XA_WIN_DESKTOP_BUTTON_PROXY;
-extern Atom _XA_WIN_AREA;
-extern Atom _XA_WIN_AREA_COUNT;
-extern Atom _XA_WM_CLIENT_LEADER;
-extern Atom _XA_SM_CLIENT_ID;
-
-/* KDE specific */
-extern Atom _XA_KWM_WIN_ICON;
-
-extern Atom XA_IcewmWinOptHint;
 
 extern YIcon *defaultAppIcon;
 

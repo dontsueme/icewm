@@ -33,9 +33,6 @@ static YColor *inactiveBorderBg = 0;
 YTimer *YFrameWindow::fAutoRaiseTimer = 0;
 YTimer *YFrameWindow::fDelayFocusTimer = 0;
 
-extern XContext frameContext;
-extern XContext clientContext;
-
 bool YFrameWindow::isButton(char c) {
     if (strchr(titleButtonsSupported, c) == 0)
         return false;
@@ -44,7 +41,8 @@ bool YFrameWindow::isButton(char c) {
     return false;
 }
 
-YFrameWindow::YFrameWindow(YWindow *parent, YFrameClient *client): YWindow(parent) {
+YFrameWindow::YFrameWindow(YWindow *parent, YFrameClient *client):
+YWindow(parent) {
     if (activeBorderBg == 0)
         activeBorderBg = new YColor(clrActiveBorder);
     if (inactiveBorderBg == 0)
@@ -52,7 +50,8 @@ YFrameWindow::YFrameWindow(YWindow *parent, YFrameClient *client): YWindow(paren
 
     fClient = 0;
     fFocused = false;
-    fNextFrame = fPrevFrame = 0;
+    fNextFrame = fPrevFrame = NULL;
+    fNextCreated = fPrevCreated = NULL;
     fPopupActive = 0;
 
     normalX = 0;
@@ -174,7 +173,7 @@ YFrameWindow::YFrameWindow(YWindow *parent, YFrameClient *client): YWindow(paren
     else {
         fMenuButton = new YFrameButton(fTitleBar, this, 0);
         fMenuButton->show();
-        fMenuButton->setActionListener(this);
+        fMenuButton->actionListener(this);
     }
 
     getFrameHints();
@@ -222,13 +221,13 @@ YFrameWindow::~YFrameWindow() {
 #ifdef CONFIG_GUIEVENTS
     wmapp->signalGuiEvent(geWindowClosed);
 #endif
-    if (fAutoRaiseTimer && fAutoRaiseTimer->getTimerListener() == this) {
-        fAutoRaiseTimer->stopTimer();
-        fAutoRaiseTimer->setTimerListener(0);
+    if (fAutoRaiseTimer && fAutoRaiseTimer->timerListener() == this) {
+        fAutoRaiseTimer->stop();
+        fAutoRaiseTimer->timerListener(NULL);
     }
-    if (fDelayFocusTimer && fDelayFocusTimer->getTimerListener() == this) {
-        fDelayFocusTimer->stopTimer();
-        fDelayFocusTimer->setTimerListener(0);
+    if (fDelayFocusTimer && fDelayFocusTimer->timerListener() == this) {
+        fDelayFocusTimer->stop();
+        fDelayFocusTimer->timerListener(NULL);
     }
     if (movingWindow || sizingWindow)
         endMoveSize();
@@ -272,11 +271,15 @@ YFrameWindow::~YFrameWindow() {
     removeAsTransient();
     manager->removeClientFrame(this);
     removeFrame();
-    if (fClient != 0) {
+    
+    if (NULL != fClient) {
         if (!fClient->destroyed())
             XRemoveFromSaveSet(app->display(), client()->handle());
-        XDeleteContext(app->display(), client()->handle(), frameContext);
+
+        XDeleteContext(app->display(), client()->handle(),
+                       YWindowManager::frameContext);
     }
+
     if (doNotCover())
         manager->updateWorkArea();
 
@@ -448,7 +451,7 @@ void YFrameWindow::configureClient(const XConfigureRequestEvent &configureReques
         if ((configureRequest.value_mask & CWSibling) &&
             XFindContext(app->display(),
                          configureRequest.above,
-                         clientContext,
+                         YWindowManager::clientContext,
                          (XPointer *)&sibling) == 0)
             xwc.sibling = sibling->handle();
         else
@@ -608,8 +611,8 @@ void YFrameWindow::handleCrossing(const XCrossingEvent &crossing) {
                 if (fDelayFocusTimer == 0)
                     fDelayFocusTimer = new YTimer(pointerFocusDelay);
                 if (fDelayFocusTimer) {
-                    fDelayFocusTimer->setTimerListener(this);
-                    fDelayFocusTimer->startTimer();
+                    fDelayFocusTimer->timerListener(this);
+                    fDelayFocusTimer->start();
                 }
             }
         }
@@ -618,8 +621,8 @@ void YFrameWindow::handleCrossing(const XCrossingEvent &crossing) {
                 fAutoRaiseTimer = new YTimer(autoRaiseDelay);
             }
             if (fAutoRaiseTimer) {
-                fAutoRaiseTimer->setTimerListener(this);
-                fAutoRaiseTimer->startTimer();
+                fAutoRaiseTimer->timerListener(this);
+                fAutoRaiseTimer->start();
             }
         }
     } else if (crossing.type == LeaveNotify &&
@@ -630,9 +633,9 @@ void YFrameWindow::handleCrossing(const XCrossingEvent &crossing) {
         if (crossing.detail != NotifyInferior &&
             crossing.mode == NotifyNormal)
         {
-            if (fDelayFocusTimer && fDelayFocusTimer->getTimerListener() == this) {
-                fDelayFocusTimer->stopTimer();
-                fDelayFocusTimer->setTimerListener(0);
+            if (fDelayFocusTimer && fDelayFocusTimer->timerListener() == this) {
+                fDelayFocusTimer->stop();
+                fDelayFocusTimer->timerListener(NULL);
             }
 #if 0 /// !!! focus root
             if (!clickFocus) {
@@ -640,9 +643,9 @@ void YFrameWindow::handleCrossing(const XCrossingEvent &crossing) {
             }
 #endif
             if (autoRaise) {
-                if (fAutoRaiseTimer && fAutoRaiseTimer->getTimerListener() == this) {
-                    fAutoRaiseTimer->stopTimer();
-                    fAutoRaiseTimer->setTimerListener(0);
+                if (fAutoRaiseTimer && fAutoRaiseTimer->timerListener() == this) {
+                    fAutoRaiseTimer->stop();
+                    fAutoRaiseTimer->timerListener(NULL);
                 }
             }
         }
@@ -704,18 +707,23 @@ void YFrameWindow::removeFrame() {
 #ifdef DEBUG
     if (debug_z) dumpZorder("before removing", this);
 #endif
-    if (prev())
-        prev()->setNext(next());
-    else
-        manager->setTop(getLayer(), next());
+    if (prev()) prev()->next(next());
+    else manager->top(getLayer(), next());
 
-    if (next())
-        next()->setPrev(prev());
-    else
-        manager->setBottom(getLayer(), prev());
+    if (next()) next()->prev(prev());
+    else manager->bottom(getLayer(), prev());
 
-    setPrev(0);
-    setNext(0);
+    prev(NULL);
+    next(NULL);
+
+    if (nextCreated()) nextCreated()->prevCreated(prevCreated());
+    else manager->lastCreated(prevCreated());
+
+    if (prevCreated()) prevCreated()->nextCreated(nextCreated());
+    else manager->firstCreated(nextCreated());
+
+    prevCreated(NULL);
+    nextCreated(NULL);
 
 #ifdef DEBUG
     if (debug_z) dumpZorder("after removing", this);
@@ -726,13 +734,21 @@ void YFrameWindow::insertFrame() {
 #ifdef DEBUG
     if (debug_z) dumpZorder("before inserting", this);
 #endif
-    setNext(manager->top(getLayer()));
-    setPrev(0);
-    if (next())
-        next()->setPrev(this);
-    else
-        manager->setBottom(getLayer(), this);
-    manager->setTop(getLayer(), this);
+    next(manager->top(getLayer()));
+    prev(NULL);
+
+    if (next()) next()->prev(this);
+    else manager->bottom(getLayer(), this);
+
+    manager->top(getLayer(), this);
+
+    nextCreated(NULL);
+    prevCreated(manager->lastCreated());
+
+    if (prevCreated()) prevCreated()->nextCreated(this);
+    else manager->firstCreated(this);
+
+    manager->lastCreated(this);
 #ifdef DEBUG
     if (debug_z) dumpZorder("after inserting", this);
 #endif
@@ -743,28 +759,24 @@ void YFrameWindow::setAbove(YFrameWindow *aboveFrame) {
     if (debug_z) dumpZorder("before setAbove", this, aboveFrame);
 #endif
     if (aboveFrame != next() && aboveFrame != this) {
-        if (prev())
-            prev()->setNext(next());
-        else
-            manager->setTop(getLayer(), next());
+        if (prev()) prev()->next(next());
+        else manager->top(getLayer(), next());
 
-        if (next())
-            next()->setPrev(prev());
-        else
-            manager->setBottom(getLayer(), prev());
+        if (next()) next()->prev(prev());
+        else manager->bottom(getLayer(), prev());
 
-        setNext(aboveFrame);
+        next(aboveFrame);
+
         if (next()) {
-            setPrev(next()->prev());
-            next()->setPrev(this);
+            prev(next()->prev());
+            next()->prev(this);
         } else {
-            setPrev(manager->bottom(getLayer()));
-            manager->setBottom(getLayer(), this);
+            prev(manager->bottom(getLayer()));
+            manager->bottom(getLayer(), this);
         }
-        if (prev())
-            prev()->setNext(this);
-        else
-            manager->setTop(getLayer(), this);
+
+        if (prev()) prev()->next(this);
+        else manager->top(getLayer(), this);
 #ifdef DEBUG
         if (debug_z) dumpZorder("after setAbove", this, aboveFrame);
 #endif
@@ -772,8 +784,7 @@ void YFrameWindow::setAbove(YFrameWindow *aboveFrame) {
 }
 
 void YFrameWindow::setBelow(YFrameWindow *belowFrame) {
-    if (belowFrame != next())
-        setAbove(belowFrame->next());
+    if (belowFrame != next()) setAbove(belowFrame->next());
 }
 
 YFrameWindow *YFrameWindow::findWindow(int flags) {
@@ -1207,7 +1218,7 @@ void YFrameWindow::wmClose() {
     client()->getProtocols();
 
     if (client()->protocols() & YFrameClient::wpDeleteWindow) {
-        client()->sendMessage(_XA_WM_DELETE_WINDOW);
+        client()->sendMessage(atoms.wmDeleteWindow);
     } else {
         wmConfirmKill();
     }
@@ -1227,7 +1238,7 @@ void YFrameWindow::wmConfirmKill() {
         msgbox->setText(_("WARNING! All unsaved changes will be lost when\n"
 			  "this client is killed. Do you wish to proceed?"));
         msgbox->autoSize();
-        msgbox->setMsgBoxListener(this);
+        msgbox->msgBoxListener(this);
         msgbox->showFocused();
     }
 #endif
@@ -1271,6 +1282,8 @@ void YFrameWindow::wmLastWindow() {
 }
 
 void YFrameWindow::loseWinFocus() {
+    MSG(("losing focus %lX", this));
+
     if (fFocused && fManaged) {
         fFocused = false;
 
@@ -1290,7 +1303,9 @@ void YFrameWindow::loseWinFocus() {
     }
 }
 
-void YFrameWindow::setWinFocus() {
+void YFrameWindow::takeWinFocus() {
+    MSG(("taking focus %lX", this));
+
     if (!fFocused) {
         fFocused = true;
 
@@ -1576,8 +1591,11 @@ void YFrameWindow::popupSystemMenu(int x, int y,
 }
 
 void YFrameWindow::updateTitle() {
+    titlebar()->setToolTip(client()->windowTitle());
     titlebar()->repaint();
+
     layoutShape();
+
     updateIconTitle();
 #ifdef CONFIG_WINLIST
     if (fWinListItem && windowList->visible())
@@ -1591,6 +1609,9 @@ void YFrameWindow::updateTitle() {
     if (fTrayApp)
         fTrayApp->setToolTip((const char *)client()->windowTitle());
 #endif
+
+    if (fMiniIcon)
+        fMiniIcon->setToolTip(client()->iconTitle());
 }
 
 void YFrameWindow::updateIconTitle() {
@@ -1604,9 +1625,11 @@ void YFrameWindow::updateIconTitle() {
     if (fTrayApp)
         fTrayApp->setToolTip((const char *)client()->windowTitle());
 #endif
-    if (isIconic()) {
+    if (fMiniIcon)
+        fMiniIcon->setToolTip(client()->iconTitle());
+
+    if (isIconic())
         fMiniIcon->repaint();
-    }
 }
 
 void YFrameWindow::wmOccupyAllOrCurrent() {
@@ -1656,7 +1679,7 @@ void YFrameWindow::wmMoveToWorkspace(long workspace) {
 }
 
 void YFrameWindow::getFrameHints() {
-#ifndef NO_MWM_HINTS
+#ifdef CONFIG_MOTIF_HINTS
     long decors = client()->mwmDecors();
     long functions = client()->mwmFunctions();
     long win_hints = client()->winHints();
@@ -1867,33 +1890,36 @@ void YFrameWindow::updateIcon() {
     YIcon *oldFrameIcon(fFrameIcon);
 
     if (client()->getWinIcons(&type, &count, &elem)) {
-        if (type == _XA_WIN_ICONS)
-            fFrameIcon = newClientIcon(elem[0], elem[1], elem + 2);
-        else // compatibility
-            fFrameIcon = newClientIcon(count/2, 2, elem);
+        fFrameIcon = type == atoms.winIcons
+                   ? newClientIcon(elem[0], elem[1], elem + 2)
+                   : newClientIcon(count/2, 2, elem); // compatibility
         XFree(elem);
     } else if (client()->getKwmIcon(&count, &pixmap) && count == 2) {
-        XWMHints *h = client()->hints();
-        if (h && (h->flags & IconPixmapHint)) {
-            long pix[4];
-            pix[0] = pixmap[0];
-            pix[1] = pixmap[1];
-            pix[2] = h->icon_pixmap;
-            pix[3] = (h->flags & IconMaskHint) ? h->icon_mask : None;
+        XWMHints const *wmHints(client()->hints());
+
+        if (wmHints && (wmHints->flags & IconPixmapHint)) {
+            long pix[] = {
+                pixmap[0], pixmap[1],
+                wmHints->icon_pixmap,
+                wmHints->flags & IconMaskHint ? wmHints->icon_mask : None
+            };
+
             fFrameIcon = newClientIcon(2, 2, pix);
         } else {
-            long pix[2];
-            pix[0] = pixmap[0];
-            pix[1] = pixmap[1];
-            fFrameIcon = newClientIcon(count / 2, 2, pix);
+            long pix[] = { pixmap[0], pixmap[1] };
+            fFrameIcon = newClientIcon(1, 2, pix);
         }
+
         XFree(pixmap);
     } else {
-        XWMHints *h = client()->hints();
-        if (h && (h->flags & IconPixmapHint)) {
-            long pix[2];
-            pix[0] = h->icon_pixmap;
-            pix[1] = (h->flags & IconMaskHint) ? h->icon_mask : None;
+        XWMHints const *wmHints(client()->hints());
+
+        if (wmHints && (wmHints->flags & IconPixmapHint)) {
+            long pix[] = {
+                wmHints->icon_pixmap,
+                wmHints->flags & IconMaskHint ? wmHints->icon_mask : None
+            };
+
             fFrameIcon = newClientIcon(1, 2, pix);
         }
     }
@@ -1965,7 +1991,7 @@ void YFrameWindow::removeAsTransient() {
         for (YFrameWindow * curr(fOwner->transient()), * prev(NULL);
 	     curr; prev = curr, curr = curr->nextTransient()) {
 	    if (curr == this) {
-                if (prev) prev->setNextTransient(nextTransient());
+                if (prev) prev->nextTransient(nextTransient());
                 else fOwner->setTransient(nextTransient());
 		break;
             }
@@ -1988,7 +2014,7 @@ void YFrameWindow::removeTransients() {
 
         while (w) {
             n = w->nextTransient();
-            w->setNextTransient(0);
+            w->nextTransient(0);
             w->setOwner(0);
             w = n;
         }

@@ -1,9 +1,10 @@
 1.0.10: 2001-10-22 ???
+!!!     - feature: partial support of the Extended Window Manager
+          Specification (aka net wm-spec) (KDE 2.1, GNOME2)
 !!!     - feature: add KDE tray windows to the tray
-!!!     - feature: full net wm-spec support
 !!!     - feature: allow to specify $DESTDIR on "make install"
-???     - feature: create tooltip for titlebar and mini icon
-???     - feature: allow to select wm specs to support on compile time
+!!!     - feature: allow to select wm specs to support on compile time
+        - feature: create tooltip for titlebar and mini icon
         - feature: history function for input fields;
           options: AddressBarHistory, HistoryCapacity,
           ColorInputButton, ColorInputArrow
@@ -14,18 +15,18 @@
 
 !!!     - bugfix: cleaner path handling
 !!!     - bugfix: cleaner icon caching
-!!!     - bugfix: netstat overflow
+!!!     - bugfix: avoid overflow of network statistics
 !!!     - bugfix: fixed maximized terminals gap bug (again, sig!)
 !!!     - bugfix: don't autohide taskbar when addressbar has focus
-???     - bugfix: #467231 + closing of start menu when Win* isn't mapped
+        - bugfix: #467231 + closing of start menu when Win* isn't mapped
           to Alt or Meta
-???     - bugfix: added context menu to all taskbar objects, currently
+        - bugfix: added context menu to all taskbar objects, currently
           just the taskbar's default menu
-???     - bugfix: massive code cleanups for lists, timers, sockets,
+        - bugfix: massive code cleanups for lists, timers, sockets,
           affected: YApplication
-???     - bugfix: consider frame borders when moving windows per
+        - bugfix: consider frame borders when moving windows per
           Pos1, End, PgUp, PgDown (inspired by Markus Gaugusch)
-???     - bugfix: renamed private atoms to match the ICCCM naming conventions,
+        - bugfix: renamed private atoms to match the ICCCM naming conventions,
           reorganized atom management
         - bugfix: replaced --with-kde-dir and KDEDataDir by the
           KDEMenuDir option: If emtpy $KDEDIR/share/applnk will be

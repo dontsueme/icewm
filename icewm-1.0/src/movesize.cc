@@ -456,10 +456,8 @@ int YFrameWindow::handleMoveKeys(const XKeyEvent &key, int &newX, int &newY) {
     int m = KEY_MODMASK(key.state);
     int factor = 1;
 
-    if (m & ShiftMask)
-        factor = 4;
-    if (m & ControlMask)
-        factor<<= 4;
+    if (m & ShiftMask) factor = 4;
+    if (m & ControlMask) factor<<= 4;
 
     if (k == XK_Left || k == XK_KP_Left)
         newX -= factor;
@@ -470,13 +468,17 @@ int YFrameWindow::handleMoveKeys(const XKeyEvent &key, int &newX, int &newY) {
     else if (k == XK_Down || k == XK_KP_Down)
         newY += factor;
     else if (k == XK_Home || k == XK_KP_Home)
-        newX = manager->minX(this) - borderX();
+        newX = considerHorizBorder ? manager->minX(this)
+                                   : manager->minX(this) + borderX();
     else if (k == XK_End || k == XK_KP_End)
-        newX = manager->maxX(this) - width() + borderX();
+        newX = considerHorizBorder ? manager->maxX(this) - width()
+                                   : manager->maxX(this) - width() - borderX();
     else if (k == XK_Prior || k == XK_KP_Prior)
-        newY = manager->minY(this) - borderY();
+        newY = considerVertBorder ? manager->minY(this)
+                                  : manager->minY(this) + borderY();
     else if (k == XK_Next || k == XK_KP_Next)
-        newY = manager->maxY(this) - height() + borderY();
+        newY = considerVertBorder ? manager->maxY(this) - height()
+                                  : manager->maxY(this) - height() - borderY();
     else if (k == XK_KP_Begin) {
 	newX = (manager->minX(getLayer()) + 
 		manager->maxX(getLayer()) - (int)width()) / 2;
@@ -1052,7 +1054,7 @@ void YFrameWindow::constrainMouseToWorkspace(int &x, int &y) {
 bool YFrameWindow::canSize(bool horiz, bool vert) {
     if (isRollup())
         return false;
-#ifndef NO_MWM_HINTS
+#ifdef CONFIG_MOTIF_HINTS
     if (!(client()->mwmFunctions() & MWM_FUNC_RESIZE))
         return false;
 #endif
@@ -1065,7 +1067,7 @@ bool YFrameWindow::canSize(bool horiz, bool vert) {
 }
 
 bool YFrameWindow::canMove() {
-#ifndef NO_MWM_HINTS
+#ifdef CONFIG_MOTIF_HINTS
     if (!(client()->mwmFunctions() & MWM_FUNC_MOVE))
         return false;
 #endif

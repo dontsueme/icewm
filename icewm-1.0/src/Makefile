@@ -98,6 +98,8 @@ iceskt_OBJS = \
 
 testlocale_OBJS = \
 	testlocale.o ylocale.o
+testlists_OBJS = \
+	testlists.o
 testdockapp_OBJS = \
 	testdockapp.o
 testtrayapp_OBJS = \
@@ -105,10 +107,12 @@ testtrayapp_OBJS = \
 
 ################################################################################
 
+TESTAPPS = $(foreach APP,locale lists dockapp trayapp,test$(APP))
 #COREAPPS = genpref icewm icewmhint icewmbg 
 #ALLAPPS = $(COREAPPS) $(EXTRAAPPS) #icehelp icesound #icelist iceclock icebar icerun
-OBJECTS = $(foreach APP,$(APPLICATIONS),$($(APP)_OBJS))
+OBJECTS = $(foreach APP,$(APPLICATIONS) $(TESTAPPS),$($(APP)_OBJS))
 BINARIES = $(foreach APP,$(APPLICATIONS),$(APP)$(EXEEXT))
+TESTBINS = $(foreach APP,$(TESTAPPS),$(APP)$(EXEEXT))
 DEPENDENCIES = $(OBJECTS:.o=.p)
 
 ################################################################################
@@ -126,7 +130,7 @@ clean:
 
 ################################################################################
 
-$(BINARIES):
+$(BINARIES) $(TESTBINS):
 	@echo Linking $@...
 	@$(LD) -o $@ $($@_OBJS) $(LFLAGS) $($@_LFLAGS) $(LIBS) $($@_LIBS)
 
@@ -134,7 +138,7 @@ libice.so: $(COREOBJS)
 	-@rm -f $@
 	ld -shared -o $@ $(COREOBJS)
 
-wmabout.o: ../VERSION
+genpref.o icesound.o wmmgr.o: ../VERSION
 
 .targets: Makefile
 	@{ for p in $(BINARIES); do echo $$p: "\$$($${p}_OBJS)"; done; } > $@

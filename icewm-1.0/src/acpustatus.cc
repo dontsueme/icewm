@@ -10,6 +10,7 @@
 #ifdef CONFIG_APPLET_CPU_STATUS
 #include "ylib.h"
 #include "wmapp.h"
+#include "wmtaskbar.h"
 
 #include "acpustatus.h"
 #include "sysdep.h"
@@ -40,8 +41,8 @@ CPUStatus::CPUStatus(YWindow *aParent): YWindow(aParent) {
 
     fUpdateTimer = new YTimer(UPDATE_INTERVAL);
     if (fUpdateTimer) {
-        fUpdateTimer->setTimerListener(this);
-        fUpdateTimer->startTimer();
+        fUpdateTimer->timerListener(this);
+        fUpdateTimer->start();
     }
 
     color[IWM_USER] = new YColor(clrCpuUser);
@@ -160,6 +161,9 @@ void CPUStatus::handleClick(const XButtonEvent &up, int count) {
         if (cpuCommand && cpuCommand[0] &&
 	   (taskBarLaunchOnSingleClick ? count == 1 : !(count % 2)))
 	    wmapp->runCommandOnce(cpuClassHint, cpuCommand);
+    } else if (up.button == 3) {
+        if (count == 1 && IS_BUTTON(up.state, Button3Mask))
+            taskBar->contextMenu(up.x_root, up.y_root);
     }
 }
 

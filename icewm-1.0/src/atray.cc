@@ -69,9 +69,9 @@ TrayApp::TrayApp(ClientData *frame, YWindow *aParent): YWindow(aParent) {
 }
 
 TrayApp::~TrayApp() {
-    if (fRaiseTimer && fRaiseTimer->getTimerListener() == this) {
-        fRaiseTimer->stopTimer();
-        fRaiseTimer->setTimerListener(0);
+    if (fRaiseTimer && fRaiseTimer->timerListener() == this) {
+        fRaiseTimer->stop();
+        fRaiseTimer->timerListener(NULL);
     }
 }
 
@@ -230,17 +230,17 @@ void TrayApp::handleDNDEnter() {
     if (fRaiseTimer == 0)
         fRaiseTimer = new YTimer(autoRaiseDelay);
     if (fRaiseTimer) {
-        fRaiseTimer->setTimerListener(this);
-        fRaiseTimer->startTimer();
+        fRaiseTimer->timerListener(this);
+        fRaiseTimer->start();
     }
     selected = 3;
     repaint();
 }
 
 void TrayApp::handleDNDLeave() {
-    if (fRaiseTimer && fRaiseTimer->getTimerListener() == this) {
-        fRaiseTimer->stopTimer();
-        fRaiseTimer->setTimerListener(0);
+    if (fRaiseTimer && fRaiseTimer->timerListener() == this) {
+        fRaiseTimer->stop();
+        fRaiseTimer->timerListener(NULL);
     }
     selected = 0;
     repaint();
@@ -324,12 +324,12 @@ void TrayPane::removeApp(YFrameWindow *frame) {
 }
 
 int TrayPane::getRequiredWidth() {
-    int tc = 0;
+    int count(0);
 
     for (TrayApp *a(fFirst); a != NULL; a = a->getNext())
-        if (a->getShown()) tc++;
+        if (a->getShown()) count++;
 
-    return (tc ? 4 + tc * (height() - 4) : 1);
+    return (count ? 4 + count * (height() - 4) : 1);
 }
 
 void TrayPane::relayoutNow() {
@@ -339,13 +339,13 @@ void TrayPane::relayoutNow() {
     fNeedRelayout = false;
 
     int x, y, w, h;
-    int tc = 0;
+    int count(0);
 
     for (TrayApp *a(fFirst); a != NULL; a = a->getNext())
-        if (a->getShown()) tc++;
+        if (a->getShown()) ++count;
 
     w = h = height() - 4;
-    x = width() - 2 - tc * w;
+    x = width() - 2 - count * w;
     y = 2;
 
     for (TrayApp *f(fFirst); f != NULL; f = f->getNext()) {
@@ -364,10 +364,9 @@ void TrayPane::handleClick(const XButtonEvent &up, int count) {
     }
 }
 
-void TrayPane::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsigned int /*height*/) {
-    int const w(width());
-    int const h(height());
-    
+void TrayPane::paint(Graphics &g, int /*x*/, int /*y*/,
+                     unsigned int /*width*/, unsigned int /*height*/) {
+    int const w(width()), h(height());
     g.setColor(taskBarBg);
 
 #ifdef CONFIG_GRADIENTS

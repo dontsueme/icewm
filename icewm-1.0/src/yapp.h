@@ -3,12 +3,11 @@
 
 #include <signal.h>
 
+#include "yatoms.h"
 #include "ywindow.h"
 #include "ycursor.h"
 #include "ypaths.h"
 
-class YTimer;
-class YSocket;
 class YClipboard;
 
 class YApplication {
@@ -26,14 +25,20 @@ public:
     Colormap colormap() { return DefaultColormap(display(), screen()); }
     unsigned depth() { return DefaultDepth(display(), screen()); }
     char const * executable() { return fExecutable; }
+    
+    Atom internAtom(char const *name, bool queryOnly = false);
+    void internAtoms(YAtomInfo * info, unsigned const count,
+                     bool queryOnly = false);
 
     bool hasColormap();
     bool hasGNOME();
 
     void saveEventTime(XEvent &xev);
-    Time getEventTime() const { return lastEventTime; }
+    Time getEventTime() const { return fLastEventTime; }
 
-    int grabEvents(YWindow *win, Cursor ptr, unsigned int eventMask, int grabMouse = 1, int grabKeyboard = 1, int grabTree = 0);
+    int grabEvents(YWindow *win, Cursor ptr, unsigned int eventMask,
+                   bool grabMouse = true, bool grabKeyboard = true,
+                   bool grabTree = false);
     int releaseEvents();
     void handleGrabEvent(YWindow *win, XEvent &xev);
 
@@ -90,8 +95,6 @@ public:
     static YResourcePaths iconPaths;
 #endif
 
-    XModifierKeymap *fModifierMap;
-
     unsigned int AltMask;
     unsigned int MetaMask;
     unsigned int NumLockMask;
@@ -112,36 +115,24 @@ public:
 
 private:
     Display *fDisplay;
-    Time lastEventTime;
-    YPopupWindow *fPopup;
+    char const * fExecutable;
+    XModifierKeymap *fModifierMap;
 
-    int fGrabTree;
-    YWindow *fXGrabWindow;
-    int fGrabMouse;
-    YWindow *fGrabWindow;
-
-    YTimer *fFirstTimer, *fLastTimer;
-    YSocket *fFirstSocket, *fLastSocket;
-    YClipboard *fClip;
-
+    Time fLastEventTime;
     bool fReplayEvent;
 
-    int fLoopLevel;
-    int fExitLoop;
-    int fExitCode;
-    int fExitApp;
-    
-    char const * fExecutable;
+    bool fGrabTree;
+    bool fGrabMouse;
+    YWindow *fXGrabWindow;
+    YWindow *fGrabWindow;
+    YPopupWindow *fPopup;
 
-    friend class YTimer;
-    friend class YSocket;
-    
-    void registerTimer(YTimer *t);
-    void unregisterTimer(YTimer *t);
-    void getTimeout(struct timeval *timeout);
-    void handleTimeouts();
-    void registerSocket(YSocket *t);
-    void unregisterSocket(YSocket *t);
+    YClipboard *fClip;
+
+    int fLoopLevel;
+    int fExitCode;
+    bool fLoopContinue;
+    bool fAppContinue;
 };
 
 extern YApplication *app;

@@ -18,6 +18,7 @@
 #include "apppstatus.h"
 
 #include "wmapp.h"
+#include "wmtaskbar.h"
 
 #ifdef HAVE_NET_STATUS
 #include "prefs.h"
@@ -50,9 +51,9 @@ NetStatus::NetStatus(char const * netdev, YWindow *aParent):
 
     fUpdateTimer = new YTimer();
     if (fUpdateTimer) {
-        fUpdateTimer->setInterval(NET_UPDATE_INTERVAL);
-        fUpdateTimer->setTimerListener(this);
-        fUpdateTimer->startTimer();
+        fUpdateTimer->interval(NET_UPDATE_INTERVAL);
+        fUpdateTimer->timerListener(this);
+        fUpdateTimer->start();
     }
     prev_ibytes = prev_obytes = 0;
     // set prev values for first updateStatus
@@ -170,6 +171,9 @@ void NetStatus::handleClick(const XButtonEvent &up, int count) {
 		    wmapp->runCommandOnce(netClassHint, netCommand);
             }
         }
+    } else if (up.button == 3) {
+        if (count == 1 && IS_BUTTON(up.state, Button3Mask))
+            taskBar->contextMenu(up.x_root, up.y_root);
     }
 }
 

@@ -28,46 +28,7 @@ static int signalPipe[2] = { 0, 0 };
 static sigset_t oldSignalMask;
 static sigset_t signalMask;
 
-Atom _XA_WM_PROTOCOLS;
-Atom _XA_WM_TAKE_FOCUS;
-Atom _XA_WM_DELETE_WINDOW;
-Atom _XA_WM_STATE;
-Atom _XA_WM_CHANGE_STATE;
-Atom _XATOM_MWM_HINTS;
-//Atom _XA_MOTIF_WM_INFO;!!!
-Atom _XA_WM_COLORMAP_WINDOWS;
-Atom _XA_WM_CLIENT_LEADER;
-Atom _XA_SM_CLIENT_ID;
-Atom _XA_CLIPBOARD;
-Atom _XA_TARGETS;
-
-Atom _XA_WIN_PROTOCOLS;
-Atom _XA_WIN_WORKSPACE;
-Atom _XA_WIN_WORKSPACE_COUNT;
-Atom _XA_WIN_WORKSPACE_NAMES;
-Atom _XA_WIN_WORKAREA;
-#ifdef CONFIG_TRAY
-Atom _XA_WIN_TRAY;
-#endif
-Atom _XA_WIN_ICONS;
-Atom _XA_WIN_STATE;
-Atom _XA_WIN_LAYER;
-Atom _XA_WIN_HINTS;
-Atom _XA_WIN_SUPPORTING_WM_CHECK;
-Atom _XA_WIN_CLIENT_LIST;
-Atom _XA_WIN_DESKTOP_BUTTON_PROXY;
-Atom _XA_WIN_AREA;
-Atom _XA_WIN_AREA_COUNT;
-
-Atom _XA_KWM_WIN_ICON;
-
-Atom XA_XdndAware;
-Atom XA_XdndEnter;
-Atom XA_XdndLeave;
-Atom XA_XdndPosition;
-Atom XA_XdndStatus;
-Atom XA_XdndDrop;
-Atom XA_XdndFinished;
+YAtoms atoms;
 
 YCursor YApplication::leftPointer;
 YCursor YApplication::rightPointer;
@@ -349,7 +310,7 @@ public:
             acquireSelection(false);
     }
     void handleSelectionClear(const XSelectionClearEvent &clear) {
-        if (clear.selection == _XA_CLIPBOARD) {
+        if (clear.selection == atoms.clipboard) {
             if (fData)
                 delete [] fData;
             fLen = 0;
@@ -357,7 +318,7 @@ public:
         }
     }
     void handleSelectionRequest(const XSelectionRequestEvent &request) {
-        if (request.selection == _XA_CLIPBOARD) {
+        if (request.selection == atoms.clipboard) {
             XSelectionEvent notify;
 
             notify.type = SelectionNotify;
@@ -367,7 +328,7 @@ public:
             notify.time = request.time;
             notify.property = request.property;
 
-            if (request.selection == _XA_CLIPBOARD &&
+            if (request.selection == atoms.clipboard &&
                 request.target == XA_STRING &&
                 fLen > 0)
             {
@@ -378,8 +339,8 @@ public:
                                 8, PropModeReplace,
                                 (unsigned char *)(fData ? fData : ""),
                                 fLen);
-            } else if (request.selection == _XA_CLIPBOARD &&
-                       request.target == _XA_TARGETS &&
+            } else if (request.selection == atoms.clipboard &&
+                       request.target == atoms.targets &&
                        fLen > 0)
             {
                 Atom type = XA_STRING;
@@ -412,71 +373,10 @@ void initSignals() {
 
     if (pipe(signalPipe) != 0)
         die(2, _("Pipe creation failed (errno=%d)."), errno);
+
     fcntl(signalPipe[1], F_SETFL, O_NONBLOCK);
     fcntl(signalPipe[0], F_SETFD, FD_CLOEXEC);
     fcntl(signalPipe[1], F_SETFD, FD_CLOEXEC);
-}
-
-static void initAtoms() {
-    struct {
-        Atom *atom;
-        const char *name;
-    } atom_info[] = {
-        { &_XA_WM_PROTOCOLS, "WM_PROTOCOLS" },
-        { &_XA_WM_TAKE_FOCUS, "WM_TAKE_FOCUS" },
-        { &_XA_WM_DELETE_WINDOW, "WM_DELETE_WINDOW" },
-        { &_XA_WM_STATE, "WM_STATE" },
-        { &_XA_WM_CHANGE_STATE, "WM_CHANGE_STATE" },
-        { &_XA_WM_COLORMAP_WINDOWS, "WM_COLORMAP_WINDOWS" },
-        { &_XA_WM_CLIENT_LEADER, "WM_CLIENT_LEADER" },
-        { &_XA_SM_CLIENT_ID, "SM_CLIENT_ID" },
-        { &_XATOM_MWM_HINTS, _XA_MOTIF_WM_HINTS },
-        { &_XA_KWM_WIN_ICON, "KWM_WIN_ICON" },
-        { &_XA_WIN_WORKSPACE, XA_WIN_WORKSPACE },
-        { &_XA_WIN_WORKSPACE_COUNT, XA_WIN_WORKSPACE_COUNT },
-        { &_XA_WIN_WORKSPACE_NAMES, XA_WIN_WORKSPACE_NAMES },
-        { &_XA_WIN_WORKAREA, XA_WIN_WORKAREA },
-        { &_XA_WIN_ICONS, XA_WIN_ICONS },
-        { &_XA_WIN_LAYER, XA_WIN_LAYER },
-#ifdef CONFIG_TRAY
-        { &_XA_WIN_TRAY, XA_WIN_TRAY },
-#endif
-        { &_XA_WIN_STATE, XA_WIN_STATE },
-        { &_XA_WIN_HINTS, XA_WIN_HINTS },
-        { &_XA_WIN_PROTOCOLS, XA_WIN_PROTOCOLS },
-        { &_XA_WIN_SUPPORTING_WM_CHECK, XA_WIN_SUPPORTING_WM_CHECK },
-        { &_XA_WIN_CLIENT_LIST, XA_WIN_CLIENT_LIST },
-        { &_XA_WIN_DESKTOP_BUTTON_PROXY, XA_WIN_DESKTOP_BUTTON_PROXY },
-        { &_XA_WIN_AREA, XA_WIN_AREA },
-        { &_XA_WIN_AREA_COUNT, XA_WIN_AREA_COUNT },
-        { &_XA_CLIPBOARD, "CLIPBOARD" },
-        { &_XA_TARGETS, "TARGETS" },
-        { &XA_XdndAware, "XdndAware" },
-        { &XA_XdndEnter, "XdndEnter" },
-        { &XA_XdndLeave, "XdndLeave" },
-        { &XA_XdndPosition, "XdndPosition" },
-        { &XA_XdndStatus, "XdndStatus" },
-        { &XA_XdndDrop, "XdndDrop" },
-        { &XA_XdndFinished, "XdndFinished" }
-    };
-    unsigned int i;
-
-#ifdef HAVE_XINTERNATOMS
-    const char *names[ACOUNT(atom_info)];
-    Atom atoms[ACOUNT(atom_info)];
-
-    for (i = 0; i < ACOUNT(atom_info); i++)
-        names[i] = atom_info[i].name;
-
-    XInternAtoms(app->display(), (char **)names, ACOUNT(atom_info), False, atoms);
-
-    for (i = 0; i < ACOUNT(atom_info); i++)
-        *(atom_info[i].atom) = atoms[i];
-#else
-    for (i = 0; i < ACOUNT(atom_info); i++)
-        *(atom_info[i].atom) = XInternAtom(app->display(),
-                                           atom_info[i].name, False);
-#endif
 }
 
 static void initPointers() {
@@ -522,21 +422,25 @@ char *YApplication::findConfigFile(const char *name) {
     return 0;
 }
 
-YApplication::YApplication(int *argc, char ***argv, const char *displayName) {
+YApplication::YApplication(int *argc, char ***argv, const char *displayName):
+    fDisplay(NULL),
+    fModifierMap(NULL),
+
+    fLastEventTime(CurrentTime),
+    fReplayEvent(false),
+
+    fGrabTree(false),
+    fGrabMouse(false),
+    fXGrabWindow(NULL),
+    fGrabWindow(NULL),
+    fPopup(NULL),
+    
+    fClip(NULL),
+
+    fLoopLevel(0),
+    fAppContinue(true) {
     app = this;
-    fLoopLevel = 0;
-    fExitApp = 0;
-    lastEventTime = CurrentTime;
-    fGrabWindow = 0;
-    fGrabTree = 0;
-    fXGrabWindow = 0;
-    fGrabMouse = 0;
-    fPopup = 0;
-    fFirstTimer = fLastTimer = 0;
-    fFirstSocket = fLastSocket = 0;
-    fClip = 0;
-    fReplayEvent = false;
-    fModifierMap = NULL;
+
     {
 	char const * cmd(**argv);
 	char cwd[PATH_MAX + 1];
@@ -595,7 +499,7 @@ YApplication::YApplication(int *argc, char ***argv, const char *displayName) {
     YPixbuf::init();
 
     initSignals();
-    initAtoms();
+    atoms.init();
     initModifiers();
     initPointers();
     initColors();
@@ -653,120 +557,16 @@ bool YApplication::hasColormap() {
     return false;
 }
 
-void YApplication::registerTimer(YTimer *t) {
-    t->fPrev = 0;
-    t->fNext = fFirstTimer;
-    if (fFirstTimer)
-        fFirstTimer->fPrev = t;
-    else
-        fLastTimer = t;
-    fFirstTimer = t;
-}
-
-void YApplication::unregisterTimer(YTimer *t) {
-    if (t->fPrev)
-        t->fPrev->fNext = t->fNext;
-    else
-        fFirstTimer = t->fNext;
-    if (t->fNext)
-        t->fNext->fPrev = t->fPrev;
-    else
-        fLastTimer = t->fPrev;
-    t->fPrev = t->fNext = 0;
-}
-
-void YApplication::getTimeout(struct timeval *timeout) {
-    YTimer *t;
-    struct timeval curtime;
-    bool fFirst = true;
-
-    gettimeofday(&curtime, 0);
-    timeout->tv_sec += curtime.tv_sec;
-    timeout->tv_usec += curtime.tv_usec;
-    while (timeout->tv_usec >= 1000000) {
-        timeout->tv_usec -= 1000000;
-        timeout->tv_sec++;
-    }
-
-    t = fFirstTimer;
-    while (t) {
-        if (t->isRunning() && (fFirst || timercmp(timeout, &t->timeout, >))) {
-            *timeout = t->timeout;
-            fFirst = false;
-        }
-        t = t->fNext;
-    }
-    if ((curtime.tv_sec == timeout->tv_sec &&
-         curtime.tv_usec == timeout->tv_usec)
-        || timercmp(&curtime, timeout, >))
-    {
-        timeout->tv_sec = 0;
-        timeout->tv_usec = 1;
-    } else {
-        timeout->tv_sec -= curtime.tv_sec;
-        timeout->tv_usec -= curtime.tv_usec;
-        while (timeout->tv_usec < 0) {
-            timeout->tv_usec += 1000000;
-            timeout->tv_sec--;
-        }
-    }
-    //msg("set: %d %d", timeout->tv_sec, timeout->tv_usec);
-    PRECONDITION(timeout->tv_sec >= 0);
-    PRECONDITION(timeout->tv_usec >= 0);
-}
-
-void YApplication::handleTimeouts() {
-    YTimer *t, *n;
-    struct timeval curtime;
-    gettimeofday(&curtime, 0);
-
-    t = fFirstTimer;
-    while (t) {
-        n = t->fNext;
-        if (t->isRunning() && timercmp(&curtime, &t->timeout, >)) {
-            YTimerListener *l = t->getTimerListener();
-            t->stopTimer();
-            if (l && l->handleTimer(t))
-                t->startTimer();
-        }
-        t = n;
-    }
-}
-
 void YApplication::afterWindowEvent(XEvent & /*xev*/) {
 }
 
 extern void logEvent(XEvent xev);
 
-void YApplication::registerSocket(YSocket *t) {
-    t->fPrev = 0;
-    t->fNext = fFirstSocket;
-    if (fFirstSocket)
-        fFirstSocket->fPrev = t;
-    else
-        fLastSocket = t;
-    fFirstSocket = t;
-}
-
-void YApplication::unregisterSocket(YSocket *t) {
-    if (t->fPrev)
-        t->fPrev->fNext = t->fNext;
-    else
-        fFirstSocket = t->fNext;
-    if (t->fNext)
-        t->fNext->fPrev = t->fPrev;
-    else
-        fLastSocket = t->fPrev;
-    t->fPrev = t->fNext = 0;
-}
-
 int YApplication::mainLoop() {
-    fLoopLevel++;
-    fExitLoop = 0;
+    ++fLoopLevel;
+    fLoopContinue = true;
 
-    struct timeval timeout, *tp;
-
-    while (!fExitApp && !fExitLoop) {
+    while (fAppContinue && fLoopContinue) {
         if (XPending(display()) > 0) {
             XEvent xev;
 
@@ -843,46 +643,33 @@ int YApplication::mainLoop() {
             FD_ZERO(&read_fds);
             FD_ZERO(&write_fds);
             FD_SET(ConnectionNumber(app->display()), &read_fds);
+
             if (signalPipe[0] != -1)
                 FD_SET(signalPipe[0], &read_fds);
+
 #ifdef CONFIG_SESSION
             if (IceSMfd != -1)
                 FD_SET(IceSMfd, &read_fds);
 #endif
-            {
-                for (YSocket *s = fFirstSocket; s; s = s->fNext) {
-                    if (s->reading) {
-                        FD_SET(s->sockfd, &read_fds);
-                        MSG(("wait read"));
-                    }
-                    if (s->connecting) {
-                        FD_SET(s->sockfd, &write_fds);
-                        MSG(("wait connect"));
-                    }
-                }
-            }
 
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 0;
-            getTimeout(&timeout);
-            tp = 0;
-            if (timeout.tv_sec != 0 || timeout.tv_usec != 0)
-                tp = &timeout;
-            else
-                tp = 0;
+            YSocket::registerSockets(read_fds, write_fds);
+
+            YTimeout timeout;
+            YTimer::nextTimeout(timeout);
 
             sigprocmask(SIG_UNBLOCK, &signalMask, NULL);
 
             rc = select(sizeof(fd_set),
                         SELECT_TYPE_ARG234 &read_fds,
                         SELECT_TYPE_ARG234 &write_fds,
-                        0,
-                        tp);
+                        SELECT_TYPE_ARG234 NULL,
+                        timeout.tv_sec || timeout.tv_usec ? &timeout : NULL);
 
             sigprocmask(SIG_BLOCK, &signalMask, NULL);
 #if 0
             sigset_t mask;
             sigpending(&mask);
+
             if (sigismember(&mask, SIGINT))
                 handleSignal(SIGINT);
             if (sigismember(&mask, SIGTERM))
@@ -891,48 +678,38 @@ int YApplication::mainLoop() {
                 handleSignal(SIGHUP);
 #endif
 
-            if (rc == 0) {
-                handleTimeouts();
-            } else if (rc == -1) {
+            if (0 == rc) {
+                YTimer::handleTimeouts();
+            } else if (-1 == rc) {
                 if (errno != EINTR)
                     warn(_("Message Loop: select failed (errno=%d)"), errno);
             } else {
-            if (signalPipe[0] != -1) {
-                if (FD_ISSET(signalPipe[0], &read_fds)) {
-                    unsigned char sig;
-                    if (read(signalPipe[0], &sig, 1) == 1) {
-                        handleSignal(sig);
+                if (signalPipe[0] != -1) {
+                    if (FD_ISSET(signalPipe[0], &read_fds)) {
+                        unsigned char sig;
+                        if (read(signalPipe[0], &sig, 1) == 1)
+                            handleSignal(sig);
                     }
                 }
-            }
-            {
-                for (YSocket *s = fFirstSocket; s; s = s->fNext) {
-                    if (s->reading && FD_ISSET(s->sockfd, &read_fds)) {
-                        MSG(("got read"));
-                        s->can_read();
-                    }
-                    if (s->connecting && FD_ISSET(s->sockfd, &write_fds)) {
-                        MSG(("got connect"));
-                        s->connected();
-                    }
-                }
-            }
+
+                YSocket::handleSockets(read_fds, write_fds);
+            
 #ifdef CONFIG_SESSION
-            if (IceSMfd != -1 && FD_ISSET(IceSMfd, &read_fds)) {
-                Bool rep;
-                if (IceProcessMessages(IceSMconn, NULL, &rep)
-                    == IceProcessMessagesIOError)
-                {
-                    SmcCloseConnection(SMconn, 0, NULL);
-                    IceSMconn = NULL;
-                    IceSMfd = -1;
+                if (IceSMfd != -1 && FD_ISSET(IceSMfd, &read_fds)) {
+                    Bool rep;
+                    if (IceProcessMessagesIOError ==
+                        IceProcessMessages(IceSMconn, NULL, &rep)) {
+                        SmcCloseConnection(SMconn, 0, NULL);
+                        IceSMconn = NULL;
+                        IceSMfd = -1;
+                    }
                 }
-            }
-#endif  
+#endif
             }
         }
     }
-    fLoopLevel--;
+
+    --fLoopLevel;
     return fExitCode;
 }
 
@@ -940,8 +717,7 @@ void YApplication::dispatchEvent(YWindow *win, XEvent &xev) {
     if (xev.type == KeyPress || xev.type == KeyRelease) {
         YWindow *w = win;
         while (w && (w->handleKey(xev.xkey) == false)) {
-            if (fGrabTree && w == fXGrabWindow)
-                break;
+            if (fGrabTree && w == fXGrabWindow) break;
             w = w->parent();
         }
     } else {
@@ -1022,8 +798,7 @@ void YApplication::handleGrabEvent(YWindow *winx, XEvent &xev) {
             }
         }
         if (xev.type == EnterNotify || xev.type == LeaveNotify)
-            if (win != fGrabWindow)
-                return ;
+            if (win != fGrabWindow) return;
         if (fGrabWindow != fXGrabWindow)
             win = fGrabWindow;
     }
@@ -1049,18 +824,18 @@ void YApplication::releaseGrabEvents(YWindow *win) {
     }
 }
 
-int YApplication::grabEvents(YWindow *win, Cursor ptr, unsigned int eventMask, int grabMouse, int grabKeyboard, int grabTree) {
+int YApplication::grabEvents(YWindow *win, Cursor ptr, unsigned int eventMask,
+                             bool grabMouse, bool grabKeyboard, bool grabTree) {
     int rc;
 
-    if (fGrabWindow != 0)
-        return 0;
-    if (win == 0)
-        return 0;
+    if (NULL != fGrabWindow) return 0;
+    if (NULL == win) return 0;
 
     XSync(display(), 0);
     fGrabTree = grabTree;
+
     if (grabMouse) {
-        fGrabMouse = 1;
+        fGrabMouse = true;
         rc = XGrabPointer(display(), win->handle(),
                           grabTree ? True : False,
                           eventMask,
@@ -1072,11 +847,8 @@ int YApplication::grabEvents(YWindow *win, Cursor ptr, unsigned int eventMask, i
             return 0;
         }
     } else {
-        fGrabMouse = 0;
-
-        XChangeActivePointerGrab(display(),
-                                 eventMask,
-                                 ptr, CurrentTime);
+        fGrabMouse = false;
+        XChangeActivePointerGrab(display(), eventMask, ptr, CurrentTime);
     }
 
     if (grabKeyboard) {
@@ -1100,70 +872,73 @@ int YApplication::grabEvents(YWindow *win, Cursor ptr, unsigned int eventMask, i
 }
 
 int YApplication::releaseEvents() {
-    if (fGrabWindow == 0)
-        return 0;
-    fGrabWindow = 0;
-    fXGrabWindow = 0;
-    fGrabTree = 0;
+    if (NULL == fGrabWindow) return 0;
+
+    fGrabWindow = NULL;
+    fXGrabWindow = NULL;
+    fGrabTree = false;
+
     if (fGrabMouse) {
         XUngrabPointer(display(), CurrentTime);
-        fGrabMouse = 0;
+        fGrabMouse = false;
     }
+
     XUngrabKeyboard(display(), CurrentTime);
+
     desktop->resetColormapFocus(true);
     return 1;
 }
 
 void YApplication::exitLoop(int exitCode) {
-    fExitLoop = 1;
+    fLoopContinue = false;
     fExitCode = exitCode;
 }
 
 void YApplication::exit(int exitCode) {
-    fExitApp = 1;
+    fAppContinue = false;
     exitLoop(exitCode);
 }
 
 void YApplication::saveEventTime(XEvent &xev) {
-    //lastEventTime = CurrentTime;
+    //fLastEventTime = CurrentTime;
     //return ;
     switch (xev.type) {
     case ButtonPress:
     case ButtonRelease:
-        lastEventTime = xev.xbutton.time;
+        fLastEventTime = xev.xbutton.time;
         break;
 
     case MotionNotify:
-        lastEventTime = xev.xmotion.time;
+        fLastEventTime = xev.xmotion.time;
         break;
 
     case KeyPress:
     case KeyRelease:
-        lastEventTime = xev.xkey.time;
+        fLastEventTime = xev.xkey.time;
         break;
 
     case EnterNotify:
     case LeaveNotify:
-        lastEventTime = xev.xcrossing.time;
+        fLastEventTime = xev.xcrossing.time;
         break;
 
     case PropertyNotify:
-        lastEventTime = xev.xproperty.time;
+        fLastEventTime = xev.xproperty.time;
         break;
 
     case SelectionClear:
-        lastEventTime = xev.xselectionclear.time;
+        fLastEventTime = xev.xselectionclear.time;
         break;
 
     case SelectionRequest:
-        lastEventTime = xev.xselectionrequest.time;
+        fLastEventTime = xev.xselectionrequest.time;
         break;
 
     case SelectionNotify:
-        lastEventTime = xev.xselection.time;
+        fLastEventTime = xev.xselection.time;
         break;
     default:
-        lastEventTime = CurrentTime;
+        fLastEventTime = CurrentTime;
         break;
     }
 }
@@ -1421,3 +1196,152 @@ bool YApplication::hasGNOME() {
     return getenv("SESSION_MANAGER");
 #endif
 }
+
+/******************************************************************************/
+
+Atom YApplication::internAtom(char const *name, bool queryOnly) {
+    return XInternAtom(display(), name, queryOnly);
+}
+
+
+void YApplication::internAtoms(YAtomInfo * info, unsigned const count,
+                               bool queryOnly) {
+#ifdef HAVE_XINTERNATOMS
+    const char *names[count];
+    for (unsigned n(0); n < count; ++n) names[n] = info[n].name;
+
+    Atom atoms[count];
+    XInternAtoms(display(), (char **)names, count, queryOnly, atoms);
+
+    for (unsigned n(0); n < count; ++n) *info[n].atom = atoms[n];
+#else
+    for (unsigned n(0); n < count; ++n) 
+        atom_info[i].atom = internAtom(info[i].name, queryOnly);
+#endif
+}
+
+/******************************************************************************/
+
+void YAtoms::init() {
+    YAtomInfo info[] = {
+        { &clipboard,               "CLIPBOARD"                             },
+        { &targets,                 "TARGETS"                               },
+
+        { &wmProtocols,             "WM_PROTOCOLS"                          },
+        { &wmDeleteWindow,          "WM_DELETE_WINDOW"                      },
+        { &wmTakeFocus,             "WM_TAKE_FOCUS"                         },
+        { &wmColormapWindows,       "WM_COLORMAP_WINDOWS"                   },
+        { &wmName,                  "WM_NAME"                               },
+        { &wmState,                 "WM_STATE"                              },
+        { &wmChangeState,           "WM_CHANGE_STATE"                       },
+        { &smClientId,              "WM_CLIENT_LEADER"                      },
+        { &wmClientLeader,          "SM_CLIENT_ID"                          },
+
+#ifdef CONFIG_XDND_HINTS
+        { &xdndAware,               "XdndAware"                             },
+        { &xdndEnter,               "XdndEnter"                             },
+        { &xdndLeave,               "XdndLeave"                             },
+        { &xdndPosition,            "XdndPosition"                          },
+        { &xdndStatus,              "XdndStatus"                            },
+        { &xdndDrop,                "XdndDrop"                              },
+        { &xdndFinished,            "XdndFinished"                          },
+        { &xdndSelection,           "XdndSelection"                         },
+        { &xdndTypelist,            "XdndTypelist"                          },
+#endif
+
+#ifdef CONFIG_MOTIF_HINTS
+        { &mwmHints,                _XA_MOTIF_WM_HINTS                      },
+#endif
+
+#ifdef CONFIG_GNOME_HINTS
+        { &winProtocols,            XA_WIN_PROTOCOLS                        },
+        { &winSupportingWmCheck,    XA_WIN_SUPPORTING_WM_CHECK              },
+        { &winIcons,                XA_WIN_ICONS                            },
+        { &winWorkspace,            XA_WIN_WORKSPACE                        },
+        { &winWorkspaceCount,       XA_WIN_WORKSPACE_COUNT                  },
+        { &winWorkspaceNames,       XA_WIN_WORKSPACE_NAMES                  },
+        { &winWorkspaces,           XA_WIN_WORKSPACES                       },
+        { &winWorkspacesAdd,        XA_WIN_WORKSPACES_ADD                   },
+        { &winWorkspacesRemove,     XA_WIN_WORKSPACES_REMOVE                },
+        { &winLayer,                XA_WIN_LAYER                            },
+        { &winHints,                XA_WIN_HINTS                            },
+        { &winState,                XA_WIN_STATE                            },
+        { &winWorkarea,             XA_WIN_WORKAREA                         },
+        { &winClientList,           XA_WIN_CLIENT_LIST                      },
+        { &winDesktopButtonProxy,   XA_WIN_DESKTOP_BUTTON_PROXY             },
+        { &winArea,                 XA_WIN_AREA                             },
+        { &winAreaCount,            XA_WIN_AREA_COUNT                       },
+#endif
+
+#ifdef CONFIG_KDE_HINTS
+        { &kwmWinIcon,              "KWM_WIN_ICON"                          },
+        { &kwmDockwindow,           "KWM_DOCKWINDOW"                        },
+#ifdef CONFIG_WMSPEC_HINTS
+        { &kdeNetSystemTrayWindows, "_KDE_NET_SYSTEM_TRAY_WINDOWS"          },
+        { &kdeNetwmSystemTrayWindowFor,
+                                    "_KDE_NET_WM_SYSTEM_TRAY_WINDOW_FOR"    },
+#endif
+#endif
+
+#ifdef CONFIG_WMSPEC_HINTS
+        { &netSupported,            "_NET_SUPPORTED"                        },
+        { &netClientList,           "_NET_CLIENT_LIST"                      },
+        { &netClientListStacking,   "_NET_CLIENT_LIST_STACKING"             },
+        { &netNumberOfDesktops,     "_NET_NUMBER_OF_DESKTOPS"               },
+        { &netDesktopGeometry,      "_NET_DESKTOP_GEOMETRY"                 },
+        { &netDesktopViewport,      "_NET_DESKTOP_VIEWPORT"                 },
+        { &netCurrentDesktop,       "_NET_CURRENT_DESKTOP"                  },
+        { &netCurrentDesktopNames,  "_NET_CURRENT_DESKTOP_NAMES"            },
+        { &netActiveWindow,         "_NET_ACTIVE_WINDOW"                    },
+        { &netWorkarea,             "_NET_WORKAREA"                         },
+        { &netSupportingWmCheck,    "_NET_SUPPORTING_WM_CHECK"              },
+
+        { &netCloseWindow,          "_NET_CLOSE_WINDOW"                     },
+        { &netwmMoveResize,         "_NET_WM_MOVERESIZE"                    },
+
+        { &netwmName,               "_NET_WM_NAME"                          },
+        { &netwmIconName,           "_NET_WM_ICON_NAME"                     },
+        { &netwmDesktop,            "_NET_WM_DESKTOP"                       },
+        { &netwmWindowType,         "_NET_WM_WINDOW_TYPE"                   },
+        { &netwmWindowTypeDesktop,  "_NET_WM_WINDOW_TYPE_DESKTOP"           },
+        { &netwmWindowTypeDock,     "_NET_WM_WINDOW_TYPE_DOCK"              },
+        { &netwmWindowTypeToolbar,  "_NET_WM_WINDOW_TYPE_TOOLBAR"           },
+        { &netwmWindowTypeMenu,     "_NET_WM_WINDOW_TYPE_MENU"              },
+        { &netwmWindowTypeDialog,   "_NET_WM_WINDOW_TYPE_DIALOG"            },
+        { &netwmWindowTypeNormal,   "_NET_WM_WINDOW_TYPE_NORMAL"            },
+        { &netwmState,              "_NET_WM_STATE"                         },
+        { &netwmStateModal,         "_NET_WM_STATE_MODAL"                   },
+        { &netwmStateSticky,        "_NET_WM_STATE_STICKY"                  },
+        { &netwmStateMaximizedVert, "_NET_WM_STATE_MAXIMIZED_VERT"          },
+        { &netwmStateMaximizedHorz, "_NET_WM_STATE_MAXIMIZED_HORZ"          },
+        { &netwmStateShaded,        "_NET_WM_STATE_SHADED"                  },
+        { &netwmStateSkipTaskbar,   "_NET_WM_STATE_SKIP_TASKBAR"            },
+        { &netwmStateSkipPager,     "_NET_WM_STATE_SKIP_PAGER"              },
+        { &netwmStateFullscreen,    "_ICEWM_NET_WM_STATE_FULLSCREEN"        },
+        
+        { &netwmStrut,              "_NET_WM_STRUT"                         },
+        { &netwmIconGeometry,       "_NET_WM_ICON_GEOMETRY"                 },
+        { &netwmIcon,               "_NET_WM_ICON"                          },
+        { &netwmPid,                "_NET_WM_PID"                           },
+        { &netwmHandledIcons,       "_NET_WM_HANDLED_ICON"                  },
+
+        { &netwmPing,               "_NET_WM_PING"                          },
+#endif
+
+        { &xrootPixmapId,           XA_XROOTPMAP_ID                         },
+        { &xrootColorPixel,         XA_XROOTCOLOR_PIXEL                     },
+
+#ifndef NO_WINDOW_OPTIONS
+        { &icewmWinOpt,             XA_ICEWM_WINOPT                         },
+#endif
+#ifdef CONFIG_TRAY
+        { &icewmTrayOpt,            XA_ICEWM_TRAYOPT                        },
+#endif
+#ifdef CONFIG_GUIEVENTS
+        { &icewmGuiEvent,           XA_ICEWM_GUI_EVENT                      },          
+#endif
+        { &icewmFontPath,           XA_ICEWM_FONTPATH                       }
+    };
+
+    app->internAtoms(info, ACOUNT(info));
+};

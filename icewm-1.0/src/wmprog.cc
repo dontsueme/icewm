@@ -48,7 +48,9 @@ DObjectMenuItem::~DObjectMenuItem() {
     delete fObject;
 }
 
-void DObjectMenuItem::actionPerformed(YActionListener * /*listener*/, YAction * /*action*/, unsigned int /*modifiers*/) {
+void DObjectMenuItem::actionPerformed(YAction::Listener * /*listener*/,
+                                      YAction * /*action*/, 
+                                      unsigned int /*modifiers*/) {
 #ifdef CONFIG_GUIEVENTS
     wmapp->signalGuiEvent(geLaunchApp);
 #endif
@@ -72,7 +74,7 @@ void DFile::open() {
 }
 
 ObjectMenu::ObjectMenu(YWindow *parent): YMenu(parent) {
-    setActionListener(wmapp);
+    actionListener(wmapp);
 }
 
 ObjectMenu::~ObjectMenu() {
@@ -453,7 +455,7 @@ bool StartMenu::handleKey(const XKeyEvent &key) {
         KeySym k = XKeycodeToKeysym(app->display(), key.keycode, 0);
         int m = KEY_MODMASK(key.state);
         
-        if (((k == XK_Meta_L) || (k == XK_Alt_L)) && m == 0) {
+        if (((k == app->Win_L) || (k == app->Win_R)) && m == 0) {
             cancelPopup();
             return true;
         }

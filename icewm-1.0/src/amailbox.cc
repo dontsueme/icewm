@@ -18,6 +18,7 @@
 #include "base.h"
 #include "prefs.h"
 #include "wmapp.h"
+#include "wmtaskbar.h"
 #include <sys/socket.h>
 #include <netdb.h>
 
@@ -33,7 +34,7 @@ YPixmap *newMailPixmap = 0;
 MailCheck::MailCheck(MailBoxStatus *mbx):
     state(IDLE), fMbx(mbx), fLastSize(-1), fLastCount(-1),
     fLastUnseen(0), fLastCountSize(-1), fLastCountTime(0) {
-    sk.setListener(this);
+    sk.socketListener(this);
 }
 
 MailCheck::~MailCheck() {
@@ -295,8 +296,8 @@ MailBoxStatus::MailBoxStatus(const char *mailbox, YWindow *aParent):
 
         fMailboxCheckTimer = new YTimer(mailCheckDelay * 1000);
         if (fMailboxCheckTimer) {
-            fMailboxCheckTimer->setTimerListener(this);
-            fMailboxCheckTimer->startTimer();
+            fMailboxCheckTimer->timerListener(this);
+            fMailboxCheckTimer->start();
         }
         checkMail();
     }
@@ -304,8 +305,8 @@ MailBoxStatus::MailBoxStatus(const char *mailbox, YWindow *aParent):
 
 MailBoxStatus::~MailBoxStatus() {
     if (fMailboxCheckTimer) {
-        fMailboxCheckTimer->stopTimer();
-        fMailboxCheckTimer->setTimerListener(0);
+        fMailboxCheckTimer->stop();
+        fMailboxCheckTimer->timerListener(NULL);
     }
     delete fMailboxCheckTimer; fMailboxCheckTimer = 0;
     delete [] fMailBox; fMailBox = 0;
@@ -352,8 +353,10 @@ void MailBoxStatus::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*widt
 }
 
 void MailBoxStatus::handleClick(const XButtonEvent &up, int count) {
-    if ((taskBarLaunchOnSingleClick ? up.button == 2
-				    : up.button == 1) && count == 1)
+    if (up.button == 3 && count == 1 && IS_BUTTON(up.state, Button3Mask))
+        taskBar->contextMenu(up.x_root, up.y_root);
+    else if ((taskBarLaunchOnSingleClick ? up.button == 2
+				         : up.button == 1) && count == 1)
 	checkMail();
     else if (mailCommand && mailCommand[0] && up.button == 1 &&
 	(taskBarLaunchOnSingleClick ? count == 1 : !(count % 2)))
@@ -391,7 +394,7 @@ void MailBoxStatus::checkMail() {
 
 void MailBoxStatus::mailChecked(MailBoxState mst, long count) {
     if (mst != mbxError)
-        fMailboxCheckTimer->startTimer();
+        fMailboxCheckTimer->start();
     if (mst != fState) {
         fState = mst;
         repaint();
