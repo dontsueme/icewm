@@ -23,8 +23,8 @@
       $line = fgets($clog, 4096);
     
       if ($line[0] >= '0' && $line[0] <= '9') {	// print release marker
+        if ($have_item) { echo "\n  </li>";  $have_item = 0; }
         if ($rel) {
-          if ($have_item) { echo "\n  </li>";  $have_item = 0; }
           echo "\n  </ul>";
           echo "\n  </li>\n";
 	  if ($rel == $stop)
