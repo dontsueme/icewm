@@ -88,8 +88,9 @@
         if ($line[0] == '-')
           echo "\n<li>".substr($line,2);
         else if ($line[0] == "!")
-          echo "\n<li><em>In progress: </em>".substr($line,strpos($line,'-')+1);
-        echo
+          echo "\n<li><em>In progress: </em>".
+	       substr($line,strpos($line,'-') + 1);
+        else
           echo " $line";
       }
     }
