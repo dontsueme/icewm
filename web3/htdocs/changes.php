@@ -37,6 +37,8 @@
         $line = preg_replace('/#(\d+)/',
                              '<a href="'.BUGTRACKER.'&aid=\1">#\1</a>',
                              trim($line));
+        $line = preg_replace('&', '&amp;', $line);
+        $line = preg_replace('<', '&lt;', $line);
 
         if ($line[0] == '-') {
           if ($have_item) { echo "\n  </li>";  $have_item = 0; }
