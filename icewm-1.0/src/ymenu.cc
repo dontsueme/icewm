@@ -38,8 +38,8 @@ int YMenu::fAutoScrollMouseY = -1;
 #define CONFIG_RAISE_MENU_ITEM (false)
 #endif
 
-void YMenu::actionListener(YAction::Listener *actionListener):
-fActionListener(actionListener) {
+void YMenu::actionListener(YAction::Listener *actionListener) {
+    fActionListener = actionListener;
 }
 
 void YMenu::finishPopup(YMenuItem *item, YAction *action, unsigned int modifiers) {

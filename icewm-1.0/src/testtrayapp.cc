@@ -2,7 +2,7 @@
 #include <X11/Xatom.h>
 #include <X11/xpm.h>
 #include <X11/extensions/shape.h>
-#include <iostream>
+#include <stdio.h>
 
 static Display * dpy(NULL);
 
@@ -12,7 +12,6 @@ static Atom XA_WM_DELETE_WINDOW(None);
 static Atom XA_KDE_NET_WM_SYSTEM_TRAY_WINDOW_FOR(None);
 static int width, height;
 
-static XImage * gsource(NULL);
 static Pixmap pixmap(None), mask(None);
 
 int init(int argc, char ** argv) {
@@ -85,15 +84,15 @@ int main(int argc, char * argv[]) {
 		break;
 
 	    case ClientMessage:
-		if (ev.xclient.message_type == XA_WM_PROTOCOLS &&
-		    ev.xclient.data.l[0] == XA_WM_DELETE_WINDOW)
+		if (XA_WM_PROTOCOLS == ev.xclient.message_type &&
+		    XA_WM_DELETE_WINDOW == (Atom) ev.xclient.data.l[0])
 		    rc = 0;
 
 		break;
 	}
     }
 
-    if (rc) std::cerr << "Failed with rc=" << rc << std::endl;
+    if (rc) fprintf(stderr, "Failed with rc=%d\n", rc);
     if (dpy) XCloseDisplay(dpy);
     
     return rc;

@@ -6,6 +6,7 @@
 #include <string.h>
 
 char const * YApplication::Name = "testlocale";
+bool multiByte(true);
 
 static char *
 foreign_str(char const * charset, char const * foreign)

@@ -35,7 +35,7 @@ Atom _XA_WIN_WORKSPACE_NAMES;
 Atom _XA_WIN_STATE;
 Atom _XA_WIN_LAYER;
 Atom _XA_WIN_WORKAREA;
-Atom _XA_WIN_TRAY;
+Atom _XA_WIN_TRAYOPT;
 
 void changeWorkspace(Window w, long workspace) {
     XClientMessageEvent xev;
@@ -83,7 +83,7 @@ void setTrayHint(Window w, long tray_opt) {
     memset(&xev, 0, sizeof(xev));
     xev.type = ClientMessage;
     xev.window = w;
-    xev.message_type = _XA_WIN_TRAY;
+    xev.message_type = _XA_WIN_TRAYOPT;
     xev.format = 32;
     xev.data.l[0] = tray_opt;
     xev.data.l[1] = CurrentTime; //xev.data.l[1] = timeStamp;
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
     _XA_WIN_STATE = XInternAtom(display, XA_WIN_STATE, False);
     _XA_WIN_LAYER = XInternAtom(display, XA_WIN_LAYER, False);
     _XA_WIN_WORKAREA = XInternAtom(display, XA_WIN_WORKAREA, False);
-    _XA_WIN_TRAY = XInternAtom(display, XA_WIN_TRAY, False);
+    _XA_WIN_TRAYOPT = XInternAtom(display, XA_ICEWM_TRAYOPT, False);
 
     window = XCreateWindow(display, root,
                            0,
@@ -190,7 +190,8 @@ int main(int argc, char **argv) {
                         {
                             if (r_type == XA_CARDINAL && r_format == 32 && count == 1) {
                                 activeWorkspace = ((long *)prop)[0];
-                                printf("active=%d of %d\n", activeWorkspace, workspaceCount);
+                                printf("active=%ld of %ld\n",
+                                       activeWorkspace, workspaceCount);
                             }
                             XFree(prop);
                         }
@@ -204,7 +205,7 @@ int main(int argc, char **argv) {
                         {
                             if (r_type == XA_CARDINAL && r_format == 32 && count == 4) {
                                 long *area = (long *)prop;
-                                printf("workarea: min=%d,%d max=%d,%d\n",
+                                printf("workarea: min=%ld,%ld max=%ld,%ld\n",
                                        area[0],
                                        area[1],
                                        area[2],
@@ -223,7 +224,7 @@ int main(int argc, char **argv) {
                         {
                             if (r_type == XA_CARDINAL && r_format == 32 && count == 1) {
                                 windowWorkspace = ((long *)prop)[0];
-                                printf("window=%d of %d\n", windowWorkspace, workspaceCount);
+                                printf("window=%ld of %ld\n", windowWorkspace, workspaceCount);
                             }
                             XFree(prop);
                         }
@@ -250,20 +251,23 @@ int main(int argc, char **argv) {
                         {
                             if (r_type == XA_CARDINAL && r_format == 32 && count == 1) {
                                 long layer = ((long *)prop)[0];
-                                printf("layer=%d\n", layer);
+                                printf("layer=%ld\n", layer);
                             }
                             XFree(prop);
                         }
-                    } else if (property.atom == _XA_WIN_TRAY) {
+                    } else if (property.atom == _XA_WIN_TRAYOPT) {
                         if (XGetWindowProperty(display, window,
-                                               _XA_WIN_TRAY,
+                                               _XA_WIN_TRAYOPT,
                                                0, 1, False, XA_CARDINAL,
                                                &r_type, &r_format,
                                                &count, &bytes_remain, &prop) == Success && prop)
                         {
                             if (r_type == XA_CARDINAL && r_format == 32 && count == 1) {
                                 long tray = ((long *)prop)[0];
-                                printf("tray option=%d\n", tray);
+                                printf("tray option=%ld\n", tray);
+                            }
+                        }
+                    }
                 }
             }
         }

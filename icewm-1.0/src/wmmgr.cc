@@ -1300,7 +1300,14 @@ canActivate
                        posWidth,
                        posHeight);
 }
-
+/*
+#ifdef CONFIG_TRAY
+#ifdef CONFIG_KDE_HINTS
+kwmDockwindow;
+#ifdef CONFIG_WMSPEC_HINTS
+kdeNetSystemTrayWindows,
+kdeNetwmSystemTrayWindowFor;
+*/
 YFrameWindow *YWindowManager::manageClient(Window win, bool mapClient) {
     YFrameWindow *frame(NULL);
     YFrameClient *client(NULL);

@@ -97,17 +97,25 @@ iceskt_OBJS = \
 	$(COREOBJS) iceskt.o
 
 testlocale_OBJS = \
-	testlocale.o ylocale.o
+	testlocale.o ylocale.o misc.o
 testlists_OBJS = \
 	testlists.o
+testdockapp_LIBS = \
+	$(CORE_LIBS) -lXpm
 testdockapp_OBJS = \
 	testdockapp.o
+testtrayapp_LIBS = \
+	$(CORE_LIBS) -lXpm
 testtrayapp_OBJS = \
 	testtrayapp.o
+testwinhints_LIBS = \
+	$(CORE_LIBS)
+testwinhints_OBJS = \
+	testwinhints.o
 
 ################################################################################
 
-TESTAPPS = $(foreach APP,locale lists dockapp trayapp,test$(APP))
+TESTAPPS = $(foreach APP,locale lists dockapp trayapp winhints,test$(APP))
 #COREAPPS = genpref icewm icewmhint icewmbg 
 #ALLAPPS = $(COREAPPS) $(EXTRAAPPS) #icehelp icesound #icelist iceclock icebar icerun
 OBJECTS = $(foreach APP,$(APPLICATIONS) $(TESTAPPS),$($(APP)_OBJS))
@@ -122,7 +130,7 @@ all: base
 base: $(BINARIES) ../lib/preferences
 
 clean:
-	rm -f $(BINARIES) *.o *.p *~
+	rm -f $(BINARIES) $(TESTBINS) *.o *.p *~
 
 ################################################################################
 
@@ -141,7 +149,7 @@ libice.so: $(COREOBJS)
 genpref.o icesound.o wmmgr.o: ../VERSION
 
 .targets: Makefile
-	@{ for p in $(BINARIES); do echo $$p: "\$$($${p}_OBJS)"; done; } > $@
+	@{ for p in $(BINARIES) $(TESTBINS); do echo $$p: "\$$($${p}_OBJS)"; done; } > $@
 
 ../lib/preferences: genpref
 	./genpref >../lib/preferences
