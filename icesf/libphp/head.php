@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <?php
   define(ICEWM_STABLE,	'1.0.6-5');
-  define(ICEWM_DEVEL, 	'1.0.8-2, 1.1/CVS');
+  define(ICEWM_DEVEL, 	'1.0.8-4, 1.1.0/CVS');
 
   define(STABLE_DATE,	'2001-02-17');
   define(STABLE_ID,	18077);
