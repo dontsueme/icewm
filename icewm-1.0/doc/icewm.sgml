@@ -158,6 +158,26 @@ Toggles the minimized/active state of the window.
 <tag/Right Button Click/ Display a context menu.
 </descrip>
 
+<sect1>Addressbar commands<p>
+<descrip>
+<tag/Return or Enter/ Pass the command entered to the programm specified by
+the AddressBarCommand option or by the $SHELL variable.
+(exec "${AddressBarCommand:-$SHELL -c} ...")
+<tag/Ctrl + Return or Enter/ Pass the command entered and the programm specified by
+by the AddressBarCommand option or by the $SHELL variable to the programm
+specified by the TerminalCommand options.
+(exec "${TerminalCommand} -e ${AddressBarCommand:-$SHELL -c} ...")
+<tag/Ctrl + X/ Cut selection (to clipboard)
+<tag/Ctrl + C/ Copy selection to clipboard.
+<tag/Ctrl + V/ Paste from clipboard.
+<tag/Ctrl + A/ Select all.
+<tag/Up arrow/ Next history item.
+<tag/Down arrow/ Previous history item.
+<tag/Page down/ Open popup listing of all history items.
+<tag/Tab/ Expand if matches exactly one history item of open popup listing
+all history items with the same prefix.
+</descrip>
+
 <sect>Keyboard Commands<p>
 
 <em>Alt key is assumed to be the key defined as Mod1 modifier.</em>

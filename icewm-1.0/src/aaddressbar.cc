@@ -27,13 +27,13 @@ bool AddressBar::handleKey(const XKeyEvent &key) {
         int m = KEY_MODMASK(key.state);
 
         if (k == XK_KP_Enter || k == XK_Return) {
-            const char *t = getText();
+            const char *text = getText();
             const char *args[7];
             int i = 0;
 
             if (m & ControlMask) {
                 args[i++] = terminalCommand;
-                args[i++] = "-e";
+                args[i++] = text && *text ? "-e" : NULL;
             }
             if (addressBarCommand && addressBarCommand[0]) {
                 args[i++] = addressBarCommand;
@@ -41,15 +41,15 @@ bool AddressBar::handleKey(const XKeyEvent &key) {
                 args[i++] = getenv("SHELL");;
                 args[i++] = "-c";
             }
-            args[i++] = t;
-            args[i++] = 0;
-            if (m & ControlMask)
-                if (t == 0 || t[0] == 0)
-                    args[1] = 0;
+            
+            args[i++] = text;
+            args[i++] = NULL;
+
             app->runProgram(args[0], args);
             selectAll();
         }
     }
+
     return YInputLine::handleKey(key);
 }
 
