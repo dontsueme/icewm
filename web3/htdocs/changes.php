@@ -34,6 +34,7 @@
 	echo "  <li>$line  <ul>";
 	$rel = substr($line, 0, strpos($line, ':'));
       } else {					// print changed item
+        if ($have_item) { echo "\n  </li>";  $have_item = 0; }
         $line = preg_replace('/#(\d+)/',
                              '<a href="'.BUGTRACKER.'&aid=\1">#\1</a>',
                              trim($line));
