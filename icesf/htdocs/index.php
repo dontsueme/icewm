@@ -124,8 +124,8 @@ A small screenshot displaying the default look is <A HREF="screenshot.jpg">here<
 	subscribe is the same as listed above.
 <?php endBlock() ?>
 <?php beginBlock('IRC', irc) ?>
-	The official IRC channel is #icewm at the <a
-	href="http://openprojects.nu/">Open Projects Network</a>.
+	The official IRC channel is #icewm at <a
+	href="http://www.freenode.info/">freenode</a>.
 <?php endBlock() ?>
 <!--
  <TR>
