@@ -4,14 +4,14 @@
 
   include('../libphp/head.php');
 ?>
-<h2>Stable Release - 2003-03-08<br>
-</h2>
+<h2>Stable Release - 2003-03-08</h2>
 <ul>
-  <li style="font-weight: bold;">Source code</li>
+  <li style="font-weight: bold;">Source code
   <ul>
     <li><a href="http://ftp1.sourceforge.net/icewm/icewm-1.2.7.tar.gz">icewm-1.2.7.tar.gz</a></li>
   </ul>
-  <li style="font-weight: bold;">Binaries</li>
+  </li>
+  <li style="font-weight: bold;">Binaries
   <ul>
     <li><a
  href="http://ftp1.sourceforge.net/icewm/icewm-1.2.7-1.i386.rpm">icewm-1.2.7-1.i386.rpm</a>	</li>
@@ -22,6 +22,7 @@
     <li><a
  href="http://ftp1.sourceforge.net/icewm/icewm-menu-gnome1-1.2.7-1.i386.rpm">icewm-menu-gnome1-1.2.7-1.i386.rpm</a></li>
   </ul>
+  </li>
   <li><a href="changes.php">Change Log</a></li>
 </ul>
 
