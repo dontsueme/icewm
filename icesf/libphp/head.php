@@ -33,8 +33,8 @@
 
   function fileref($name, $extension) {
     echo '<a href="http://ftp1.sourceforge.net/icewm/'.
-    	 "$name-".ICEWM_STABLE.".$extension\">".
-    	 "$name-".ICEWM_STABLE.".$extension</a>";
+    	 "$name-".ICEWM_STABLE."$extension\">".
+    	 "$name-".ICEWM_STABLE."$extension</a>";
   }
 
   $firstBlock=1;
