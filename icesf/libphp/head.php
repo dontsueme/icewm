@@ -27,7 +27,7 @@
   }
 
   function cvsref($label, $file) {
-    echo '<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/'.
+    echo '<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/icewm/'.
     	 "$file\">$label</a>";
   }
 
