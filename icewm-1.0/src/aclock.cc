@@ -35,7 +35,8 @@ YColor *YClock::clockFg = 0;
 YFont *YClock::clockFont = 0;
 
 inline char const * strTimeFmt(struct tm const & t) {
-    return (fmtTimeAlt && (t.tm_sec & 1) ? fmtTimeAlt : fmtTime);
+    return (fmtTimeAlt && *fmtTimeAlt && (t.tm_sec & 1) ? fmtTimeAlt
+                                                        : fmtTime);
 }
 
 YClock::YClock(YWindow *aParent): YWindow(aParent) {

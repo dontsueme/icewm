@@ -377,11 +377,11 @@ XSV(const char *, netDevice,			"ppp0 eth0")
 XSV(const char *, addressBarCommand,		0)
 #ifdef CONFIG_I18N
 XSV(const char *, fmtTime,			"%X")
-XSV(const char *, fmtTimeAlt,			NULL)
+XSV(const char *, fmtTimeAlt,			"")
 XSV(const char *, fmtDate,			"%c")
 #else
 XSV(const char *, fmtTime,			"%H:%M:%S")
-XSV(const char *, fmtTimeAlt,			NULL)
+XSV(const char *, fmtTimeAlt,			"")
 XSV(const char *, fmtDate,			"%B %A %Y-%m-%d %H:%M:%S %Z")
 #endif
 XSV(const char *, clrDialog,			"rgb:C0/C0/C0")
