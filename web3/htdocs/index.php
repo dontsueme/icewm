@@ -67,7 +67,7 @@ See themes.
   <li><b>French</b> (Laurent Pouillet, Frederic Dubuy)</li>
   <li><b>German</b> (Mathias Hasselmann)</li>
   <li><b>Hungarian</b> (Gabor Suveg)</li>
-  <li><b>Italian</b> (Riccardo Murri)</li>
+  <li><b>Italian</b> (Yuri Bongiorno)</li>
   <li><b>Japanese</b> (Yoichi ASAI)</li>
   <li><b>Lithuanian</b> (Martynas Jocius, Gediminas Paulauskas)</li>
   <li><b>Norwegian</b> (Petter Johan Olsen) </li>
