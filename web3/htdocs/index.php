@@ -43,6 +43,7 @@ TODO: page with some of the best icewm themes (contrib).
 <h2>Translations</h2>
 
 <ul>
+  <li><b>Belarusian</b> (Hleb Valoska)</li>
   <li><b>Catalan</b> (Toni Cu&ntilde;at i Alario)</li>
   <li><b>Croatian</b> (Vlatko Kosturjak)</li>
   <li><b>Czech</b> (Jan Hor&aacute;k)</li>
