@@ -148,7 +148,7 @@ libice.so: $(COREOBJS)
 
 genpref.o icesound.o wmmgr.o: ../VERSION
 
-.targets: Makefile
+.targets: Makefile ../sysdep.inc
 	@{ for p in $(BINARIES) $(TESTBINS); do echo $$p: "\$$($${p}_OBJS)"; done; } > $@
 
 ../lib/preferences: genpref
