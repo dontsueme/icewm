@@ -16,10 +16,14 @@
 # rollupI.xpm rolldownI.xpm menuButtonI.xpm 
 # closeA.xpm depthA.xpm maximizeA.xpm minimizeA.xpm restoreA.xpm hideA.xpm
 # rollupA.xpm rolldownA.xpm menuButtonA.xpm
+#
+# Infadel3:
+#
+# replaced all buttons by rectangular buttons, minor color adjustments
 
-ThemeDescription="Infadel/1.0.7"
-ThemeAuthor="xerithane@nerdfarm.org"
-Look=pixmap
+ThemeDescription    = "Infadel R3: Deep Sky"
+ThemeAuthor         = "xerithane@nerdfarm.org,\nmathias.hasselmann@gmx.de"
+Look                = pixmap
 
 TitleButtonsLeft="s"
 TitleButtonsRight="xmi"
@@ -34,8 +38,6 @@ CornerSizeY=28
 DlgBorderSizeX=2
 DlgBorderSizeY=2
 
-MenuMouseTracking=1 
-
 ColorNormalButton="rgb:22/2d/3c"
 ColorNormalButtonText="rgb:ff/ff/ff"
 ColorActiveButton="rgb:42/4d/5c"
@@ -46,31 +48,11 @@ ColorActiveTitleBarText="rgb:ff/ff/ff"
 ColorActiveBorder="rgb:86/86/87"
 ColorNormalBorder="rgb:57/57/57"
 
-ColorDialog="rgb:32/3d/4c"
-ColorListBox="rgb:32/3d/4c"
-ColorListBoxText="rgb:ff/ff/ff"
-ColorListBoxSelection="rgb:52/5d/6c"
-ColorListBoxSelectionText="rgb:ff/ff/ff"
-ColorScrollBar="rgb:42/4d/5c"
-ColorScrollBarSlider="rgb:32/3d/4c"
-ColorScrollBarButton="rgb:32/3d/4c"
-ColorScrollBarButtonArrow="rgb:ff/ff/ff"
-ColorLabel="rgb:32/3d/4c"
-ColorLabelText="rgb:ff/ff/ff"
+ColorNormalMinimizedWindow="rgb:22/2d/3c"
+ColorNormalMinimizedWindowText="rgb:c0/c0/c0"
+ColorActiveMinimizedWindow="rgb:42/4d/5c"
+ColorActiveMinimizedWindowText="rgb:ff/ff/ff"
 
-ColorNormalMenu="rgb:32/3d/4c"
-ColorActiveMenuItem="rgb:52/5d/6c"
-ColorNormalMenuItemText="rgb:ff/ff/ff"
-ColorActiveMenuItemText="rgb:ff/ff/ff"
-ColorDisabledMenuItemText="rgb:80/80/80"
-
-ColorDefaultTaskBar="rgb:32/3d/4c"
-ColorNormalTaskBarApp="rgb:42/4d/5c"
-ColorNormalTaskBarAppText="rgb:ff/ff/ff"
-ColorActiveTaskBarApp="rgb:52/5d/6c"
-ColorActiveTaskBarAppText="rgb:ff/ff/ff"
-ColorMinimizedTaskBarApp="rgb:22/2d/4c"
-ColorMinimizedTaskBarAppText="rgb:ff/ff/ff"
 
 ColorInput="rgb:42/4d/5c"
 ColorInputText="rgb:ff/ff/ff"
@@ -86,27 +68,83 @@ ColorNetSend="rgb:82/8d/9c"
 ColorNetReceive="rgb:52/5d/6c"
 ColorNetIdle="rgb:32/3d/4c"
 
-ColorToolTip="rgb:c0/c0/c0"
-ColorToolTipText="rgb:00/00/00"
+ColorToolTip="rgb:9e/9e/ae"
+ColorToolTipText="rgb:ff/ff/ff"
 ColorMoveSizeStatus="rgb:32/3d/4c"
 ColorMoveSizeStatusText="rgb:ff/ff/ff"
 ColorQuickSwitch="rgb:32/3d/4c"
 ColorQuickSwitchText="rgb:ff/ff/ff"
 
-# Font Specification
-TitleFontName		=	"-artwiz-snap-regular-r-normal-sans-10-*"
-MenuFontName		=	"-artwiz-snap-regular-r-normal-sans-10-*"
-MinimizedWindowFontName	=	"-artwiz-snap-regular-r-normal-sans-10-*"
-ActiveButtonFontName	=	"-artwiz-snap-regular-r-normal-sans-10-*"
-NormalButtonFontName	=	"-artwiz-snap-regular-r-normal-sans-10-*"
-QuickSwitchFontName	=	"-artwiz-snap-regular-r-normal-sans-10-*"
-ListBoxFontName		=	"-artwiz-snap-regular-r-normal-sans-10-*"
-StatusFontName		=	"-artwiz-snap-regular-r-normal-sans-10-*"
-ToolTipFontName		=	"-artwiz-snap-regular-r-normal-sans-10-*"
-ActiveTaskBarFontName	=	"-artwiz-snap-regular-r-normal-sans-10-*"
-NormalTaskBarFontName	=	"-artwiz-snap-regular-r-normal-sans-10-*"
-InputFontName		=	"-artwiz-snap-regular-r-normal-sans-10-*"
-ClockFontName		=	"-b&h-lucida-bold-r-normal-sans-14-*"
 
-ShowMenuButtonIcon=0
+#MenuMouseTracking=1 
+#ShowMenuButtonIcon=0
 TaskBarClockLeds=0
+InputDrawBevel=0
+TrayDrawBevel=0
+
+##
+# Generic widgets/dialogs # --------------------------------------------
+                         ##
+
+ColorDialog                     = "rgb:dd/dd/dd"
+ColorLabel                      = "rgb:dd/dd/dd"
+ColorLabelText                  = "rgb:2c/2c/3c"
+
+ColorNormalButton               = "rgb:cc/cc/cc"
+ColorActiveButton               = "rgb:cc/cc/cc"
+ColorNormalButtonText           = "rgb:2c/2c/3c"
+ColorActiveButtonText           = "rgb:2c/2c/3c"
+
+ColorListBox                    = "rgb:ee/ee/ee"
+ColorListBoxText                = "rgb:2c/2c/3c"
+ColorListBoxSelection           = "rgb:7c/7c/8c"
+ColorListBoxSelectionText       = "rgb:ff/ff/ff"
+ColorScrollBar                  = "rgb:dd/dd/dd"
+ColorScrollBarSlider            = "rgb:cc/cc/cc"
+ColorScrollBarButton            = "rgb:cc/cc/cc"
+ColorScrollBarButtonArrow       = "rgb:4c/4c/5c"
+ColorScrollBarInactiveArrow     = "rgb:99/99/99"
+
+ColorNormalMenu                 = "rgb:ee/ee/ee"
+ColorActiveMenuItem             = "rgb:7c/7c/8c"
+ColorNormalMenuItemText         = "rgb:2c/2c/3c"
+ColorActiveMenuItemText         = "rgb:ff/ff/ff"
+ColorDisabledMenuItemText       = "rgb:80/80/80"
+
+##
+# Taskbar widgets # ----------------------------------------------------
+                 ##
+
+ColorToolButton                 = "rgb:2c/2c/3c"
+ColorToolButtonText             = "rgb:ff/ff/ff"
+ColorNormalWorkspaceButton      = "rgb:2c/2c/3c"
+ColorActiveWorkspaceButton      = "rgb:4c/4c/5c"
+ColorNormalWorkspaceButtonText  = "rgb:ff/ff/ff"
+ColorActiveWorkspaceButtonText  = "rgb:ff/ff/ff"
+
+ColorDefaultTaskBar             = "rgb:3c/3c/4c"
+ColorNormalTaskBarApp           = "rgb:4c/4c/5c"
+ColorNormalTaskBarAppText       = "rgb:ff/ff/ff"
+ColorActiveTaskBarApp           = "rgb:5c/5c/6c"
+ColorActiveTaskBarAppText       = "rgb:ff/ff/ff"
+ColorMinimizedTaskBarApp        = "rgb:2c/2c/4c"
+ColorMinimizedTaskBarAppText    = "rgb:ff/ff/ff"
+
+##
+# Font Specification # -------------------------------------------------
+                    ##
+
+TitleFontName           = "-artwiz-snap-regular-r-normal-sans-10-*"
+MinimizedWindowFontName = "-artwiz-snap-regular-r-normal-sans-10-*"
+NormalButtonFontName    = "-adobe-helvetica-medium-r-normal-*-10-*-*-*-p-*-*-*"
+ActiveButtonFontName    = "-adobe-helvetica-medium-r-normal-*-10-*-*-*-p-*-*-*"
+QuickSwitchFontName     = "-artwiz-snap-regular-r-normal-sans-10-*"
+ListBoxFontName         = "-artwiz-snap-regular-r-normal-sans-10-*"
+StatusFontName          = "-artwiz-snap-regular-r-normal-sans-10-*"
+ToolTipFontName         = "-artwiz-snap-regular-r-normal-sans-10-*"
+ActiveTaskBarFontName   = "-artwiz-snap-regular-r-normal-sans-10-*"
+NormalTaskBarFontName   = "-artwiz-snap-regular-r-normal-sans-10-*"
+MenuFontName            = "-adobe-helvetica-medium-r-normal-*-10-*-*-*-p-*-*-*"
+InputFontName           = "-adobe-helvetica-medium-r-normal-*-12-*-*-*-p-*-*-*"
+LabelFontName           = "-adobe-helvetica-medium-r-normal-*-12-*-*-*-p-*-*-*"
+ClockFontName           = "-adobe-helvetica-medium-r-normal-*-10-*-*-*-p-*-*-*"

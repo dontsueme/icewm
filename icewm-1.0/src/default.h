@@ -11,7 +11,7 @@
 #endif
 
 #define CONFIG_DEFAULT_LOOK lookNice
-#define CONFIG_DEFAULT_THEME "Infadel2/default.theme"
+#define CONFIG_DEFAULT_THEME "infadel3-sky/default.theme"
 
 #ifdef CFGDEF
 #define XSV(t,a,b) t a(b);
@@ -262,7 +262,7 @@ XIV(bool, haveXft,				true)
 #ifdef CONFIG_SHAPED_DECORATION
 XIV(bool, protectClientWindow, 			true)
 #endif
-XIV(bool, inputDrawBorder,                      true)
+XIV(bool, inputDrawBevel,                       true)
 XIV(WMLook, wmLook,				CONFIG_DEFAULT_LOOK)
 XIV(int, wsBorderX,				6)
 XIV(int, wsBorderY,				6)
@@ -495,7 +495,7 @@ static struct {
     const char *description;
 #endif
 } bool_options[] = {
-    OBV("ClickToFocus",				&clickFocus,			"Focus windows by clicking"),
+    OBV("ClickToFocus",				&clickFocus,			"Focus windows by clicking (disable to get sloppy focus)"),
     OBV("RaiseOnFocus",				&raiseOnFocus,			"Raise windows when focused"),
     OBV("FocusOnClickClient",			&focusOnClickClient,		"Focus window when client area clicked"),
     OBV("RaiseOnClickClient",			&raiseOnClickClient,		"Raise window when client area clicked"),
@@ -614,7 +614,7 @@ static struct {
 #ifdef CONFIG_SHAPED_DECORATION
     OBV("ShapesProtectClientWindow",		&protectClientWindow,		"Don't cut client windows by shapes set trough frame corner pixmap"),
 #endif
-    OBV("InputDrawBorder",                      &inputDrawBorder,               "Draw a border arround input fields"),
+    OBV("InputDrawBevel",                       &inputDrawBevel,                "Draw a border arround input fields"),
 };
 
 static struct {

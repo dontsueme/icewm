@@ -1,4 +1,5 @@
 1.0.10: 2001-10-22 ???
+        - feature: updated default theme to "Infadel R3: Deep Sky"
 !!!     - feature: partial support of the Extended Window Manager
           Specification (aka net wm-spec) (KDE 2.1, GNOME2)
 !!!     - feature: add KDE tray windows to the tray
