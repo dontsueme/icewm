@@ -97,7 +97,7 @@
     fclose($clog);
   }
 ?>
-!!!     -
+
 <html>
  <head>
   <title>[IceWM-Devel] <?php echo ICEWM_TITLE ?></title>
