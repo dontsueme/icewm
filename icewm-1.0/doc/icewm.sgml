@@ -422,7 +422,8 @@ not tiled. (set to 0 or 1).
 <tag/IconPath/ Path to the icon directory. Multiple paths can be entered
 using the colon (UNIX) or semicolon (OS/2) as the separator.
 <tag/LibPath/ Path to the icewm/lib directory.
-<tag/KDEDataDir/Root directory for KDE data (/usr/share by default).
+<tag/KDEMenuDir/Directory containing KDE's menu (If emtpy "$KDEDIR/share/applnk"
+will be passed to the GNOME libraries).
 </descrip>
 
 <sect1>Programs<p>

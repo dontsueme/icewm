@@ -552,19 +552,6 @@ LIBS=$no_x_libs
 
 dnl Path adjustment
 
-AC_ARG_WITH(kdedatadir,
-  [  --with-kdedatadir=path  KDE's data directory (\$KDEDIR/share)],
-  [ if test x"$with_kdedatadir" = x -o "$with_kdedatadir" = "yes"; then
-      AC_MSG_ERROR([Invalid usage of --with-kdedatadir argument])
-    else
-      kdedatadir=$with_kdedatadir
-    fi ],
-  [ if test x"$KDEDIR" != x; then
-      kdedatadir="${KDEDIR}/share"
-    else
-      kdedatadir='${datadir}'
-    fi ])
-
 AC_ARG_WITH(libdir,
   [  --with-libdir=path      Default configuration directory (\$libdir/X11/icewm)],
   [ if test x"$with_libdir" = x -o "$with_libdir" = "yes"; then
@@ -618,7 +605,6 @@ AC_SUBST(datadir)
 AC_SUBST(localedir)
 AC_SUBST(libdatadir)
 AC_SUBST(cfgdatadir)
-AC_SUBST(kdedatadir)
 AC_SUBST(docdir)
 
 AC_OUTPUT(
@@ -639,5 +625,4 @@ ICE_MSG_VALUE([       BINDIR], bindir)
 ICE_MSG_VALUE([       LOCDIR], localedir)
 ICE_MSG_VALUE([       LIBDIR], libdatadir)
 ICE_MSG_VALUE([       CFGDIR], cfgdatadir)
-ICE_MSG_VALUE([       KDEDIR], kdedatadir)
 ICE_MSG_VALUE([       DOCDIR], docdir)

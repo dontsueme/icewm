@@ -354,7 +354,7 @@ XSV(const char *, moveSizeFontName,		BOLDFONT(100))
 XSV(const char *, iconPath,			0)
 XSV(const char *, libDir,			LIBDIR)
 XSV(const char *, configDir,			CFGDIR)
-XSV(const char *, kdeDataDir,			KDEDIR)
+XSV(const char *, kdeMenuDir,			"")
 XSV(const char *, mailBoxPath,			0)
 XSV(const char *, mailCommand,			"xterm -name pine -title PINE -e pine")
 XSV(const char *, mailClassHint,		"pine.XTerm")
@@ -703,7 +703,7 @@ static struct {
     OSV("Gradients",				&gradients,			"List of gradient pixmaps in the current theme"),
 #endif
     OSV("IconPath",				&iconPath,			"Icon search path (colon separated)"),
-    OSV("KDEDataDir",				&kdeDataDir,			"Root directory for KDE data"),
+    OSV("KDEMenuDir",				&kdeMenuDir,			"Directory containing KDE's menu ($KDEDIR/share/applnk if empty)"),
     OSV("MailBoxPath",				&mailBoxPath,			"Mailbox path (use $MAIL instead)"),
     OSV("MailCommand",				&mailCommand,			"Command to run on mailbox"),
     OSV("MailClassHint",			&mailClassHint,			"WM_CLASS to allow runonce for MailCommand"),

@@ -13,6 +13,9 @@
 !!!     - bugfix: netstat overflow
 !!!     - bugfix: fixed maximized terminals gap bug (again, sig!)
 !!!     - bugfix: don't autohide taskbar when addressbar has focus
+        - bugfix: replaced --with-kde-dir and KDEDataDir by the
+          KDEMenuDir option: If emtpy $KDEDIR/share/applnk will be
+          passed to the GNOME libraries.
         - bugfix: slightly improved handling of weird modifier mappings
         - bugfix: draw buttons properly for themes with Look=Gtk
         - bugfix: allow "" to disable TimeFormatAlt

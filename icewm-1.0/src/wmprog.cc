@@ -468,7 +468,9 @@ void StartMenu::updatePopup() {
     if (autoReloadMenus) {
         char *gnomeAppsMenu = gnome_datadir_file("gnome/apps/");
         char *gnomeUserMenu = gnome_util_home_file("apps/");
-        const char *kdeMenu = strJoin(kdeDataDir, "/applnk", 0);
+        const char *kdeMenu = '\0' == *kdeMenuDir
+                            ? strJoin(getenv("KDEDIR"), "/share/applnk", NULL)
+                            : kdeMenuDir;
 
         struct stat sb;
         bool dirty = false;
@@ -510,7 +512,9 @@ void StartMenu::updatePopup() {
 
         g_free(gnomeAppsMenu);
         g_free(gnomeUserMenu);
-        delete kdeMenu;
+
+        if ('\0' == *kdeMenuDir)
+            delete[] kdeMenu;
 
         if (dirty) refresh();
     }
@@ -532,7 +536,9 @@ void StartMenu::refresh() {
 
         char *gnomeAppsMenu = gnome_datadir_file("gnome/apps/");
         char *gnomeUserMenu = gnome_util_home_file("apps/");
-        const char *kdeMenu = strJoin(kdeDataDir, "/applnk", 0);
+        const char *kdeMenu = '\0' == *kdeMenuDir
+                            ? strJoin(getenv("KDEDIR"), "/share/applnk", NULL)
+                            : kdeMenuDir;
 
         fHasGnomeAppsMenu = showGnomeAppsMenu &&
 			    !access(gnomeAppsMenu, X_OK | R_OK);
@@ -578,7 +584,9 @@ void StartMenu::refresh() {
 
         g_free(gnomeAppsMenu);
         g_free(gnomeUserMenu);
-        delete kdeMenu;
+
+        if ('\0' == *kdeMenuDir)
+            delete[] kdeMenu;
 	
 //	delete gnomeIcon;
 //	delete kdeIcon;
