@@ -1,4 +1,5 @@
 1.0.10: 2001-??-??
+        - bugfix: #469081 Java cause IceWM to crash on mapping
         - bugfix: massive code cleanups for lists, timers, sockets,
           affected: YApplication
         - bugfix: consider frame borders when moving windows per
