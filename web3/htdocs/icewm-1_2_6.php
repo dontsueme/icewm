@@ -14,13 +14,13 @@
   <li style="font-weight: bold;">Binaries</li>
   <ul>
     <li><a
- href="http://ftp1.sourceforge.net/icewm/icewm-1.2.6-1.i386.rpm">icewm-1.2.5-1.i386.rpm</a>	</li>
+ href="http://ftp1.sourceforge.net/icewm/icewm-1.2.6-1.i386.rpm">icewm-1.2.6-1.i386.rpm</a>	</li>
     <li><a
- href="http://ftp1.sourceforge.net/icewm/icewm-themes-1.2.6-1.i386.rpm">icewm-themes-1.2.5-1.i386.rpm</a>	</li>
+ href="http://ftp1.sourceforge.net/icewm/icewm-themes-1.2.6-1.i386.rpm">icewm-themes-1.2.6-1.i386.rpm</a>	</li>
     <li><a
- href="http://ftp1.sourceforge.net/icewm/icewm-l10n-1.2.6-1.i386.rpm">icewm-l10n-1.2.5-1.i386.rpm</a>	</li>
+ href="http://ftp1.sourceforge.net/icewm/icewm-l10n-1.2.6-1.i386.rpm">icewm-l10n-1.2.6-1.i386.rpm</a>	</li>
     <li><a
- href="http://ftp1.sourceforge.net/icewm/icewm-menu-gnome1-1.2.6-1.i386.rpm">icewm-menu-gnome1-1.2.5-1.i386.rpm</a></li>
+ href="http://ftp1.sourceforge.net/icewm/icewm-menu-gnome1-1.2.6-1.i386.rpm">icewm-menu-gnome1-1.2.6-1.i386.rpm</a></li>
   </ul>
 </ul>
 
