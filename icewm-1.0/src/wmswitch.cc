@@ -28,7 +28,11 @@ YFont *SwitchWindow::switchFont(NULL);
 SwitchWindow * switchWindow(NULL);
 
 SwitchWindow::SwitchWindow(YWindow *parent):
-    YPopupWindow(parent) INIT_GRADIENT(fGradient, NULL) {
+    YPopupWindow(parent),
+    fActiveWindow(NULL), fLastWindow(NULL),
+    fModsDown(0), fIsActive(false)
+    INIT_GRADIENT(fGradient, NULL) {
+
     if (switchBg == 0)
         switchBg = new YColor(clrQuickSwitch);
     if (switchFg == 0)
@@ -38,20 +42,15 @@ SwitchWindow::SwitchWindow(YWindow *parent):
     if (switchFont == 0)
         switchFont = YFont::getFont(switchFontName);
 
-    fActiveWindow = 0;
-    fLastWindow = 0;
-    modsDown = 0;
-    isUp = false;
-
     resize();
 
     setStyle(wsSaveUnder | wsOverrideRedirect);
 }
 
 SwitchWindow::~SwitchWindow() {
-    if (isUp) {
+    if (fIsActive) {
         cancelPopup();
-        isUp = false;
+        fIsActive = false;
     }
     
 #ifdef CONFIG_GRADIENTS
@@ -302,14 +301,14 @@ YFrameWindow *SwitchWindow::nextWindow(YFrameWindow *from, bool zdown, bool next
     return n;
 }
 
-void SwitchWindow::begin(bool zdown, int mods) {
-    modsDown = mods & (app->AltMask | app->MetaMask | 
-    		       app->HyperMask | app->SuperMask | 
-		       ControlMask);
+void SwitchWindow::begin(bool zdown, unsigned mods) {
+    fModsDown = mods & (app->AltMask | app->MetaMask | 
+    		        app->HyperMask | app->SuperMask | 
+		        ControlMask);
 
-    if (isUp) {
+    if (fIsActive) {
         cancelPopup();
-        isUp = false;
+        fIsActive = false;
     } else {
 	fLastWindow = fActiveWindow = manager->getFocus();
 	fActiveWindow = nextWindow(fLastWindow, zdown, true);
@@ -340,7 +339,7 @@ void SwitchWindow::begin(bool zdown, int mods) {
 
 	if (fActiveWindow) {
 	    displayFocus(fActiveWindow);
-	    isUp = popup(0, 0, YPopupWindow::pfNoPointerChange);
+	    fIsActive = popup(0, 0, YPopupWindow::pfNoPointerChange);
 	}
     }
 }
@@ -352,9 +351,9 @@ void SwitchWindow::deactivatePopup() {
 }
 
 void SwitchWindow::cancel() {
-    if (isUp) {
+    if (fIsActive) {
         cancelPopup();
-        isUp = false;
+        fIsActive = false;
     }
     if (fLastWindow) {
         displayFocus(fLastWindow);
@@ -383,9 +382,9 @@ void SwitchWindow::accept() {
             manager->activate(fActiveWindow, true);
             fActiveWindow->wmRaise();
         }
-        if (isUp) {
+        if (fIsActive) {
             cancelPopup();
-            isUp = false;
+            fIsActive = false;
         }
         //manager->activate(fActiveWindow, true);
     }
@@ -440,8 +439,8 @@ bool SwitchWindow::handleKey(const XKeyEvent &key) {
     return YPopupWindow::handleKey(key);
 }
 
-bool SwitchWindow::modDown(int mod) {
-    return ((mod & app->KeyMask/* & modsDown*/) == modsDown);
+bool SwitchWindow::modDown(unsigned mod) {
+    return ((mod & app->KeyMask/* & fModsDown*/) == fModsDown);
 }
 
 void SwitchWindow::handleButton(const XButtonEvent &button) {

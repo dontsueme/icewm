@@ -13,7 +13,7 @@ public:
     virtual void paint(Graphics &g, int x, int y, unsigned int width, unsigned int height);
 
     YFrameWindow *nextWindow(YFrameWindow *from, bool zdown, bool next);
-    void begin(bool zdown, int mods);
+    void begin(bool zdown, unsigned mods);
 
     virtual void activatePopup();
     virtual void deactivatePopup();
@@ -28,10 +28,15 @@ public:
     void displayFocus(YFrameWindow *frame);
 
 private:
+    bool modDown(unsigned m);
+    void resize();
+
     YFrameWindow *fActiveWindow;
     YFrameWindow *fLastWindow;
 
     int fIconCount, fIconOffset;
+    unsigned fModsDown;
+    bool fIsActive;
 
 #ifdef CONFIG_GRADIENTS
     class YPixbuf * fGradient;
@@ -41,13 +46,6 @@ private:
     static YColor *switchBg;
     static YColor *switchHl;
     static YFont *switchFont;
-
-    int modsDown;
-
-    bool isUp;
-
-    bool modDown(int m);
-    void resize();
 };
 
 extern SwitchWindow * switchWindow;
