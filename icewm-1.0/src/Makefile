@@ -98,6 +98,10 @@ iceskt_OBJS = \
 
 testlocale_OBJS = \
 	testlocale.o ylocale.o
+testdockapp_OBJS = \
+	testdockapp.o
+testtrayapp_OBJS = \
+	testtrayapp.o
 
 ################################################################################
 
