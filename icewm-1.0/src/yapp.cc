@@ -536,7 +536,7 @@ YApplication::YApplication(int *argc, char ***argv, const char *displayName) {
     fFirstSocket = fLastSocket = 0;
     fClip = 0;
     fReplayEvent = false;
-
+    fModifierMap = NULL;
     {
 	char const * cmd(**argv);
 	char cwd[PATH_MAX + 1];
@@ -631,6 +631,8 @@ YApplication::~YApplication() {
         IceSMconn = NULL;
     }
 #endif
+    if (NULL != fModifierMap) XFreeModifiermap(fModifierMap);
+
     XCloseDisplay(display());
     delete[] fExecutable;
 
@@ -1209,11 +1211,13 @@ static KeyCode sym2code(KeySym k) {
 }
 
 void YApplication::initModifiers() {
-    XModifierKeymap *xmk = XGetModifierMapping(app->display());
+    if (NULL != fModifierMap) XFreeModifiermap(fModifierMap);
+    fModifierMap = XGetModifierMapping(display());
+
     AltMask = MetaMask = WinMask = SuperMask = HyperMask = 
 	NumLockMask = ScrollLockMask = ModeSwitchMask = 0;
     
-    if (xmk) {
+    if (fModifierMap) {
         KeyCode numLockKeyCode = sym2code(XK_Num_Lock);
         KeyCode scrollLockKeyCode = sym2code(XK_Scroll_Lock);
         KeyCode altKeyCode = sym2code(XK_Alt_L);
@@ -1228,30 +1232,31 @@ void YApplication::initModifiers() {
         if (!superKeyCode) superKeyCode = sym2code(XK_Super_R);
         if (!hyperKeyCode) hyperKeyCode = sym2code(XK_Hyper_R);
 
-        KeyCode *c(xmk->modifiermap);
+        KeyCode *keyptr(fModifierMap->modifiermap);
 
-        for (int m = 0; m < 8; m++)
-            for (int k = 0; k < xmk->max_keypermod; k++, c++) {
-                if (*c == NoSymbol)
+        for (unsigned modMask(1); modMask < 256; modMask <<= 1) {
+            for (int k = 0; k < fModifierMap->max_keypermod; k++, keyptr++) {
+                KeyCode const keycode(*keyptr);
+
+                if (keycode == NoSymbol)
                     continue;
                 // If numLockKeyCode == 0, it can never match.
-                if (*c == numLockKeyCode)
-                    NumLockMask = (1 << m);
-                if (*c == scrollLockKeyCode)
-                    ScrollLockMask = (1 << m);
-                if (*c == altKeyCode)
-                    AltMask = (1 << m);
-                if (*c == metaKeyCode)
-                    MetaMask = (1 << m);
-                if (*c == superKeyCode)
-                    SuperMask = (1 << m);
-                if (*c == hyperKeyCode)
-                    HyperMask = (1 << m);
-                if (*c == modeSwitchCode)
-                    ModeSwitchMask = (1 << m);
+                if (keycode == numLockKeyCode)
+                    NumLockMask = modMask;
+                if (keycode == scrollLockKeyCode)
+                    ScrollLockMask = modMask;
+                if (keycode == altKeyCode)
+                    AltMask = modMask;
+                if (keycode == metaKeyCode)
+                    MetaMask = modMask;
+                if (keycode == superKeyCode)
+                    SuperMask = modMask;
+                if (keycode == hyperKeyCode)
+                    HyperMask = modMask;
+                if (keycode == modeSwitchCode)
+                    ModeSwitchMask = modMask;
             }
-
-	XFreeModifiermap(xmk);
+        }
     }
 
     MSG(("alt:%d meta:%d super:%d hyper:%d mode:%d num:%d scroll:%d",
@@ -1329,6 +1334,30 @@ void YApplication::initModifiers() {
     MSG(("alt:%d meta:%d super:%d hyper:%d win:%d mode:%d num:%d scroll:%d",
          AltMask, MetaMask, SuperMask, HyperMask, WinMask, ModeSwitchMask,
 	 NumLockMask, ScrollLockMask));
+}
+
+bool YApplication::isModifier(KeyCode keycode) const {
+    if (0 != keycode) {
+        if (fModifierMap) {
+            unsigned const nModifiers(fModifierMap->max_keypermod * 8);
+
+            for (KeyCode * modptr(fModifierMap->modifiermap);
+                 modptr < fModifierMap->modifiermap + nModifiers; ++modptr)
+                if (*modptr == keycode)
+                    return true;
+        } else {
+            KeySym keysym(XKeycodeToKeysym(app->display(), keycode, 0));
+
+            if (keysym == XK_Alt_L     || keysym == XK_Alt_R     ||
+                keysym == XK_Meta_L    || keysym == XK_Meta_R    ||
+                keysym == XK_Super_L   || keysym == XK_Super_R   ||
+                keysym == XK_Hyper_L   || keysym == XK_Hyper_R   ||
+                keysym == XK_Control_L || keysym == XK_Control_R)
+                return true;
+        }
+    }
+
+    return false;
 }
 
 void YApplication::alert() {

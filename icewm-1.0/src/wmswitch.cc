@@ -429,38 +429,19 @@ bool SwitchWindow::handleKey(const XKeyEvent &key) {
             return true;
         }
     } else if (key.type == KeyRelease) {
-        if (!modDown(m)) {
-            accept();
-            return true;
-        }
-/*
         if ((IS_WMKEY(k, vm, gKeySysSwitchNext)) && !modDown(m)) {
             accept();
             return true;
-        } else if (isModKey(key.keycode)) {
+        } else if (app->isModifier(key.keycode) && modDown(m)) {
             accept();
             return true;
         }
-*/        
     }
     return YPopupWindow::handleKey(key);
 }
 
-bool SwitchWindow::isModKey(KeyCode c) {
-    KeySym k = XKeycodeToKeysym(app->display(), c, 0);
-
-    if (k == XK_Control_L || k == XK_Control_R ||
-        k == XK_Alt_L     || k == XK_Alt_R     ||
-        k == XK_Meta_L    || k == XK_Meta_R    ||
-        k == XK_Super_L   || k == XK_Super_R   ||
-        k == XK_Hyper_L   || k == XK_Hyper_R)
-        return true;
-
-    return false;
-}
-
 bool SwitchWindow::modDown(int mod) {
-    return ((mod & app->KeyMask & modsDown) == modsDown);
+    return ((mod & app->KeyMask/* & modsDown*/) == modsDown);
 }
 
 void SwitchWindow::handleButton(const XButtonEvent &button) {

@@ -47,7 +47,6 @@ private:
     bool isUp;
 
     bool modDown(int m);
-    bool isModKey(KeyCode c);
     void resize();
 };
 

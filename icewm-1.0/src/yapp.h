@@ -59,6 +59,7 @@ public:
     //void unblockSignal(int sig);
 
     void initModifiers();
+    bool isModifier(KeyCode keycode) const;
 
     void alert();
 
@@ -88,6 +89,8 @@ public:
 #ifndef LITE
     static YResourcePaths iconPaths;
 #endif
+
+    XModifierKeymap *fModifierMap;
 
     unsigned int AltMask;
     unsigned int MetaMask;
