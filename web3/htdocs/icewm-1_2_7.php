@@ -9,7 +9,7 @@
 <ul>
   <li style="font-weight: bold;">Source code</li>
   <ul>
-    <li><a href="http://ftp1.sourceforge.net/icewm/icewm-1.2.7.tar.gz">icewm-1.2.6.tar.gz</a></li>
+    <li><a href="http://ftp1.sourceforge.net/icewm/icewm-1.2.7.tar.gz">icewm-1.2.7.tar.gz</a></li>
   </ul>
   <li style="font-weight: bold;">Binaries</li>
   <ul>

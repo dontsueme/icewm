@@ -83,7 +83,7 @@ SourceForge.</p>
   <li>icewm-user - icewm user discussion
     <p>
 To subscribe to the mailing list send an email to:
-<a href="icewm-user-request@lists.sourceforge.net">icewm-user-request@lists.sourceforge.net</a>
+<a href="mailto:icewm-user-request@lists.sourceforge.net">icewm-user-request@lists.sourceforge.net</a>
 with body or subject "subscribe", or visit
 <a href="http://lists.sourceforge.net/mailman/listinfo/icewm-user">http://lists.sourceforge.net/mailman/listinfo/icewm-user</a>.
     </p>
@@ -93,7 +93,7 @@ with body or subject "subscribe", or visit
   <li>icewm-devel - discussion of icewm development</li>
     <p>
 To subscribe to the mailing list send an email to:
-<a href="icewm-devel-request@lists.sourceforge.net">icewm-devel-request@lists.sourceforge.net</a>
+<a href="mailto:icewm-devel-request@lists.sourceforge.net">icewm-devel-request@lists.sourceforge.net</a>
 with body or subject "subscribe", or visit
 <a href="http://lists.sourceforge.net/mailman/listinfo/icewm-devel">http://lists.sourceforge.net/mailman/listinfo/icewm-devel</a>.
     </p>
@@ -124,6 +124,12 @@ cvs -d :pserver:anonymous@cvs.icewm.sourceforge.net:/cvsroot/icewm co -r icewm-1
   <li><a
  href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/icewm/icewm-1.2">Browse
 CVS</a></li>
+</ul>
+
+<hr size="1"/>
+<h2>Links</h2>
+<ul>
+<li>Some icons <a href="http://themes.freshmeat.net/projects/iceicons/">here</a></li>
 </ul>
 
 <hr size="1"/>
