@@ -18,10 +18,10 @@
           </a>
          </td>
          <td align="center"><small>
-           icewm © 1997-2003 <a href="mailto:marko.macek@gmx.net?subject=icewm">Marko Ma&#269;ek</a> (current maintainer)
+           icewm © 1997-2003 <a href="mailto:marko.macek@gmx.net?subject=icewm">Marko&nbsp;Ma&#269;ek</a> (current maintainer)
          </small></td>
          <td align="center"><small>
-           icewm © 2001 <a href="mailto:mathias.hasselmann@gmx.de?subject=icewm">Mathias Hasselmann</a>
+           icewm © 2001 <a href="mailto:mathias.hasselmann@gmx.de?subject=icewm">Mathias&nbsp;Hasselmann</a>
          </small></td>
         </tr>
        </tbody>
