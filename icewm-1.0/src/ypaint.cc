@@ -951,8 +951,8 @@ void Graphics::color(YColor * color) {
     XSetForeground(fDisplay, gc, (fColor = color)->pixel());
 }
 
-void Graphics::font(YFont * aont) {
-    fFont = aont;
+void Graphics::font(YFont * font) {
+    fFont = font;
 }
 
 void Graphics::lineWidth(int width) {

@@ -4,6 +4,7 @@
  * Copyright (C) 1997-2001 Marko Macek
  */
 #include "config.h"
+#include "intl.h"
 
 #include "yfull.h"
 #include "ykey.h"

@@ -168,11 +168,10 @@ void YButton::armed(bool armed, bool mouseDown) {
     if (armed != fArmed) {
         fArmed = armed;
         repaint();
+
         if (fPopup)
-            if (fArmed)
-                popup(mouseDown);
-            else
-                popdown();
+            if (fArmed) popup(mouseDown);
+            else popdown();
     }
 }
 
@@ -183,7 +182,7 @@ bool YButton::handleKey(const XKeyEvent &key) {
 
     if (key.type == KeyPress) {
         if (!fSelected) {
-            if (((k == XK_Return || k == 32) && m == 0) ||
+            if (((k == XK_Return || k == XK_space) && m == 0) ||
                 (uk == hotKey && (m & ~app->AltMask) == 0))
             {
                 requestFocus();

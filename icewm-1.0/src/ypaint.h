@@ -353,8 +353,8 @@ public:
     void fillPolygon(XPoint * points, int const n, int const shape,
 		    int const mode);
     void fillArc(int x, int y, int width, int height, int a1, int a2);
-    void color(YColor * aColor);
-    void font(YFont * aFont);
+    void color(YColor * color);
+    void font(YFont * font);
     void thinLines(void) { lineWidth(0); }
     void wideLines(int width = 1) { lineWidth(width >= 1 ? width : 1); }
     void lineWidth(int width);
