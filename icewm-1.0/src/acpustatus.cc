@@ -259,7 +259,7 @@ void CPUStatus::status() {
         }
         if (new_kcid != 0)
             continue; /* kstat changed - start over */
-        ks = kstat_lookup(kc, "unix", 0, "system_misc");
+        ks = kstat_lookup(kc, (char*)"unix", 0, (char*)"system_misc");
         if (kstat_read(kc, ks, 0) == -1) {
             perror("kstat_read ");
             return;/* FIXME : need err handler? */
@@ -267,7 +267,7 @@ void CPUStatus::status() {
         if (changed) {
             /* the kstat has changed - reread the data */
             thiscpu = 0; ncpus = 0;
-            kn = (kstat_named_t *)kstat_data_lookup(ks, "ncpus");
+            kn = (kstat_named_t *)kstat_data_lookup(ks, (char*)"ncpus");
             if ((kn) && (kn->value.ui32 > ncpus)) {
                 /* I guess I should be using 'new' here... FIXME */
                 ncpus = kn->value.ui32;
