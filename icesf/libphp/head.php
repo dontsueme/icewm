@@ -8,8 +8,8 @@
   define(STABLE_ID,	18077);
 
   define(PREFIX,	'/home/groups/i/ic/icewm/');
-  define(LIBDIR,	PREFIX.'libphp');
-  define(DOCDIR,	PREFIX.'htdocs');
+  define(LIBDIR,	PREFIX.'libphp/');
+  define(DOCDIR,	PREFIX.'htdocs/');
   define(CHANGELOG,	PREFIX.'cvs/icewm-1.2/CHANGES');
   define(BUGTRACKER,	'http://sourceforge.net/tracker/index.php?'.
 			'func=detail&group_id=31&atid=100031');
@@ -58,9 +58,9 @@
 <?php endif ?>
       <td>
 <?php if($firstBlock): ?>
-       <a href="http://sourceforge.net/"><img
+       <!--a href="http://sourceforge.net/"><img
         src="/cgi-bin/sflogo.sh" align=right width=31 height=88 border=0
-        alt="Hosted by Sourceforge"></a>
+        alt="Hosted by Sourceforge"></a-->
 <?php $firstBlock=0; endif ?>
 <?php
   }
@@ -148,6 +148,9 @@
 
   <br>
 
+  <div align=right>
+<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=31&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
+  </div>
   <div align=center><small>
    <a href="/"><img
      src="/icewm.png" width=360 height=80 border=0 alt="IceWM"></a><br>
