@@ -148,3 +148,7 @@ install-gnome: gnome
 	@$(INSTALLDIR) $(WMPROPDIR)
 	@$(INSTALLLIB) lib/IceWM.desktop $(WMPROPDIR)
 	@echo ------------------------------------------
+
+update-config:
+	rm -f config.guess config.sub
+	wget $(GNUCONFIG)/config.guess $(GNUCONFIG)/config.sub
