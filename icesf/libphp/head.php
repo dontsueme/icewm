@@ -1,11 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <?php
-  define(ICEWM_STABLE,	'1.0.9-2');
-  define(ICEWM_DEVEL, 	'1.2.0/CVS');
-  define(ICEWM_CHANGES,	'1.2.0pre1');
+  define(ICEWM_STABLE,	'1.2.0');
+  define(ICEWM_DEVEL, 	'1.2.1pre1');
+  define(ICEWM_CHANGES,	'1.2.1pre1');
 
-  define(STABLE_DATE,	'2001-05-07');
-  define(STABLE_ID,	18077);
+  define(STABLE_DATE,	'2002-06-30');
+  define(STABLE_ID,	97354);
 
   define(PREFIX,	'/home/groups/i/ic/icewm/');
   define(LIBDIR,	PREFIX.'libphp/');
