@@ -10,7 +10,7 @@
   define(PREFIX,	'/home/groups/i/ic/icewm/');
   define(LIBDIR,	PREFIX.'libphp');
   define(DOCDIR,	PREFIX.'htdocs');
-  define(CHANGELOG,	PREFIX.'cvs/icewm-1.2/icewm/CHANGES');
+  define(CHANGELOG,	PREFIX.'cvs/icewm-1.2/CHANGES');
   define(BUGTRACKER,	'http://sourceforge.net/tracker/index.php?'.
 			'func=detail&group_id=31&atid=100031');
 
