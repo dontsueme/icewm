@@ -92,7 +92,7 @@ A small screenshot displaying the default look is <A HREF="screenshot.jpg">here<
        </table>
 <?php endBlock() ?>
 <?php beginBlock('Changelog', changes) ?>
-<?php changes(substr(ICEWM_STABLE,0,strpos(ICEWM_STABLE,'-'))) ?>
+<?php changes(substr(ICEWM_CHANGES,0,strpos(ICEWM_CHANGES,'-'))) ?>
        <p>
 	View the file <a href="changes.php">CHANGES</a> of the CVS repository
 	for information about previous and future versions.
