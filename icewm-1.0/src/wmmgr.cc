@@ -138,8 +138,8 @@ void YWindowManager::registerProtocols() {
         atoms.netActiveWindow,
         atoms.netWorkarea,
         atoms.netSupportingWmCheck,
-//        atoms.netCloseWindow,
-//        atoms.netwmMoveResize,
+        atoms.netCloseWindow,
+        atoms.netwmMoveResize,
 //        atoms.netwmName,
 //        atoms.netwmIconName,
 //        atoms.netwmDesktop,
@@ -172,7 +172,7 @@ void YWindowManager::registerProtocols() {
 #ifdef CONFIG_TRAY
         atoms.kwmDockwindow,
 #ifdef CONFIG_WMSPEC_HINTS
-        atoms.kdeNetSystemTrayWindows,
+//        atoms.kdeNetSystemTrayWindows,
 //        atoms.kdeNetwmSystemTrayWindowFor,
 #endif // CONFIG_TRAY
 #endif // CONFIG_WMSPEC_HINTS
@@ -708,8 +708,19 @@ void YWindowManager::handleDestroyWindow(const XDestroyWindowEvent &destroyWindo
 
 void YWindowManager::handleClientMessage(const XClientMessageEvent &message) {
 #ifdef CONFIG_WMSPEC_HINTS
-    if (message.message_type == atoms.netCurrentDesktop)
+    if (message.message_type == atoms.netCurrentDesktop &&
+        message.format == 32)
         winWorkspace(message.data.l[0]);
+    else if (message.message_type == atoms.netCloseWindow &&
+             message.format == 32) {
+        YFrameWindow *frame(findFrame(message.window));
+        if (frame) frame->wmClose();
+    } else if (message.message_type == atoms.netwmMoveResize &&
+             message.format == 32) {
+        YFrameWindow *frame(findFrame(message.window));
+        if (frame) frame->startMoveSize(message.data.l[0], message.data.l[1],
+                               (netwm::MoveResizeDirection)message.data.l[2]);
+    }
 #endif
 #ifdef CONFIG_GNOME_HINTS
     if (message.message_type == atoms.winWorkspace)

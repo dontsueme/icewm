@@ -1069,6 +1069,20 @@ bool YFrameWindow::canMove() {
     return true;
 }
 
+#ifdef CONFIG_WMSPEC_HINTS
+void YFrameWindow::startMoveSize(int x, int y,
+                                 netwm::MoveResizeDirection direction) {
+    if (direction < netwm::moveResizeLast) {
+        char sx[netwm::moveResizeLast] = { -1, 0, 1, 1, 1, 0, -1, -1, 0 };
+        char sy[netwm::moveResizeLast] = { -1, -1, -1, 0, 1, 1, 1, 0, 0 };
+
+        startMoveSize(direction == netwm::moveResizeMove,
+                      true, sx[direction], sy[direction], x, y);
+    } else
+        warn(_("Unknown direction in move/resize request: %d"), direction);
+}
+#endif
+
 void YFrameWindow::startMoveSize(int doMove, int byMouse,
                                  int sideX, int sideY,
                                  int mouseXroot, int mouseYroot) {

@@ -110,6 +110,9 @@ public:
     YFrameTitleBar *titlebar() const { return fTitleBar; }
     YClientContainer *container() const { return fClientContainer; }
 
+#ifdef CONFIG_WMSPEC_HINTS
+    void startMoveSize(int x, int y, netwm::MoveResizeDirection direction);
+#endif
     void startMoveSize(int doMove, int byMouse,
                        int sideX, int sideY,
                        int mouseXroot, int mouseYroot);

@@ -390,7 +390,8 @@ struct netwm {
         moveResizeSizeBottom =      5,
         moveResizeSizeBottomLeft =  6,
         moveResizeSizeLeft =        7,
-        moveResizeMove =            8
+        moveResizeMove =            8,
+        moveResizeLast =            9
     };
     
     enum StateAction {

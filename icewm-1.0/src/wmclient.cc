@@ -623,21 +623,22 @@ void YFrameClient::handleClientMessage(const XClientMessageEvent &message) {
                              WinStateRollup |
                              WinStateMinimized, 0);
         } // !!! handle WithdrawnState if needed
-
+#ifdef CONFIG_GNOME_HINTS
     } else if (message.message_type == atoms.winWorkspace) {
         if (frame()) frame()->workspace(message.data.l[0]);
         else winWorkspace(message.data.l[0]);
     } else if (message.message_type == atoms.winLayer) {
         if (frame()) frame()->layer(message.data.l[0]);
         else winLayer(message.data.l[0]);
+    } else if (message.message_type == atoms.winState) {
+        if (frame()) frame()->state(message.data.l[0], message.data.l[1]);
+        else winState(message.data.l[0], message.data.l[1]);
+#endif        
 #ifdef CONFIG_TRAY	    
     } else if (message.message_type == atoms.icewmTrayOption) {
         if (frame()) frame()->trayOption(message.data.l[0]);
         else icewmTrayOption(message.data.l[0]);
 #endif	    
-    } else if (message.message_type == atoms.winState) {
-        if (frame()) frame()->state(message.data.l[0], message.data.l[1]);
-        else winState(message.data.l[0], message.data.l[1]);
     } else
         YWindow::handleClientMessage(message);
 }
