@@ -28,25 +28,30 @@ YPixmap *menuButton[2] = { 0, 0 };
 YFrameButton::YFrameButton(YWindow *parent,
                            YFrameWindow *frame,
                            YAction *action,
-                           YAction *action2): YButton(parent, 0)
-{
+                           YAction *action2):
+YButton(parent, 0),
+fFrame(frame),
+fAction(action),
+fAction2(action2) {
     if (titleButtonBg == 0)
         titleButtonBg = new YColor(clrNormalTitleButton);
     if (titleButtonFg == 0)
         titleButtonFg = new YColor(clrNormalTitleButtonText);
 
-    fFrame = frame;
-    fAction = action;
-    fAction2 = action2;
-    if (fAction == 0)
+    int w(18), h(18);
+
+    if (NULL == fAction) {
         setPopup(frame->windowMenu());
 
-
-    int w = 18, h = 18;
-    if (minimizePixmap[0]) {
-        w = minimizePixmap[0]->width();
-        h = minimizePixmap[0]->height();
+        if (*menuButton) {
+            w = (*menuButton)->width();
+            h = (*menuButton)->height();
+        }
+    } else if (*minimizePixmap) {
+        w = (*minimizePixmap)->width();
+        h = (*minimizePixmap)->height();
     }
+
     switch (wmLook) {
 #ifdef CONFIG_LOOK_WARP3
     case lookWarp3:

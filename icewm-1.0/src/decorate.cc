@@ -103,7 +103,7 @@ void YFrameWindow::updateMenu() {
 #ifdef CONFIG_TRAY
     if (trayMenu) for (int k(0); k < trayMenu->itemCount(); k++) {
         item = trayMenu->item(k);
-        for (int opt(0); opt < WinTrayOptionCount; opt++)
+        for (int opt(0); opt < IcewmTrayOptionCount; opt++)
             if (item && item->action() == trayOptionActionSet[opt]) {
                 bool const e(opt == getTrayOption());
                 item->setEnabled(!e);
@@ -356,10 +356,8 @@ void YFrameWindow::positionButton(YFrameButton *b, int &xPos, bool onRight) {
     /// !!! clean this up
     if (b == fMenuButton) {
 	const unsigned bw((wmLook == lookPixmap || wmLook == lookMetal || 
-			   wmLook == lookGtk) && 
-			   showFrameIcon || !b->getImage(0) ?
+			   wmLook == lookGtk) && NULL == b->getImage(0) ?
 			   titleY() : b->getImage(0)->width());
-
         if (onRight) xPos -= bw;
         b->setGeometry(xPos, 0, bw, titleY());
         if (!onRight) xPos += bw;
