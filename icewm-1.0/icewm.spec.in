@@ -176,7 +176,7 @@ window list, mailbox status, digital clock. Fast and small.
 This is the experimental version of IceWM. It contains all the features of 
 the GNOME version and some additional experimental features. Those
 experimental features include enhanced move/size effects, antialiasing,
-grandients and shaped window decorations.
+gradients and shaped window decorations.
 
 %prep
 %setup -q
