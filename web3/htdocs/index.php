@@ -10,16 +10,14 @@ href="http://www.xfree86.org/">X11 Window System</a>.
 The goal of IceWM is speed, simplicity,
 and not getting in the user's way.</p>
 </div>
-<h2>News<br>
-</h2>
+<h2>News</h2>
 <ul>
-  <li>Stable version <a href="icewm-1_2_7.php">1.2.7</a> released (2003-03-08)
-  <li>Devel version <a href="http://sourceforge.net/project/showfiles.php?group_id=31">1.2.7pre3</a> released (2003-03-02)
-  <li>Unofficial Slackware packages provided by David Lechnyr <a href="http://hr.uoregon.edu/davidrl/icewm.html">here</a>.
-  <li>Devel version <a href="http://sourceforge.net/project/showfiles.php?group_id=31">1.2.7pre2</a> released (2003-02-26)
+  <li>Stable version <a href="icewm-1_2_7.php">1.2.7</a> released (2003-03-08)</li>
+  <li>Devel version <a href="http://sourceforge.net/project/showfiles.php?group_id=31">1.2.7pre3</a> released (2003-03-02)</li>
+  <li>Unofficial Slackware packages provided by David Lechnyr <a href="http://hr.uoregon.edu/davidrl/icewm.html">here</a>.</li>
+  <li>Devel version <a href="http://sourceforge.net/project/showfiles.php?group_id=31">1.2.7pre2</a> released (2003-02-26)</li>
   <li>Stable version <a href="icewm-1_2_6.php">1.2.6</a> released
-(2003-01-19)<br>
-  </li>
+(2003-01-19)</li>
 </ul>
 <h2>Features</h2>
 <ul>
@@ -101,36 +99,35 @@ SourceForge.</p>
 <h2>Mailing Lists</h2>
 <ul>
   <li>icewm-user - icewm user discussion
-    <p>
+    <br />
 To subscribe to the mailing list send an email to:
 <a href="mailto:icewm-user-request@lists.sourceforge.net">icewm-user-request@lists.sourceforge.net</a>
 with body or subject "subscribe", or visit
 <a href="http://lists.sourceforge.net/mailman/listinfo/icewm-user">http://lists.sourceforge.net/mailman/listinfo/icewm-user</a>.
-    </p>
-    <br/>
+    <br />
   </li>
 
   <li>icewm-devel - discussion of icewm development</li>
-    <p>
+    <br />
 To subscribe to the mailing list send an email to:
 <a href="mailto:icewm-devel-request@lists.sourceforge.net">icewm-devel-request@lists.sourceforge.net</a>
 with body or subject "subscribe", or visit
 <a href="http://lists.sourceforge.net/mailman/listinfo/icewm-devel">http://lists.sourceforge.net/mailman/listinfo/icewm-devel</a>.
-    </p>
-    <br/>
+    <br />
   </li>
   <li>Old yahoo/egroups list <a href="http://groups.yahoo.com/group/icewm/messages">archive</a>.
 </ul>
 <h2>IRC</h2>
 
 <p>The official IRC channel is #icewm at <a
- href="http://www.freenode.info/">freenode</a>.</p>
+ href="http://www.freenode.info/">freenode</a>.
+</p>
 
 <h2>CVS</h2>
 <ul>
   <li><a href="changes.php">View Change Log</a>
-    <br/>
-    <br/>
+    <br />
+    <br />
   </li>
   <li>Anonymous CVS<br />
 Use the following commands to check out the latest icewm source from CVS:
@@ -139,7 +136,7 @@ cvs -d :pserver:anonymous@cvs.icewm.sourceforge.net:/cvsroot/icewm login
 # blank password
 cvs -d :pserver:anonymous@cvs.icewm.sourceforge.net:/cvsroot/icewm co -r icewm-1-2-BRANCH icewm-1.2
 </pre>
-    <br/>
+    <br />
   </li>
   <li><a
  href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/icewm/icewm-1.2">Browse

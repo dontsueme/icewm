@@ -14,7 +14,7 @@
           <a href="http://sourceforge.net/">
            <img width="88" height="31" align="right" border="0"
                 src="http://sourceforge.net/sflogo.php?group_id=31&amp;type=1"
-                alt="SourceForge.net Logo" >
+                alt="SourceForge.net Logo" />
           </a>
          </td>
          <td align="center"><small>

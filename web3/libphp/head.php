@@ -1,8 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-loose.dtd">
 <html>
  <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="icon" href="icewm-ico.png" type="image/png">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="icon" href="icewm-ico.png" type="image/png" />
    
   <title><?php echo ICEWM_TITLE ?></title>
   <style type="text/css">
@@ -25,7 +25,7 @@
         <tr>
          <td bgcolor="#eeeeee">&nbsp;</td>
          <td>
-          <a href="http://www.icewm.org/"><img border="0" src="icewm-logo.png" title="" alt="icewm home page"></a>
+          <a href="http://www.icewm.org/"><img border="0" src="icewm-logo.png" title="" alt="icewm home page" /></a>
          </td>
         </tr>
        </tbody>
