@@ -23,6 +23,8 @@
           logout menu or the logout dialog
         - bugfix: killed some very stupid conditional expressions of the
           kind "cond ? true : false" and vise versa
+        - bugfix: nicer addressbar colors/font for Infadel2
+
         - change: replaced session file suffix ".ses" by ".session"
 
 1.0.9-2: 2001-10-09
