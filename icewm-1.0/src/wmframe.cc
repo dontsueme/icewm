@@ -2303,7 +2303,6 @@ void YFrameWindow::updateLayout() {
                 ny+= (maxHeight - nh) / 2;
             else if (!considerVertBorder)
 	        ny-= borderY();
-
         }
 
         if (isRollup()) nh = 2 * borderY();

@@ -4,6 +4,7 @@
 !!!     - feature: add KDE tray windows to the tray
 !!!     - feature: allow to specify $DESTDIR on "make install"
 !!!     - feature: allow to select wm specs to support on compile time
+        - feature: added support for doxygen source code documentation
         - feature: create tooltip for titlebar and mini icon
         - feature: history function for input fields;
           options: AddressBarHistory, HistoryCapacity,

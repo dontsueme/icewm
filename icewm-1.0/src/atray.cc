@@ -364,9 +364,10 @@ void TrayPane::handleClick(const XButtonEvent &up, int count) {
     }
 }
 
-void TrayPane::paint(Graphics &g, int /*x*/, int /*y*/,
-                     unsigned int /*width*/, unsigned int /*height*/) {
-    int const w(width()), h(height());
+void TrayPane::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsigned int /*height*/) {
+    int const w(width());
+    int const h(height());
+
     g.setColor(taskBarBg);
 
 #ifdef CONFIG_GRADIENTS
