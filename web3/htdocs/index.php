@@ -89,7 +89,7 @@ See themes.
 <p>There you can find almost everything you need to know:</p>
 <ul>
   <li><a href="http://www.icewm.org/manual/">IceWM Manual</a></li>
-  <li><a href="http://www.icewm.org/FAQ/">IceWM FAQ pages</a></li>
+  <li><a href="FAQ/">IceWM FAQ pages</a></li>
 </ul>
 
 <h2>Bug Tracking</h2>
