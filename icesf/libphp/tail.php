@@ -10,7 +10,7 @@
     </small></td><td align=right><small>
      Hosted by <a href="http://sourceforge.net"><img
       src="http://sourceforge.net/sflogo.php?group_id=31&type=1"
-      width="44" height="16" border="0" alt="SourceForge Logo"
+      width=44 height=16 border=0 alt="SourceForge"
       align=middle></a>
     </small></td>
    </tr>

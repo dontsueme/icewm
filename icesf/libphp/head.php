@@ -4,7 +4,7 @@
   define(ICEWM_DEVEL, 	'1.1.0/CVS');
   define(ICEWM_CHANGES,	'1.0.7');
 
-  define(STABLE_DATE,	'2001-02-17');
+  define(STABLE_DATE,	'2001-05-07');
   define(STABLE_ID,	18077);
 
   define(PREFIX,	'/home/groups/i/ic/icewm/');
@@ -27,8 +27,8 @@
   }
 
   function cvsref($label, $file) {
-    echo '<a href="http://cvs.sourceforge.net/cgi-bin/cvsweb.cgi/~checkout~/'.
-    	 "$file?content-type=text/plain&cvsroot=icewm\">$label</a>";
+    echo '<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/'.
+    	 "$file\">$label</a>";
   }
 
   function fileref($name, $extension) {
@@ -37,7 +37,11 @@
     	 "$name-".ICEWM_STABLE.".$extension</a>";
   }
 
+  $firstBlock=1;
+ 
   function beginBlock($title=0, $anchor=0) {
+    global $firstBlock;
+
 ?>
   <table width="90%" align=center bgcolor="#666666"
    cellpadding=2 cellspacing=10>
@@ -53,6 +57,11 @@
      </tr><tr>
 <?php endif ?>
       <td>
+<?php if($firstBlock): ?>
+       <a href="http://sourceforge.net/"><img
+        src="/cgi-bin/sflogo.sh" align=right width=31 height=88 border=0
+        alt="Hosted by Sourceforge"></a>
+<?php $firstBlock=0; endif ?>
 <?php
   }
 
