@@ -2,7 +2,7 @@
 <article>
 <title>IceWM
 <author>Marko Macek, <tt/Marko.Macek@gmx.net/</author>
-<date>1.0.7, 2001 Mar 04
+<date>1.0.10, 2001 Oct 16
 <abstract>
 This document is the documentation for the IceWM X11 window manager.
 
@@ -211,6 +211,26 @@ all history items with the same prefix.
 <tag/Ctrl+Alt+Shift+RightArrow/ Move the focused window to the next workspace and activate it.
 <tag/Ctrl+Alt+Shift+DownArrow/ Move the focused window to the previously active workspace and activate it.
 <tag/Ctrl+Alt+Delete/ displays the session dialog.
+</descrip>
+
+<sect1>Window movement
+
+During window movement/resizing additional keys are defined.<p>
+
+<descrip>
+<tag/Shift/ Speed up manipulation by factor 4
+<tag/Ctrl/ Speed up manipulation by factor 16
+<tag/Shift+Ctrl/ Speed up manipulation by factor 64
+<tag/Left/ Move/resize to the left
+<tag/Right/ Move/resize to the right
+<tag/Up/ Move/resize upwards
+<tag/Down/ Move/resize downwards
+<tag/Home/ Move to the left corner
+<tag/End/ Move to the right corner
+<tag/PageUp/ Move to the top corner
+<tag/PageDown/ Move to the bottom corner
+<tag/Keypad 5/ Center the window
+<tag/Escape/ Abort
 </descrip>
 
 <sect>Configuration/Resource/Library Path<p><label id="lib">
