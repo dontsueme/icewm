@@ -429,6 +429,11 @@ bool SwitchWindow::handleKey(const XKeyEvent &key) {
             return true;
         }
     } else if (key.type == KeyRelease) {
+        if (!modDown(m)) {
+            accept();
+            return true;
+        }
+/*
         if ((IS_WMKEY(k, vm, gKeySysSwitchNext)) && !modDown(m)) {
             accept();
             return true;
@@ -436,6 +441,7 @@ bool SwitchWindow::handleKey(const XKeyEvent &key) {
             accept();
             return true;
         }
+*/        
     }
     return YPopupWindow::handleKey(key);
 }
@@ -454,11 +460,7 @@ bool SwitchWindow::isModKey(KeyCode c) {
 }
 
 bool SwitchWindow::modDown(int mod) {
-    int m = mod & (app->AltMask | app->MetaMask | app->HyperMask | app->SuperMask | ControlMask);
-
-    if ((m & modsDown) != modsDown)
-        return false;
-    return true;
+    return ((mod & app->KeyMask & modsDown) == modsDown);
 }
 
 void SwitchWindow::handleButton(const XButtonEvent &button) {
