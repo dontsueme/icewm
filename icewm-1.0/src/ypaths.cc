@@ -253,10 +253,9 @@ char *YResourcePaths::kdeFilename(char const *basename,
  * The value of the KDEMenuDir options and if not set
  * "$KDEDIR/share/applnk" is returned.
  */
-char *YResourcePaths::kdeFilename(char const *basename,
-                                  char const *suffix) {
-    return '\0' == *kdeMenuDir ? YResourcePath::kdeFilename("/share/applnk")
-                               : kdeMenuDir;
+char *YResourcePaths::kdeMenuPath(void) {
+    return '\0' == *kdeMenuDir ? kdeFilename("/share/applnk")
+                               : strdup(kdeMenuDir);
 }
 
 #endif

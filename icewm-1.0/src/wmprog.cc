@@ -468,7 +468,7 @@ void StartMenu::updatePopup() {
     if (autoReloadMenus) {
         char *gnomeAppsMenu(gnome_datadir_file("gnome/apps/"));
         char *gnomeUserMenu(gnome_util_home_file("apps/"));
-        const char *kdeMenu(YResourcePath::kdeMenuPath());
+        const char *kdeMenu(YResourcePaths::kdeMenuPath());
 
         struct stat sb;
         bool dirty = false;
@@ -534,7 +534,7 @@ void StartMenu::refresh() {
 
         char *gnomeAppsMenu(gnome_datadir_file("gnome/apps/"));
         char *gnomeUserMenu(gnome_util_home_file("apps/"));
-        const char *kdeMenu(YResourcePath::kdeMenuPath());
+        const char *kdeMenu(YResourcePaths::kdeMenuPath());
 
         fHasGnomeAppsMenu = showGnomeAppsMenu &&
 			    !access(gnomeAppsMenu, X_OK | R_OK);
