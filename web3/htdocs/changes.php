@@ -34,17 +34,18 @@
 	echo "  <li>$line  <ul>";
 	$rel = substr($line, 0, strpos($line, ':'));
       } else {					// print changed item
-        if ($have_item) { echo "\n  </li>";  $have_item = 0; }
         $line = preg_replace('/#(\d+)/',
                              '<a href="'.BUGTRACKER.'&aid=\1">#\1</a>',
                              trim($line));
 
-        if ($line[0] == '-')
+        if ($line[0] == '-') {
+          if ($have_item) { echo "\n  </li>";  $have_item = 0; }
           echo "\n    <li>".substr($line,2);
-        else if ($line[0] == "!")
+        } else if ($line[0] == "!") {
+          if ($have_item) { echo "\n  </li>";  $have_item = 0; }
           echo "\n    <li><em>In progress: </em>".
 	       substr($line, strpos($line, '-') + 1);
-        else
+        } else
           echo " $line";
         $have_item = 1;
       }
