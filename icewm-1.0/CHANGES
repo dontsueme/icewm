@@ -37,7 +37,7 @@
           by the current theme
         - bugfix: window menu crashed when tray completely disabled
         - bugfix: tray crashed when compiled without gradient support
-        - bugfix: #469081 Java cause IceWM to crash on mapping
+        - bugfix: #469081 Java causes IceWM to crash on mapping
 
 1.0.9: 2001-10-08
         - feature: new translations: Croatian (Vlatko Kosturjak),
