@@ -23,7 +23,7 @@
     
       if ($line[0] >= '0' && $line[0] <= '9') {	// print release marker
         if ($rel) {
-          echo "\n  </ul>\n";
+          echo "\n  </ul>";
           echo "\n  </li>\n";
 	  if ($rel == $stop)
             break;
@@ -37,10 +37,10 @@
                              trim($line));
 
         if ($line[0] == '-')
-          echo "\n    <li>".substr($line,2);
+          echo "\n    <li>".substr($line,2)."</li>";
         else if ($line[0] == "!")
           echo "\n    <li><em>In progress: </em>".
-	       substr($line, strpos($line, '-') + 1);
+	       substr($line, strpos($line, '-') + 1)."</li>";
         else
           echo " $line";
       }
