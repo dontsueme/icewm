@@ -1,7 +1,7 @@
 <?php
   define(ICEWM_TITLE,  'ChangeLog');
   define(ICEWM_SCRIPT, $SCRIPT_FILENAME);
-  define(CHANGELOG,    '../CHANGES');
+  define(CHANGELOG,    '../cvs/icewm-1.2/CHANGES');
   define(STOP_CHANGES, '1.2.0');
   define(BUGTRACKER,	'http://sourceforge.net/tracker/index.php?'.
 			'func=detail&group_id=31&atid=100031');
