@@ -13,6 +13,7 @@
 !!!     - bugfix: netstat overflow
 !!!     - bugfix: fixed maximized terminals gap bug (again, sig!)
 !!!     - bugfix: don't autohide taskbar when addressbar has focus
+        - bugfix: select correct bevel color for selected menu items
         - bugfix: replaced --with-kde-dir and KDEDataDir by the
           KDEMenuDir option: If emtpy $KDEDIR/share/applnk will be
           passed to the GNOME libraries.

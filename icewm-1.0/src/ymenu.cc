@@ -32,6 +32,12 @@ int YMenu::fAutoScrollDeltaY = 0;
 int YMenu::fAutoScrollMouseX = -1;
 int YMenu::fAutoScrollMouseY = -1;
 
+#ifdef OLDMOTIF
+#define CONFIG_RAISE_MENU_ITEM (wmLook == lookMotif)
+#else
+#define CONFIG_RAISE_MENU_ITEM (false)
+#endif
+
 void YMenu::setActionListener(YActionListener *actionListener) {
     fActionListener = actionListener;
 }
@@ -945,31 +951,28 @@ void YMenu::paintItem(Graphics &g, int i, int &l, int &t, int &r, int minY, int 
                 g.setColor(menuBg);
             }
 
-            if (wmLook != lookWin95 && wmLook != lookWarp4 &&
-                active) {
-                bool raised(false);
-#ifdef OLDMOTIF
-                if (wmLook == lookMotif)
-                    raised = true;
-#endif
-
-                g.setColor(menuBg);
-                if (wmLook == lookGtk)
+            if (wmLook != lookWin95 && wmLook != lookWarp4 && active) {
+                if (wmLook == lookGtk) {
+                    g.setColor(activeMenuItemBg);
                     g.drawBorderW(l, t, width() - r - l - 1, eh - 1, true);
-                else if (wmLook == lookMetal) {
+                } else if (wmLook == lookMetal) {
                     g.setColor((activeMenuItemBg ? activeMenuItemBg
 		    				 : menuBg)->darker());
                     g.drawLine(l, t, width() - r - l, t);
                     g.setColor((activeMenuItemBg ? activeMenuItemBg
 		    				 : menuBg)->brighter());
                     g.drawLine(l, t + eh - 1, width() - r - l, t + eh - 1);
-                } else
+                } else {
+                    bool const raised(CONFIG_RAISE_MENU_ITEM);
+
+                    g.setColor(activeMenuItemBg && raised ? activeMenuItemBg
+                                                          : menuBg);
                     g.draw3DRect(l, t, width() - r - l - 1, eh - 1, raised);
-
-
-                if (wmLook == lookMotif)
-                    g.draw3DRect(l + 1, t + 1,
-                                 width() - r - l - 3, eh - 3, raised);
+                    
+                    if (wmLook == lookMotif)
+                        g.draw3DRect(l + 1, t + 1, width() - r - l - 3, eh - 3,
+                                     raised);
+                }
             }
 
             YColor *fg(mitem->isEnabled() ? active ? activeMenuItemFg
@@ -1044,16 +1047,18 @@ void YMenu::paintItem(Graphics &g, int i, int &l, int &t, int &r, int minY, int 
 //                int active = ((mitem->action() == 0 && i == selectedItem) ||
 //                              fPopup == mitem->submenu()) ? 1 : 0;
                 if (mitem->action()) {
-                    g.setColor(menuBg);
                     if (0) {
 			drawBackground(g, width() - r - 1 -ih - pad, t + top + pad, ih, ih);
                         g.drawBorderW(width() - r - 1 - ih - pad, t + top + pad,
                                       ih - 1, ih - 1, !active);
                     } else {
-                        g.setColor(menuBg->darker());
+                        YColor *bgColor(activeMenuItemBg && active
+                            ? activeMenuItemBg : menuBg);
+
+                        g.setColor(bgColor->darker());
                         g.drawLine(cascadePos, t + top + pad,
                                    cascadePos, t + top + pad + ih);
-                        g.setColor(menuBg->brighter());
+                        g.setColor(bgColor->brighter());
                         g.drawLine(cascadePos + 1, t + top + pad,
                                    cascadePos + 1, t + top + pad + ih);
 
@@ -1062,15 +1067,17 @@ void YMenu::paintItem(Graphics &g, int i, int &l, int &t, int &r, int minY, int 
                 }
 
                 if (wmLook == lookGtk || wmLook == lookMotif) {
-                    int asize = 9;
-                    int ax = delta + width() - r - 1 - asize * 3 / 2;
-                    int ay = delta + t + top + pad + (ih - asize) / 2;
-                    g.setColor(menuBg);
+                    int const asize(9);
+                    int const ax(delta + width() - r - 1 - asize * 3 / 2);
+                    int const ay(delta + t + top + pad + (ih - asize) / 2);
+
+                    g.setColor(activeMenuItemBg && active ? activeMenuItemBg
+                                                          : menuBg);
                     g.drawArrow(Right, ax, ay, asize, active);
                 } else {
-                    int asize = 9;
-                    int ax = width() - r - 1 - asize;
-                    int ay = delta + t + top + pad + (ih - asize) / 2;
+                    int asize(9);
+                    int const ax(width() - r - 1 - asize);
+                    int const ay(delta + t + top + pad + (ih - asize) / 2);
 
                     g.setColor(fg);
 		    
