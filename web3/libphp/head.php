@@ -7,7 +7,7 @@
   </style>
  <body marginwidth="0" marginheight="0">
   
-  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background: black;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #040508;">
     <tbody>
       <tr>
         <td><a href="http://www.icewm.org/"><img border="0" src="ice-left.jpg" title="" alt="icewm home page"></a></td>

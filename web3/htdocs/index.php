@@ -8,7 +8,7 @@
 <p> IceWM is a window manager for the <a
 href="http://www.xfree86.org/">X11 Window System</a>.
 The goal of IceWM is speed, simplicity,
-and not being in the way of the user.</p>
+and not getting in the user's way.</p>
 </div>
 <h2>News<br>
 </h2>
