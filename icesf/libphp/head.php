@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <?php
-  define(ICEWM_STABLE,	'1.0.8-5');
+  define(ICEWM_STABLE,	'1.0.8-4');
   define(ICEWM_DEVEL, 	'1.1.0/CVS');
   define(ICEWM_CHANGES,	'1.0.7');
 
