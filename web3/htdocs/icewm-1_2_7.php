@@ -22,6 +22,7 @@
     <li><a
  href="http://ftp1.sourceforge.net/icewm/icewm-menu-gnome1-1.2.7-1.i386.rpm">icewm-menu-gnome1-1.2.7-1.i386.rpm</a></li>
   </ul>
+  <li><a href="changes.php">Change Log</a></li>
 </ul>
 
 <?php include('../libphp/tail.php') ?>
