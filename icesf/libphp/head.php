@@ -129,7 +129,7 @@
   </style>
  </head>
 
- <body bgcolor="#00aaaa" text="#000000" 
+ <body bgcolor="#00aaff" text="#000000" 
   link="#0000ff" alink="#ff0000" vlink="#000080" marginwidth=0 marginheight=0>
   <table width="100%" bgcolor="#666666" border=0 cellpadding=0 cellspacing=0>
    <tr valign=top>

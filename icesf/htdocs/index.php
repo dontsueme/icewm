@@ -56,7 +56,6 @@ A small screenshot displaying the default look is <A HREF="screenshot.jpg">here<
 	</tr><tr>
 	 <td valign=top>
 	  <ul>
-	   <li><?php fileref('icewm','tar.bz2')?>
 	   <li><?php fileref('icewm','tar.gz')?>
 	   <li><?php fileref('icewm','src.rpm')?>
 	  </ul><br>
