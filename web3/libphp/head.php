@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
  <head>
-  <title><?php echo PAGE_TITLE ?></title>
+  <title><?php echo ICEWM_TITLE ?></title>
   <style type="text/css">
   p, h2, ul { margin-left: 16px; }
   </style>
