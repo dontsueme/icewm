@@ -70,7 +70,7 @@ A small screenshot displaying the default look is <A HREF="screenshot.jpg">here<
 	</tr><tr>
 	 <td valign=top>
 	  <ul>
-	   <li><?php fileref('icewm','i386.rpm')?>
+	   <li><?php fileref('icewm','-1.i386.rpm')?>
 	   <li><?php fileref('icewm-themes','-1.i386.rpm')?>
 	   <li><?php fileref('icewm-l10n','-1.i386.rpm')?>
 	   <li><?php fileref('icewm-menu-gnome1','-1.i386.rpm')?>
