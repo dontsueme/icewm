@@ -16,6 +16,7 @@
   function changes($stop = 0) {
     $clog = fopen(CHANGELOG, 'r');
     $rel = 0;
+    $have_item = 0;
   
     echo "\n<ul>\n";
     while($clog && !feof($clog)) {
@@ -23,6 +24,7 @@
     
       if ($line[0] >= '0' && $line[0] <= '9') {	// print release marker
         if ($rel) {
+          if ($have_item) { echo "\n  </li>";  $have_item = 0; }
           echo "\n  </ul>";
           echo "\n  </li>\n";
 	  if ($rel == $stop)
@@ -37,14 +39,16 @@
                              trim($line));
 
         if ($line[0] == '-')
-          echo "\n    <li>".substr($line,2)."</li>";
+          echo "\n    <li>".substr($line,2);
         else if ($line[0] == "!")
           echo "\n    <li><em>In progress: </em>".
-	       substr($line, strpos($line, '-') + 1)."</li>";
+	       substr($line, strpos($line, '-') + 1);
         else
           echo " $line";
+        $have_item = 1;
       }
     }
+    if ($have_item) { echo "\n  </li>";  $have_item = 0; }
     echo "\n</ul>\n";
     fclose($clog);
   }
