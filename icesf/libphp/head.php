@@ -72,7 +72,7 @@
     while($clog && !feof($clog)) {
       $line = fgets($clog, 4096);
     
-      if ($line[0] >= '0' &&$line[0] <= '9') {
+      if ($line[0] >= '0' &&$line[0] <= '9') {	// print release marker
         if ($rel) {
           echo "\n</ul>\n";
 	  if ($rel == $stop) return;
@@ -80,22 +80,24 @@
       
 	echo "<li>$line<ul>";
 	$rel = substr($line, 0, strpos($line, ':'));
-      } else {
-        $line = preg_replace('/#(\d+)/', 
-      			     '<a href="'.BUGTRACKER.'&aid=\1">#\1</a>',
-			     trim($line));
+      } else {					// print changed item
+        $line = preg_replace('/#(\d+)/',
+                             '<a href="'.BUGTRACKER.'&aid=\1">#\1</a>',
+                             trim($line));
 
-	if ($line[0] == '-') $line = "\n<li>".substr($line,2);
-	if ($line[0] == "!!!\t-") $line = "\n<li><b>TODO</b>".substr($line,2);
-        
-	echo $line
+        if ($line[0] == '-')
+          $line = "\n<li>".substr($line,2);
+        else if ($line[0] == "!")
+          $line = "\n<li><em>In progress: </em>".substr($line,strpos($line,'-')+1);
+
+        echo $line;
       }
     }
 
     fclose($clog);
   }
 ?>
-
+!!!     -
 <html>
  <head>
   <title>[IceWM-Devel] <?php echo ICEWM_TITLE ?></title>
