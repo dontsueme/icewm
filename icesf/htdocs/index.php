@@ -71,10 +71,10 @@ A small screenshot displaying the default look is <A HREF="screenshot.jpg">here<
 	</tr><tr>
 	 <td valign=top>
 	  <ul>
-	   <li><?php fileref('icewm-common','noarch.rpm')?>
-	   <li><?php fileref('icewm-default','i386.rpm')?>
-	   <li><?php fileref('icewm-lite','i386.rpm')?>
-	   <li><?php fileref('icewm-gnome','i386.rpm')?>
+	   <li><?php fileref('icewm','i386.rpm')?>
+	   <li><?php fileref('icewm-themes','i386.rpm')?>
+	   <li><?php fileref('icewm-l10n','i386.rpm')?>
+	   <li><?php fileref('icewm-menu-gnome1','i386.rpm')?>
 	  </ul><br>
 	 </td>
 	</tr><tr>
