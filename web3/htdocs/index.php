@@ -13,6 +13,7 @@ and not getting in the user's way.</p>
 <h2>News<br>
 </h2>
 <ul>
+  <li>Devel version <a href="http://sourceforge.net/project/showfiles.php?group_id=31">1.2.7pre3</a> released (2003-03-02)
   <li>Unofficial Slackware packages provided by David Lechnyr <a href="http://hr.uoregon.edu/davidrl/icewm.html">here</a>.
   <li>Devel version <a href="http://sourceforge.net/project/showfiles.php?group_id=31">1.2.7pre2</a> released (2003-02-26)
   <li>Stable version <a href="icewm-1_2_6.php">1.2.6</a> released
