@@ -4,7 +4,7 @@
 
   include('../libphp/head.php');
 ?>
-<h2>Stable Release - 2002-01-20<br>
+<h2>Stable Release - 2003-01-20<br>
 </h2>
 <ul>
   <li style="font-weight: bold;">Source code</li>

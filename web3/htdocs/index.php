@@ -39,31 +39,29 @@ TODO: page with some of the best icewm themes (contrib).
 <h2>Translations</h2>
 
 <ul>
-  <li>Catalan</li>
-  <li>Croatian</li>
-  <li>Czech</li>
-  <li>English</li>
-  <li>Finnish</li>
-  <li>French</li>
-  <li>German</li>
-  <li>Hungarian</li>
-  <li>Italian</li>
-  <li>Japanese</li>
-  <li>Lithuanian</li>
-  <li>Norwegian</li>
-  <li>Polish</li>
-  <li>Portuguese</li>
-  <li>Romanian</li>
-  <li>Russian</li>
-  <li>Slovenian</li>
-  <li>Spanish</li>
-  <li>Swedish</li>
-  <li>Ukranian</li>
-  <li>Traditional Chinese (zh_CN.GB2312)</li>
-  <li>Traditional Chinese (zh_TW.Big5)</li>
+  <li><b>Catalan</b> (Toni Cu&ntilde;at i Alario)</li>
+  <li><b>Croatian</b> (Vlatko Kosturjak)</li>
+  <li><b>Czech</b> (Jan Hor&aacute;k)</li>
+  <li><b>English</b></li>
+  <li><b>Finnish</b> (Mika Lepp&auml;nen)</li>
+  <li><b>French</b> (Laurent Pouillet, Frederic Dubuy)</li>
+  <li><b>German</b> (Mathias Hasselmann)</li>
+  <li><b>Hungarian</b> (Gabor Suveg)</li>
+  <li><b>Italian</b> (Riccardo Murri)</li>
+  <li><b>Japanese</b> (Yoichi ASAI)</li>
+  <li><b>Lithuanian</b> (Martynas Jocius, Gediminas Paulauskas)</li>
+  <li><b>Norwegian</b> (Petter Johan Olsen) </li>
+  <li><b>Polish</b> (Przemys&#0322;aw Su&#0322;ek)</li>
+  <li><b>Portuguese</b> (pt_BR) (Fernando Brunelli)</li>
+  <li><b>Romanian</b> (Tiberiu Micu) </li>
+  <li><b>Russian</b> (Alone, Anton Farygin)</li>
+  <li><b>Slovenian</b> (Jernej Kovacic) </li>
+  <li><b>Spanish</b> (Antonio de la Torre)</li>
+  <li><b>Swedish</b> (Per Larsson)</li>
+  <li><b>Ukranian</b> (Volodymyr M. Lisivka)</li>
+  <li><b>Traditional Chinese - zh_CN.GB2312</b> (Li Wei Jih, Liu Zhuyuan)</li>
+  <li><b>Traditional Chinese - zh_TW.Big5</b> (Li Wei Jih)</li>
 </ul>
-
-TODO: add translation maintainers here
 
 <h2>Documentation</h2>
 TODO: link to docs, FAQ here.
