@@ -99,23 +99,24 @@ SourceForge.</p>
 <h2>Mailing Lists</h2>
 <ul>
   <li>icewm-user - icewm user discussion
-    <br />
+    <p>
 To subscribe to the mailing list send an email to:
 <a href="mailto:icewm-user-request@lists.sourceforge.net">icewm-user-request@lists.sourceforge.net</a>
 with body or subject "subscribe", or visit
 <a href="http://lists.sourceforge.net/mailman/listinfo/icewm-user">http://lists.sourceforge.net/mailman/listinfo/icewm-user</a>.
-    <br />
+    </p>
   </li>
 
-  <li>icewm-devel - discussion of icewm development</li>
-    <br />
+  <li>icewm-devel - discussion of icewm development
+    <p>
 To subscribe to the mailing list send an email to:
 <a href="mailto:icewm-devel-request@lists.sourceforge.net">icewm-devel-request@lists.sourceforge.net</a>
 with body or subject "subscribe", or visit
 <a href="http://lists.sourceforge.net/mailman/listinfo/icewm-devel">http://lists.sourceforge.net/mailman/listinfo/icewm-devel</a>.
-    <br />
+    </p> 
   </li>
   <li>Old yahoo/egroups list <a href="http://groups.yahoo.com/group/icewm/messages">archive</a>.
+  </li>
 </ul>
 <h2>IRC</h2>
 
