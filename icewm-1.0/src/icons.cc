@@ -258,6 +258,13 @@ YIcon::YIcon(Image * small, Image * large, Image * huge) :
 }
 
 YIcon::~YIcon() {
+    if (this != firstIcon) {
+        YIcon * icn(firstIcon);
+        while (this != icn->fNext) icn = icn->fNext;
+        icn->fNext = fNext;
+    } else
+        firstIcon = fNext;
+
     delete fHuge; fHuge = NULL;
     delete fLarge; fLarge = NULL;
     delete fSmall; fSmall = NULL;
