@@ -383,19 +383,20 @@ TaskBar::TaskBar(YWindow *aParent):
 #ifdef CONFIG_APPLET_APM
         if (fApm) {
             rightX -= 2;
-            fApm->setPosition(rightX - fApm->width(), BASE1 + (ht - ADD1 - fApm->height()) / 2);
+            fApm->setPosition(rightX - fApm->width(),
+                              BASE1 + (ht - ADD1 - fApm->height()) / 2);
             fApm->show();
             rightX -= fApm->width() + 2;
         }
 #endif
 #ifdef CONFIG_APPLET_MAILBOX
         if (fMailBoxStatus)
-	    for (MailBoxStatus ** m(fMailBoxStatus); *m; ++m) {
-		(*m)->setPosition(rightX - (*m)->width() - 1,
-                                  BASE2 + (ht - ADD2 - (*m)->height()) / 2);
+	    for (MailBoxStatus ** mbox(fMailBoxStatus); *mbox; ++mbox) {
+		(*mbox)->setPosition(rightX - (*mbox)->width() - 1,
+                                  BASE2 + (ht - ADD2 - (*mbox)->height()) / 2);
 
-		(*m)->show();
-		rightX -= (*m)->width() + 2;
+		(*mbox)->show();
+		rightX -= (*mbox)->width() + 2;
 	    }
 #endif
 #ifdef CONFIG_APPLET_CPU_STATUS
@@ -411,14 +412,14 @@ TaskBar::TaskBar(YWindow *aParent):
 
 #ifdef HAVE_NET_STATUS
         if (fNetStatus)
-	    for (NetStatus ** m(fNetStatus); *m; ++m) {
+	    for (NetStatus ** netstat(fNetStatus); *netstat; ++netstat) {
 		rightX -= 2;
 
-		(*m)->setPosition(rightX - (*m)->width() - 1,
-				  BASE1 + (ht - ADD1 - (*m)->height()) / 2);
+		(*netstat)->setPosition(rightX - (*netstat)->width() - 1,
+				  BASE1 + (ht - ADD1 - (*netstat)->height()) / 2);
 
 		// don't do a show() here because PPPStatus takes care of it
-		rightX -= (*m)->width() + 2;
+		rightX -= (*netstat)->width() + 2;
 	    }
 #endif
 
@@ -487,12 +488,12 @@ TaskBar::TaskBar(YWindow *aParent):
 #endif
 #ifdef CONFIG_APPLET_MAILBOX
         if (fMailBoxStatus)
-	    for (MailBoxStatus ** m(fMailBoxStatus); *m; ++m) {
-		(*m)->setPosition(rightX - (*m)->width() - 1,
-				  BASE2 + (ht - ADD2 - (*m)->height()) / 2);
+	    for (MailBoxStatus ** mbox(fMailBoxStatus); *mbox; ++mbox) {
+		(*mbox)->setPosition(rightX - (*mbox)->width() - 1,
+				  BASE2 + (ht - ADD2 - (*mbox)->height()) / 2);
 
-		(*m)->show();
-		rightX -= (*m)->width() + 2;
+		(*mbox)->show();
+		rightX -= (*mbox)->width() + 2;
             }
 #endif
 #ifdef CONFIG_APPLET_CPU_STATUS
@@ -507,14 +508,14 @@ TaskBar::TaskBar(YWindow *aParent):
 #endif
 #ifdef HAVE_NET_STATUS
         if (fNetStatus)
-	    for (NetStatus ** m(fNetStatus); *m; ++m) {
+	    for (NetStatus ** netstat(fNetStatus); *netstat; ++netstat) {
 		rightX -= 2;
 
-		(*m)->setPosition(rightX - (*m)->width() - 1,
-				  BASE1 + (ht - ADD1 - (*m)->height()) / 2);
+		(*netstat)->setPosition(rightX - (*netstat)->width() - 1,
+				  BASE1 + (ht - ADD1 - (*netstat)->height()) / 2);
 
 		// don't do a show() here because PPPStatus takes care of it
-		rightX -= (*m)->width() + 2;
+		rightX -= (*netstat)->width() + 2;
             }
 #endif
 #ifdef CONFIG_APPLET_APM
