@@ -24,6 +24,7 @@
       if ($line[0] >= '0' && $line[0] <= '9') {	// print release marker
         if ($rel) {
           echo "\n  </ul>\n";
+          echo "\n  </li>\n";
 	  if ($rel == $stop)
             break;
 	}
