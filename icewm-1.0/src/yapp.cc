@@ -944,21 +944,20 @@ void YApplication::saveEventTime(XEvent &xev) {
 
 void YApplication::handleSignal(int sig) {
     if (sig == SIGCHLD) {
-        int s, rc;
-        do {
-            rc = waitpid(-1, &s, WNOHANG);
-        } while (rc > 0);
+        int rc;
+	while ((rc = waitpid(-1, NULL, WNOHANG)) > 0);
     }
 }
 
 void YApplication::handleIdle() {
 }
 
-void sig_handler(int sig) {
+static void signalDispatcher(int sig) {
     unsigned char uc = sig;
-    static const char *s = "icewm: signal error\n";
+    static const char s[] = "icewm: signal error\n";
+
     if (write(signalPipe[1], &uc, 1) != 1)
-        write(2, s, strlen(s));
+        write(2, s, sizeof(s) - 1);
 }
 
 void YApplication::catchSignal(int sig) {
@@ -966,7 +965,7 @@ void YApplication::catchSignal(int sig) {
     sigprocmask(SIG_BLOCK, &signalMask, NULL);
 
     struct sigaction sa;
-    sa.sa_handler = sig_handler;
+    sa.sa_handler = signalDispatcher;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
     sigaction(sig, &sa, NULL);
