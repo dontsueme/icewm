@@ -55,12 +55,12 @@ char const *YHistory::get(int index) const {
     return index < count() ? fItems[(fHead + index) % historyCapacity] : NULL;
 }
 
-char * YHistory::getFilename(char const *id) {
-    return YResourcePaths::getPrivateFilename(id, ".history");
+char * YHistory::filename(char const *id) {
+    return YResourcePaths::privateFilename(id, ".history");
 }
 
 void YHistory::restore(void) {
-    char *filename(getFilename());
+    char *filename(filename());
     FILE *history(fopen(filename, "r"));
 
     fCommitChanges = false;
@@ -83,7 +83,7 @@ void YHistory::restore(void) {
 
 void YHistory::commit(void) {
     if (fCommitChanges) {
-    	char *filename(getFilename());
+    	char *filename(filename());
         FILE *history(fopen(filename, "w"));
 
         if (NULL != history) {

@@ -197,7 +197,13 @@ YPixbuf * YResourcePaths::loadPixbuf(char const * base, char const * name,
 }
 #endif
 
-char const *YResourcePaths::getPrivateDirectory(void) {
+/**
+ * Returns the name of the user's icewm directory.
+ *
+ * The directory's name is built by expanding "$HOME/.icewm/".
+ * Side effect: The private directory is created if it doesn't exist.
+ */
+char const *YResourcePaths::privateDirectory(void) {
     static char *privateDirectory(NULL);
     
     if (NULL == privateDirectory)
@@ -207,7 +213,50 @@ char const *YResourcePaths::getPrivateDirectory(void) {
     return privateDirectory;
 }
 
-char *YResourcePaths::getPrivateFilename(char const *basename,
-                                         char const *suffix) {
-    return strJoin(getPrivateDirectory(), basename, suffix, NULL);
+/**
+ * Returns a filename in the user's private icewm directory.
+ *
+ * The filename is built by expanding "$HOME/.icewm/$basename$suffix".
+ * Side effect: The private directory is created if it doesn't exist.
+ */
+char *YResourcePaths::privateFilename(char const *basename,
+                                      char const *suffix) {
+    return strJoin(privateDirectory(), basename, suffix, NULL);
 }
+
+#ifdef CONFIG_GNOME_MENUS
+
+/**
+ * Returns the name of KDE's toplevel directory.
+ *
+ * When $KDEDIR is set it's value is returned, the value passed
+ * to the configure script's --with-kdedir switch otherwise.
+ */
+char const *YResourcePaths::kdeDirectory(void) {
+    char const *kdedir(getenv("KDEDIR"));
+    return (kdedir ? kdedir : KDEDIR);
+}
+
+/**
+ * Returns a filename in the KDE directory.
+ *
+ * In general the filename is built by expanding "$KDEDIR/$basename$suffix".
+ */
+char *YResourcePaths::kdeFilename(char const *basename,
+                                  char const *suffix) {
+    return strJoin(kdeDirectory(), basename, suffix, NULL);
+}
+
+/**
+ * Returns the path to the KDE menu.
+ *
+ * The value of the KDEMenuDir options and if not set
+ * "$KDEDIR/share/applnk" is returned.
+ */
+char *YResourcePaths::kdeFilename(char const *basename,
+                                  char const *suffix) {
+    return '\0' == *kdeMenuDir ? YResourcePath::kdeFilename("/share/applnk")
+                               : kdeMenuDir;
+}
+
+#endif

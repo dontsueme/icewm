@@ -466,11 +466,9 @@ void StartMenu::updatePopup() {
 
 #ifdef CONFIG_GNOME_MENUS
     if (autoReloadMenus) {
-        char *gnomeAppsMenu = gnome_datadir_file("gnome/apps/");
-        char *gnomeUserMenu = gnome_util_home_file("apps/");
-        const char *kdeMenu = '\0' == *kdeMenuDir
-                            ? strJoin(getenv("KDEDIR"), "/share/applnk", NULL)
-                            : kdeMenuDir;
+        char *gnomeAppsMenu(gnome_datadir_file("gnome/apps/"));
+        char *gnomeUserMenu(gnome_util_home_file("apps/"));
+        const char *kdeMenu(YResourcePath::kdeMenuPath());
 
         struct stat sb;
         bool dirty = false;
@@ -534,11 +532,9 @@ void StartMenu::refresh() {
         YIcon *gnomeIcon = 0;
         YIcon *kdeIcon = 0;
 
-        char *gnomeAppsMenu = gnome_datadir_file("gnome/apps/");
-        char *gnomeUserMenu = gnome_util_home_file("apps/");
-        const char *kdeMenu = '\0' == *kdeMenuDir
-                            ? strJoin(getenv("KDEDIR"), "/share/applnk", NULL)
-                            : kdeMenuDir;
+        char *gnomeAppsMenu(gnome_datadir_file("gnome/apps/"));
+        char *gnomeUserMenu(gnome_util_home_file("apps/"));
+        const char *kdeMenu(YResourcePath::kdeMenuPath());
 
         fHasGnomeAppsMenu = showGnomeAppsMenu &&
 			    !access(gnomeAppsMenu, X_OK | R_OK);

@@ -132,7 +132,7 @@ char *getsesfile() {
     static char *filename(NULL);
 
     if (NULL == filename)
-        filename = YResourcePaths::getPrivateFilename(newSessionId, ".session");
+        filename = YResourcePaths::privateFilename(newSessionId, ".session");
 
     return filename;
 }

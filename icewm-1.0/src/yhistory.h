@@ -14,8 +14,8 @@ public:
     void add(char const * str);
     char const *get(int index) const;
 
-    char *getFilename(void) { return getFilename(fId); }
-    static char *getFilename(char const *id);
+    char *filename(void) { return filename(fId); }
+    static char *filename(char const *id);
 
     void restore(void);
     void commit(void);

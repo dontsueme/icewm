@@ -24,7 +24,7 @@ struct YPathElement {
 
 class YResourcePaths {
 public:
-    YResourcePaths() : fPaths(NULL) {}
+    YResourcePaths(void) : fPaths(NULL) {}
     YResourcePaths(YResourcePaths const & other) :
 	fPaths(NULL) { operator= (other); }
     YResourcePaths(char const *subdir, bool themeOnly = false) : 
@@ -32,7 +32,7 @@ public:
     YResourcePaths(YResourcePaths const & other, char const *subdir,
     		   bool themeOnly = false) : 
 	fPaths(NULL) { operator= (other); init(subdir, themeOnly); }
-    ~YResourcePaths() { delete[] fPaths; }
+    ~YResourcePaths(void) { delete[] fPaths; }
 
     YResourcePaths const & operator= (YResourcePaths const & other);
 
@@ -54,11 +54,18 @@ public:
 #endif
     }
 
-    static char const *getPrivateDirectory(void);
-    static char *getPrivateFilename(char const *basename,
-                                    char const *suffix = NULL);
+    static char const *privateDirectory(void);
+    static char *privateFilename(char const *basename,
+                                 char const *suffix = NULL);
 
-    operator YPathElement const * () { return fPaths; }
+#ifdef CONFIG_GNOME_MENUS
+    static char const *kdeDirectory(void);
+    static char *kdeFilename(char const *basename,
+                             char const *suffix = NULL);
+    static char *kdeMenuPath(void);
+#endif
+
+    operator YPathElement const * (void) { return fPaths; }
 
 protected:
     void verifyPaths(char const *base);

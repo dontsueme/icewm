@@ -4,13 +4,15 @@ prefix      = @prefix@
 exec_prefix = @exec_prefix@
 libdir      = @libdir@
 sysconfdir  = @sysconfdir@
-datadir	    = @datadir@
+datadir     = @datadir@
 
 PREFIX      = @prefix@
 BINDIR      = @bindir@
 LIBDIR      = @libdatadir@
 CFGDIR      = @cfgdatadir@
 LOCDIR      = @localedir@
+KDEDIR      = @kdedir@
+DOCDIR      = @docdir@
 DOCDIR	    = @docdir@
 
 INSTALL     = @INSTALL@
