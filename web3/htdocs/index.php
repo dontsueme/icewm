@@ -34,11 +34,28 @@ and not getting in the user's way.</p>
 
 <h2>Screenshots</h2>
 
+<p>
+See themes.
+</p>
+
 <h2>Themes</h2>
 <ul>
-  <li><a href="http://themes.freshmeat.net/">themes.freshmeat.net</a>
+  <li><a href="http://themes.freshmeat.net/">themes.freshmeat.net</a></li>
 </ul>
-TODO: page with some of the best icewm themes (contrib).
+
+<ul>
+<li><a href="http://themes.freshmeat.net/projects/bluecrux/?topic_id=925">BlueCrux</a></li>
+<li><a href="http://themes.freshmeat.net/projects/cruxteal/?topic_id=925">CruxTeal</a></li>
+<li><a href="http://themes.freshmeat.net/projects/frosty/?topic_id=925">Frosty</a></li>
+<li><a href="http://themes.freshmeat.net/projects/glamice/?topic_id=925">GlamIce</a></li>
+<li><a href="http://themes.freshmeat.net/projects/icecrack/?topic_id=925">IceCrack</a></li>
+<li><a href="http://themes.freshmeat.net/projects/obit/?topic_id=925">Obit</a> - Ximian like</li>
+<li><a href="http://themes.freshmeat.net/projects/qnx_icewm/?topic_id=925">QNX IceWM</a></li>
+<li><a href="http://themes.freshmeat.net/projects/icebluecurve/?topic_id=925">IceBlueCurve</a> - RH8.0 theme</li>
+<li><a href="http://themes.freshmeat.net/projects/yamm/?topic_id=925">Yamm</a> - Yet Another Mozilla</li>
+<li><a href="http://themes.freshmeat.net/projects/kliin/?topic_id=925">Kliin</a> - very original</li>
+<li><a href="http://themes.freshmeat.net/projects/kubical_icewm/?topic_id=934">Kubical</a></li>
+</ul>
 
 <h2>Translations</h2>
 
@@ -64,14 +81,17 @@ TODO: page with some of the best icewm themes (contrib).
   <li><b>Spanish</b> (Antonio de la Torre)</li>
   <li><b>Swedish</b> (Per Larsson)</li>
   <li><b>Ukranian</b> (Volodymyr M. Lisivka)</li>
-  <li><b>Traditional Chinese - zh_CN.GB2312</b> (Li Wei Jih, Liu Zhuyuan)</li>
+  <li><b>Traditional Chinese</b> (Li Wei Jih, Liu Zhuyuan)</li>
   <li><b>Traditional Chinese - zh_TW.Big5</b> (Li Wei Jih)</li>
 </ul>
 
 <h2>Documentation</h2>
-TODO: link to docs, FAQ here.
+<p>There you can find almost everything you need to know:</p>
+<ul>
+  <li><a href="http://www.icewm.org/manual/">IceWM Manual</a></li>
+  <li><a href="http://www.icewm.org/FAQ/">IceWM FAQ pages</a></li>
+</ul>
 
-<hr size="1"/>
 <h2>Bug Tracking</h2>
 <p>If you have a patch, a bug report or a feature request to submit,
 please do so at the <a
@@ -126,17 +146,16 @@ cvs -d :pserver:anonymous@cvs.icewm.sourceforge.net:/cvsroot/icewm co -r icewm-1
 CVS</a></li>
 </ul>
 
-<hr size="1"/>
 <h2>Links</h2>
 <ul>
 <li>Some icons <a href="http://themes.freshmeat.net/projects/iceicons/">here</a></li>
 </ul>
 
-<hr size="1"/>
 <h2>Credits</h2>
 <ul>
+<li><a href="http://bbs.cvut.cz/~covex/">Adam Pribyl</a> - for the new logo image and web page improvements.</li>
 <li>Mathias Hasselmann for maintaining icewm in 2001.</li>
-<li>Markus Ackermann for <a href="fish.txt">maintaing</a> icewm.org web pages</li>
+<li>Markus Ackermann for <a href="fish.txt">maintaing</a> icewm.org web pages.</li>
 <li>The mountain image is from <a href="http://artwiz.artramp.org/">artwiz</a>.</li>
 <li><a href="http://beret.net/">Beret</a>, <a
 href="http://www.brabbel.ch/">brabbel</a> and <a

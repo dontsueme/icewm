@@ -1,24 +1,36 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-loose.dtd">
 <html>
  <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="icon" href="icewm-ico.png" type="image/png">
+   
   <title><?php echo ICEWM_TITLE ?></title>
   <style type="text/css">
-  p, h2, ul { margin-left: 16px; }
+   body { background-color: #fff; color: black; margin: 0px; }
+   h1, h2, h3, ul { margin-left: 16px; font-family: Vera Sans, Verdana, Arial, Helvetica, sans-serif; font-size: 10pt}
+   p { margin-left: 32px; font-family: Vera Sans, Verdana, Arial, Helvetica, sans-serif; font-size: 10pt}
   </style>
- <body marginwidth="0" marginheight="0">
-  
-  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #040508;">
-    <tbody>
-      <tr>
-        <td><a href="http://www.icewm.org/"><img border="0" src="ice-left.jpg" title="" alt="icewm home page"></a></td>
-        <td align="right"><a href="http://sourceforge.net/projects/icewm/"><img border="0" src="ice-right.jpg" title="" alt="icewm project page"></a></td>
-      </tr>
-    </tbody>
+ </head>
+ <body>
+  <br />
+  <table width="90%" cellspacing="0" cellpadding="0" style="margin-left: 16px;">
+   <tbody>
+    <tr>
+     <td>
+      <table width="100%" border="1" cellspacing="0" cellpadding="0">
+       <tbody>
+        <tr>
+         <td bgcolor="#aaaaaa" width="20px"></td><td bgcolor="#eeeeee">&nbsp;</td>
+        </tr>
+        <tr>
+         <td bgcolor="#eeeeee">&nbsp;</td>
+         <td>
+          <a href="http://www.icewm.org/"><img border="0" src="icewm-logo.png" title="" alt="icewm home page"></a>
+         </td>
+        </tr>
+       </tbody>
+      </table>
+     </td>
+    </tr>
+   </tbody>
   </table>
-  <a href="http://sourceforge.net/">
-    <img width="88" height="31" align="right" border="0"
-         src="http://sourceforge.net/sflogo.php?group_id=31&amp;type=1"
-         alt="SourceForge.net Logo" >
-  </a>
-<!-- /header -->
