@@ -225,6 +225,7 @@ XIV(bool, considerVertBorder,			false)
 XIV(bool, centerMaximizedWindows,		false)
 XIV(bool, win95keys,				false)
 XIV(bool, modMetaIsCtrlAlt,			true)
+XIV(bool, swapIfMod1IsMeta,                     true)
 XIV(bool, autoReloadMenus,			true)
 XIV(bool, showFrameIcon,			true)
 XIV(bool, clientMouseActions,			true)
@@ -529,6 +530,7 @@ static struct {
     OBV("DelayPointerFocus",			&delayPointerFocus,		"Delay pointer focusing when mouse moves"),
     OBV("Win95Keys",				&win95keys,			"Support win95 keyboard keys (Penguin/Meta/Win_L,R shows menu)"),
     OBV("ModMetaIsCtrlAlt",			&modMetaIsCtrlAlt,		"Treat Penguin/Meta/Win modifier as Ctrl+Alt"),
+    OBV("SwapIfMod1IsMeta",                     &swapIfMod1IsMeta,              "Swap Alt and Meta modifier when Meta is the Mod1 modifier"),
     OBV("UseMouseWheel",			&useMouseWheel,			"Support mouse wheel"),
     OBV("ShowPopupsAbovePointer",		&showPopupsAbovePointer,	"Show popup menus above mouse pointer"),
     OBV("ReplayMenuCancelClick",		&replayMenuCancelClick,		"Send the clicks outside menus to target window"),

@@ -1266,7 +1266,7 @@ void YApplication::initModifiers() {
     // some hacks for "broken" modifier configurations
 
     // this basically does what <0.9.13 versions did
-    if (MetaMask == Mod1Mask) {
+    if (swapIfMod1IsMeta && MetaMask == Mod1Mask) {
         MetaMask = AltMask;
         AltMask = Mod1Mask;
     }
