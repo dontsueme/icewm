@@ -81,7 +81,7 @@ YInputLine::~YInputLine() {
     if (cursorBlinkTimer &&
         cursorBlinkTimer->getTimerListener() == this) {
         cursorBlinkTimer->stopTimer();
-        cursorBlinkTimer->setTimerListener(0);
+        cursorBlinkTimer->setTimerListener(NULL);
     }
 
     delete[] fText;
@@ -224,6 +224,7 @@ bool YInputLine::handleKey(const XKeyEvent &key) {
                 case 'V':
                     requestSelection(false);
                     return true;
+
                 case 'X':
                 case 'x':
                     cutSelection();
