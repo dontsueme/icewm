@@ -61,10 +61,13 @@ YPixbuf *taskbuttonminimizedPixbuf(NULL);
 #endif
 
 static void initPixmaps() {
+#ifndef ICEWM_PIXMAP
+#define ICEWM_PIXMAP "icewm.xpm"
+#endif
+
 #ifndef START_PIXMAP
-#define START_PIXMAP "icewm.xpm"
-/*
 #define START_PIXMAP "linux.xpm"
+/*
 #define START_PIXMAP "debian.xpm"
 #define START_PIXMAP "bsd-daemon.xpm"
 #define START_PIXMAP "start.xpm"
@@ -74,9 +77,13 @@ static void initPixmaps() {
     YResourcePaths const paths;
 
     char const * base("taskbar/");
+    YResourcePaths themedirs(paths, base, true);
     YResourcePaths subdirs(paths, base);
 
-    icewmImage = subdirs.loadImage(base, START_PIXMAP);
+    if (NULL == (icewmImage = themedirs.loadImage(base, ICEWM_PIXMAP)) &&
+        NULL == (icewmImage = themedirs.loadImage(base, START_PIXMAP)))
+        icewmImage = subdirs.loadImage(base, ICEWM_PIXMAP);
+
     windowsImage = subdirs.loadImage(base, "windows.xpm");
 
 #ifdef CONFIG_GRADIENTS
