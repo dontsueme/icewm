@@ -2,7 +2,7 @@
 <?php
   define(ICEWM_STABLE,	'1.2.3');
   define(ICEWM_DEVEL, 	'1.2.3');
-  define(ICEWM_CHANGES,	'1.2.3');
+  define(ICEWM_CHANGES,	'1.2.0');
 
   define(STABLE_DATE,	'2002-06-30');
   define(STABLE_ID,	97354);
