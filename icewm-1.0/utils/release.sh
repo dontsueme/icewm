@@ -39,8 +39,6 @@ make -s update-config icewm.lsm icewm.spec docs
 echo Cleaning distribution
 rm config.{cache,log,status}
 
-RELEASE=`sed -ne 's/^%define\>[[:space:]]*release\>[[:space:]]*\<\(.*\)$/\1/p'\
-	< icewm.spec`
 TARBALL="icewm-$VERSION-$RELEASE.tar"
 
 popd
