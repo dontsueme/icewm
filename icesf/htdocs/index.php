@@ -84,7 +84,7 @@ A small screenshot displaying the default look is <A HREF="screenshot.jpg">here<
 	 <td colspan=2>
 	  <ul>
 	   <li>CVSROOT=:pserver:anonymous@cvs.icewm.sourceforge.net:/cvsroot/icewm
-	   <li>WebCVS: <?php cvsref('IceWM 1.0', 'icewm-1.0/icewm-1.0') ?> (stable tree)
+	   <li>WebCVS: <?php cvsref('IceWM 1.2', 'icewm-1.2') ?> (stable tree)
 	   <!--li>WebCVS: <?php cvsref('IceWM 1.1', 'icewm') ?> (experimental tree)-->
 	  </ul>
 	 </td>
