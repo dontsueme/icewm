@@ -193,7 +193,7 @@ const char* WorkspaceStatus::templateFunction() {
     const char* longestWorkspaceName = NULL;
     int maxWorkspaceNameLength = 0;
 
-    for (long w = 0; w < manager->workspaceCount(); ++w) {
+    for (icewm::Workspace w = 0; w < manager->workspaceCount(); ++w) {
         const char* name = manager->workspaceName(w);
         int length = statusFont->textWidth(name);
 

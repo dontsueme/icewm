@@ -167,7 +167,7 @@ struct YAtoms {
     Atom icewmWinOpt;                   // store winoptions
 #endif
 #ifdef CONFIG_TRAY
-    Atom icewmTrayOpt;                  // store tray settings
+    Atom icewmTrayOption;               // store tray settings
 #endif
 #ifdef CONFIG_GUIEVENTS
     Atom icewmGuiEvent;                 // signal gui events

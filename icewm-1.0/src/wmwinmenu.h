@@ -3,7 +3,8 @@
 
 class WindowListMenu: public YMenu {
 public:
-    WindowListMenu(YWindow *parent = 0);
+    WindowListMenu(YWindow *parent = NULL): YMenu(parent) {}
+    YMenu *populate(YMenu *menu, icewm::Workspace workspace);
     virtual void updatePopup();
 };
 

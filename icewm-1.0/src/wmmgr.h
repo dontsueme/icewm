@@ -16,7 +16,7 @@
 #define MAXWORKSPACES 64
 #define INVALID_WORKSPACE 0xFFFFFFFF
 
-extern long workspaceCount;
+extern gnome::Workspace workspaceCount;
 extern char *workspaceNames[MAXWORKSPACES];
 extern YAction *workspaceActionActivate[MAXWORKSPACES];
 extern YAction *workspaceActionMoveTo[MAXWORKSPACES];
@@ -121,12 +121,12 @@ public:
 
     void removeClientFrame(YFrameWindow *frame);
 
-    int minX(long layer) const;
-    int minY(long layer) const;
-    int maxX(long layer) const;
-    int maxY(long layer) const;
-    int maxWidth(long layer) const { return maxX(layer) - minX(layer); }
-    int maxHeight(long layer) const { return maxY(layer) - minY(layer); }
+    int minX(icewm::Layer layer) const;
+    int minY(icewm::Layer layer) const;
+    int maxX(icewm::Layer layer) const;
+    int maxY(icewm::Layer layer) const;
+    int maxWidth(icewm::Layer layer) const { return maxX(layer) - minX(layer); }
+    int maxHeight(icewm::Layer layer) const { return maxY(layer) - minY(layer); }
 
     int minX(YFrameWindow const *frame) const;
     int minY(YFrameWindow const *frame) const;
@@ -144,13 +144,13 @@ public:
     void newPosition(YFrameWindow *frame, int &x, int &y, int w, int h);
     void placeWindow(YFrameWindow *frame, int x, int y, bool newClient, bool &canActivate);
 
-    YFrameWindow *top(long layer) const { return fTop[layer]; }
-    void top(long layer, YFrameWindow *top);
-    YFrameWindow *bottom(long layer) const { return fBottom[layer]; }
-    void bottom(long layer, YFrameWindow *bottom) { fBottom[layer] = bottom; }
+    YFrameWindow *top(icewm::Layer layer) const { return fTop[layer]; }
+    void top(icewm::Layer layer, YFrameWindow *top);
+    YFrameWindow *bottom(icewm::Layer layer) const { return fBottom[layer]; }
+    void bottom(icewm::Layer layer, YFrameWindow *bottom) { fBottom[layer] = bottom; }
 
-    YFrameWindow *topLayer(long layer = WinLayerCount - 1);
-    YFrameWindow *bottomLayer(long layer = 0);
+    YFrameWindow *topLayer(icewm::Layer layer = WinLayerCount - 1);
+    YFrameWindow *bottomLayer(icewm::Layer layer = 0);
 
     YFrameWindow *firstCreated() const { return fFirstCreated; }
     YFrameWindow *lastCreated() const { return fLastCreated; }
@@ -169,20 +169,18 @@ public:
     void updateTrayList();
 #endif
 
-    YMenu *createWindowMenu(YMenu *menu, long workspace);
-    int windowCount(long workspace);
 #ifdef CONFIG_WINMENU
     void popupWindowListMenu(int x, int y);
 #endif
 
-    long activeWorkspace() const { return fActiveWorkspace; }
-    long lastWorkspace() const { return fLastWorkspace; }
-    void activateWorkspace(long workspace);
-    long workspaceCount() const { return ::workspaceCount; }
-    const char *workspaceName(long workspace) const { return ::workspaceNames[workspace]; }
+    gnome::Workspace activeWorkspace(void) const { return fActiveWorkspace; }
+    gnome::Workspace lastWorkspace(void) const { return fLastWorkspace; }
+    void activateWorkspace(gnome::Workspace workspace);
+    gnome::Workspace workspaceCount() const { return ::workspaceCount; }
+    const char *workspaceName(gnome::Workspace workspace) const { return ::workspaceNames[workspace]; }
 
     void announceWorkArea();
-    void winWorkspace(long workspace);
+    void winWorkspace(gnome::Workspace workspace);
     void updateWorkArea();
     void resizeWindows();
 
@@ -202,7 +200,7 @@ public:
     void popupWindowListMenu();
 #endif
 
-    void switchToWorkspace(long nw, bool takeCurrent);
+    void switchToWorkspace(gnome::Workspace workspace, bool takeCurrent);
     void switchToPrevWorkspace(bool takeCurrent);
     void switchToNextWorkspace(bool takeCurrent);
     void switchToLastWorkspace(bool takeCurrent);
@@ -262,8 +260,8 @@ private:
     TrayWindowList fTrayWindows;
 #endif
 
-    long fActiveWorkspace;
-    long fLastWorkspace;
+    icewm::Workspace fActiveWorkspace;
+    icewm::Workspace fLastWorkspace;
     int fMinX, fMinY, fMaxX, fMaxY;
 
     EdgeSwitch *fLeftSwitch, *fRightSwitch;

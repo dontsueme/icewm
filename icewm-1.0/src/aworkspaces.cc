@@ -87,8 +87,6 @@ void WorkspaceButton::actionPerformed(YAction */*action*/, unsigned int modifier
 }
 
 WorkspacesPane::WorkspacesPane(YWindow *parent): YWindow(parent) {
-    long w;
-
     if (workspaceCount > 1)
         fWorkspaceButton = new WorkspaceButton *[workspaceCount];
     else
@@ -100,7 +98,7 @@ WorkspacesPane::WorkspacesPane(YWindow *parent): YWindow(parent) {
         int ht = 0;
         int leftX = 0;
 
-        for (w = 0; w < workspaceCount; w++) {
+        for (icewm::Workspace w(0); w < workspaceCount; ++w) {
             WorkspaceButton *wk = new WorkspaceButton(w, this);
             if (wk) {
 		YIcon::Image * image
@@ -124,7 +122,7 @@ WorkspacesPane::WorkspacesPane(YWindow *parent): YWindow(parent) {
             fWorkspaceButton[w] = wk;
         }
 
-        for (w = 0; w < workspaceCount; w++) {
+        for (icewm::Workspace w(0); w < workspaceCount; ++w) {
             YButton *wk = fWorkspaceButton[w];
             //leftX += 2;
             if (wk) {
@@ -140,7 +138,7 @@ WorkspacesPane::WorkspacesPane(YWindow *parent): YWindow(parent) {
 
 WorkspacesPane::~WorkspacesPane() {
     if (fWorkspaceButton) {
-        for (long w = 0; w < workspaceCount; w++)
+        for (icewm::Workspace w(0); w < workspaceCount; ++w)
             delete fWorkspaceButton[w];
         delete [] fWorkspaceButton;
     }

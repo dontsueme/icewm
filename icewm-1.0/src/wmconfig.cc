@@ -21,7 +21,7 @@ int configurationLoaded = 0;
 
 #include "intl.h"
 
-long workspaceCount = 0;
+icewm::Workspace workspaceCount(0);
 char *workspaceNames[MAXWORKSPACES];
 YAction *workspaceActionActivate[MAXWORKSPACES];
 YAction *workspaceActionMoveTo[MAXWORKSPACES];

@@ -83,16 +83,16 @@ void YFrameWindow::updateMenu() {
     if ((item = windowMenu->findSubmenu(moveMenu)))
         item->enabled(!isSticky());
 
-    for (int i(0); i < moveMenu->itemCount(); i++) {
+    for (unsigned i(0); i < moveMenu->itemCount(); ++i) {
         item = moveMenu->item(i);
-        for (int w(0); w < workspaceCount; w++)
+        for (icewm::Workspace w(0); w < workspaceCount; ++w)
             if (item && item->action() == workspaceActionMoveTo[w])
                 item->enabled(w != workspace());
     }
 
-    for (int j(0); j < layerMenu->itemCount(); j++) {
+    for (unsigned j(0); j < layerMenu->itemCount(); ++j) {
         item = layerMenu->item(j);
-        for (int layer(0); layer < WinLayerCount; layer++)
+        for (icewm::Layer layer(0); layer < WinLayerCount; ++layer)
             if (item && item->action() == layerActionSet[layer]) {
                 bool const e(layer == this->layer());
                 item->enabled(!e);
@@ -108,15 +108,17 @@ warn("figure out if we have a tray window");
         if ((item = windowMenu->findSubmenu(trayMenu)))
             item->enabled(withTrayMenu);
 
-        if (withTrayMenu) for (int k(0); k < trayMenu->itemCount(); k++) {
-            item = trayMenu->item(k);
-            for (int opt(0); opt < IcewmTrayOptionCount; opt++)
-                if (item && item->action() == trayOptionActionSet[opt]) {
-                    bool const e(opt == trayOption());
-                    item->enabled(!e);
-                    item->checked(e);
-                }
-        }
+        if (withTrayMenu)
+            for (unsigned o(0); o < trayMenu->itemCount(); ++o) {
+                item = trayMenu->item(o);
+                for (icewm::TrayOption option(0);
+                     option < IcewmTrayOptionCount; ++option)
+                    if (item && item->action() == trayOptionActionSet[option]) {
+                        bool const e(option == trayOption());
+                        item->enabled(!e);
+                        item->checked(e);
+                    }
+            }
     }
 #endif    
 }

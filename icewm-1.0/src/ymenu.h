@@ -11,6 +11,8 @@ class YMenu:
 public YPopupWindow,
 public YTimer::Listener {
 public:
+    static unsigned const NoItem(~0U);
+
     YMenu(YWindow *parent = 0);
     virtual ~YMenu();
 
@@ -19,7 +21,7 @@ public:
     virtual void deactivatePopup();
     virtual void donePopup(YPopupWindow *popup);
 
-    virtual void paint(Graphics &g, int x, int y, unsigned int width, unsigned int height);
+    virtual void paint(Graphics &g, int x, int y, unsigned width, unsigned height);
 
     virtual bool handleKey(const XKeyEvent &key);
     virtual void handleButton(const XButtonEvent &button);
@@ -37,13 +39,13 @@ public:
     void removeAll();
     YMenuItem *findAction(const YAction *action);
     YMenuItem *findSubmenu(const YMenu *sub);
-    YMenuItem *findName(const char *name, const int first = 0);
+    YMenuItem *findName(const char *name, const unsigned first = 0);
 
     void enableCommand(YAction *action); // 0 == All
     void disableCommand(YAction *action); // 0 == All
 
-    int itemCount() const { return fItemCount; }
-    YMenuItem *item(int n) const { return fItems[n]; }
+    unsigned itemCount() const { return fItemCount; }
+    YMenuItem *item(unsigned n) const { return fItems[n]; }
 
     bool isShared() const { return fShared; }
     void shared(bool shared = true) { fShared = shared; }
@@ -54,10 +56,34 @@ public:
     virtual bool handleTimer(YTimer *timer);
 
 private:
-    int fItemCount;
+    unsigned itemHeight(unsigned item, int &top, int &bottom, int &pad);
+    void itemWidth(unsigned item, int &iw, int &nw, int &pw);
+    void offsets(int &left, int &top, int &right, int &bottom);
+    void area(int &x, int &y, int &w, int &h);
+
+    void drawBackground(Graphics &g, int x, int y, int w, int h);
+    void drawSeparator(Graphics &g, int x, int y, int w);
+
+    void paintItem(Graphics &g, unsigned item, int &l, int &t, int &r,
+                                int minY, int maxY, bool paint);
+    void paintItems();
+    void findItemPos(unsigned item, int &x, int &y);
+    unsigned findItem(int x, int y);
+    unsigned findActiveItem(unsigned cur, int direction);
+    unsigned findHotItem(char key);
+    void focusItem(unsigned item, bool submenu, bool byMouse);
+    void activateItem(unsigned item, bool byMouse, unsigned modifiers);
+    bool isCondCascade(unsigned selectedItem);
+    bool onCascadeButton(unsigned selectedItem, int x, int y, bool checkPopup);
+
+    void autoScroll(int deltaX, int deltaY, int mx, int my,
+                    const XMotionEvent *motion);
+    void finishPopup(YMenuItem *item, YAction *action, unsigned modifiers);
+
+
+    unsigned fItemCount;
     YMenuItem **fItems;
-    int selectedItem;
-    int paintedItem;
+    unsigned fSelectedItem, fPaintedItem;
     int paramPos;
     int namePos;
     YPopupWindow *fPopup;
@@ -71,32 +97,11 @@ private:
 #endif
 
     static YTimer *fMenuTimer;
-    static int fTimerX, fTimerY, fTimerItem, fTimerSubmenu;
+    static int fTimerX, fTimerY, fTimerSubmenu;
+    static unsigned fTimerItem;
     static bool fTimerSlow;
     static int fAutoScrollDeltaX, fAutoScrollDeltaY;
     static int fAutoScrollMouseX, fAutoScrollMouseY;
-
-    int itemHeight(int itemNo, int &h, int &top, int &bottom, int &pad);
-    void itemWidth(int i, int &iw, int &nw, int &pw);
-    void offsets(int &left, int &top, int &right, int &bottom);
-    void area(int &x, int &y, int &w, int &h);
-
-    void drawBackground(Graphics &g, int x, int y, int w, int h);
-    void drawSeparator(Graphics &g, int x, int y, int w);
-
-    void paintItem(Graphics &g, int i, int &l, int &t, int &r, int minY, int maxY, int paint);
-    void paintItems();
-    int findItemPos(int item, int &x, int &y);
-    int findItem(int x, int y);
-    int findActiveItem(int cur, int direction);
-    int findHotItem(char k);
-    void focusItem(int item, int submenu, int byMouse);
-    int activateItem(int no, int byMouse, unsigned int modifiers);
-    bool isCondCascade(int selectedItem);
-    int onCascadeButton(int selectedItem, int x, int y, bool checkPopup);
-
-    void autoScroll(int deltaX, int deltaY, int mx, int my, const XMotionEvent *motion);
-    void finishPopup(YMenuItem *item, YAction *action, unsigned int modifiers);
 };
 
 extern YPixmap *menubackPixmap;

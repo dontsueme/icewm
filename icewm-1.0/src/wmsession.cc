@@ -278,10 +278,10 @@ void loadWindowInfo() {
                 msg(_("Session Manager: Unknown line %s"), line);
             }
         } else if (line[0] == 'w') {
-            int ws = 0;
+            icewm::Workspace ws(0);
 
-            if (sscanf(line, "w %d", &ws) == 1) {        
-                if (ws >= 0 && ws < manager->workspaceCount())
+            if (sscanf(line, "w %ld", &ws) == 1) {        
+                if (ws < manager->workspaceCount())
                     manager->activateWorkspace(ws);
             }
         } else {

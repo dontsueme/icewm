@@ -229,11 +229,9 @@ private:
 
 class YIcon {
 public:
-    enum Sizes {
-	sizeSmall = 16,
-	sizeLarge = 32,
-	sizeHuge = 48
-    };
+    static unsigned const sizeSmall(16);
+    static unsigned const sizeLarge(32);
+    static unsigned const sizeHuge(48);
     
 #ifdef CONFIG_ANTIALIASING
     typedef YPixbuf Image;

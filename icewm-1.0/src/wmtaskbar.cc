@@ -178,7 +178,7 @@ TaskBar::TaskBar(YWindow *aParent):
     style(wsOverrideRedirect);
 #endif
 
-    frameState(NormalState);
+    wmState(NormalState);
     pointer(YApplication::leftPointer);
     dnd(true);
 

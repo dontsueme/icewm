@@ -119,15 +119,15 @@ void YFrameClient::updateProtocols() {
     Atom *wmp = 0;
     int count;
 
-    fProtocols = fProtocols & wpDeleteWindow; // always keep WM_DELETE_WINDOW
+    fProtocols = fProtocols & wm::DeleteWindow; // always keep WM_DELETE_WINDOW
 
     if (XGetWMProtocols(app->display(),
                         handle(),
                         &wmp, &count) && wmp)
     {
         for (int i = 0; i < count; i++) {
-            if (wmp[i] == atoms.wmDeleteWindow) fProtocols |= wpDeleteWindow;
-            if (wmp[i] == atoms.wmTakeFocus) fProtocols |= wpTakeFocus;
+            if (wmp[i] == atoms.wmDeleteWindow) fProtocols |= wm::DeleteWindow;
+            if (wmp[i] == atoms.wmTakeFocus) fProtocols |= wm::TakeFocus;
         }
         XFree(wmp);
     }
@@ -383,13 +383,13 @@ void YFrameClient::trayWindow(YTrayWindow *trayWindow) {
     }
 }
 
-FrameState YFrameClient::frameState() {
+wm::State YFrameClient::wmState() {
     YWindowProperty wmState(handle(), atoms.wmState, atoms.wmState, 3);
-    return wmState == Success && wmState.count()
-        ? wmState.template data<long>() : WithdrawnState;
+    return wmState == Success && wmState.count() ?
+           wmState.template data<wm::State>() : WithdrawnState;
 }
 
-void YFrameClient::frameState(FrameState state) {
+void YFrameClient::wmState(wm::State state) {
     unsigned long arg[] = { state, None };
 
     //msg("setting frame state to %d", arg[0]);
@@ -400,7 +400,7 @@ void YFrameClient::frameState(FrameState state) {
             XDeleteProperty(app->display(), handle(), atoms.winWorkspace);
             XDeleteProperty(app->display(), handle(), atoms.winLayer);
 #ifdef CONFIG_TRAY
-            XDeleteProperty(app->display(), handle(), atoms.icewmTrayOpt);
+            XDeleteProperty(app->display(), handle(), atoms.icewmTrayOption);
 #endif	    
             XDeleteProperty(app->display(), handle(), atoms.winState);
             XDeleteProperty(app->display(), handle(), atoms.wmState);
@@ -631,9 +631,9 @@ void YFrameClient::handleClientMessage(const XClientMessageEvent &message) {
         if (frame()) frame()->layer(message.data.l[0]);
         else winLayer(message.data.l[0]);
 #ifdef CONFIG_TRAY	    
-    } else if (message.message_type == atoms.icewmTrayOpt) {
+    } else if (message.message_type == atoms.icewmTrayOption) {
         if (frame()) frame()->trayOption(message.data.l[0]);
-        else icewmTrayHint(message.data.l[0]);
+        else icewmTrayOption(message.data.l[0]);
 #endif	    
     } else if (message.message_type == atoms.winState) {
         if (frame()) frame()->state(message.data.l[0], message.data.l[1]);
@@ -814,53 +814,20 @@ bool YFrameClient::updateWinIcons(Atom &type, int &count, long *&elem) {
     return false;
 }
 
-void YFrameClient::winWorkspace(long workspace) {
+void YFrameClient::winWorkspace(gnome::Workspace workspace) {
     XChangeProperty(app->display(), handle(),
                     atoms.winWorkspace, XA_CARDINAL, 32,
                     PropModeReplace, (unsigned const char*)&workspace, 1);
 }
 
-bool YFrameClient::updateWinWorkspace(long &workspace) {
-    YWindowProperty winWorkspace(handle(), atoms.winWorkspace, XA_CARDINAL);
-    
-    if (winWorkspace == Success && 
-        winWorkspace.format() == 32 &&
-        winWorkspace.count() == 1 &&
-        winWorkspace.type() == XA_CARDINAL) {
-        long const ws(winWorkspace.template data<long>());
-        if (workspaceCount > ws) {
-            workspace = ws;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void YFrameClient::winLayer(long layer) {
+void YFrameClient::winLayer(gnome::Layer layer) {
     XChangeProperty(app->display(), handle(),
                     atoms.winLayer, XA_CARDINAL, 32,
                     PropModeReplace, (unsigned char const*)&layer, 1);
 }
 
-bool YFrameClient::updateWinLayer(long &layer) {
-    YWindowProperty winLayer(handle(), atoms.winLayer, XA_CARDINAL);
-    
-    if (winLayer == Success && winLayer.format() == 32 &&
-        winLayer.count() == 1 && winLayer.type() == XA_CARDINAL) {
-        long const l(winLayer.template data<long>());
-
-        if (WinLayerCount > l) {
-            layer = l;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void YFrameClient::winState(long mask, long state) {
-    long stateHint[] = { state, mask };
+void YFrameClient::winState(gnome::State mask, gnome::State state) {
+    gnome::State stateHint[] = { state, mask };
     MSG(("set state=%lX mask=%lX", state, mask));
 
     XChangeProperty(app->display(), handle(),
@@ -868,16 +835,54 @@ void YFrameClient::winState(long mask, long state) {
                     PropModeReplace, (unsigned char const*)&stateHint, 2);
 }
 
-bool YFrameClient::updateWinState(long &mask, long &state) {
+void YFrameClient::winHints(gnome::Hints hints) {
+    fWinHints = hints;
+
+    XChangeProperty(app->display(), handle(),
+                    atoms.winHints, XA_CARDINAL, 32,
+                    PropModeReplace,(unsigned char const*)&hints, 1);
+}
+
+bool YFrameClient::updateWinWorkspace(gnome::Workspace &workspace) {
+    YWindowProperty winWorkspace(handle(), atoms.winWorkspace, XA_CARDINAL);
+    if (winWorkspace.valid(XA_CARDINAL, 32)) {
+        gnome::Workspace newWorkspace;
+        winWorkspace.copy(newWorkspace);
+
+        if (workspaceCount > newWorkspace) {
+            workspace = newWorkspace;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool YFrameClient::updateWinLayer(gnome::Layer &layer) {
+    YWindowProperty winLayer(handle(), atoms.winLayer, XA_CARDINAL);
+    if (winLayer.valid(XA_CARDINAL, 32)) {
+        icewm::Layer newLayer;
+        winLayer.copy(newLayer);
+
+        if (WinLayerCount > newLayer) {
+            layer = newLayer;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool YFrameClient::updateWinState(gnome::State &mask, gnome::State &state) {
     YWindowProperty winState(handle(), atoms.winState, XA_CARDINAL, 2);
     
     if (winState == Success && winState.count() >= 1) {
         MSG(("got state"));
 
         if (winState.type() == XA_CARDINAL && winState.format() == 32) {
-            state = winState.template data<long>(0);
+            state = winState.template data<gnome::State>(0);
             mask = winState.count() >= 2
-                 ? winState.template data<long>(1)
+                 ? winState.template data<gnome::State>(1)
                  : WIN_STATE_ALL;
 
             return true;
@@ -889,24 +894,14 @@ bool YFrameClient::updateWinState(long &mask, long &state) {
     return false;
 }
 
-void YFrameClient::winHints(long hints) {
-    fWinHints = hints;
-
-    XChangeProperty(app->display(), handle(),
-                    atoms.winHints, XA_CARDINAL, 32,
-                    PropModeReplace,(unsigned char const*)&hints, 1);
-}
-
-bool YFrameClient::updateWinHints(long &hints) {
+bool YFrameClient::updateWinHints(gnome::Hints &hints) {
     YWindowProperty winHints(handle(), atoms.winHints, XA_CARDINAL);
     
     if (winHints == Success) {
         MSG(("got hints"));
 
-        if (winHints.format() == 32 &&
-            winHints.count() == 1 &&
-            winHints.type() == XA_CARDINAL) {
-            hints = winHints.template data<long>();
+        if (winHints.valid(XA_CARDINAL, 32)) {
+            winHints.copy(hints);
             return true;
         }
 
@@ -918,20 +913,21 @@ bool YFrameClient::updateWinHints(long &hints) {
 #endif /* CONFIG_GNOME_HINTS */
 
 #ifdef CONFIG_TRAY
-void YFrameClient::icewmTrayHint(long tray_opt) {
+void YFrameClient::icewmTrayOption(icewm::TrayOption option) {
     XChangeProperty(app->display(), handle(),
-                    atoms.icewmTrayOpt, XA_CARDINAL, 32,
-                    PropModeReplace, (unsigned char const*)&tray_opt, 1);
+                    atoms.icewmTrayOption, XA_CARDINAL, 32,
+                    PropModeReplace, (unsigned char const*)&option, 1);
 }
 
-bool YFrameClient::updateIcewmTrayHint(long &trayopt) {
-    YWindowProperty icewmTrayOpt(handle(), atoms.icewmTrayOpt, XA_CARDINAL);
+bool YFrameClient::updateIcewmTrayOption(icewm::TrayOption &option) {
+    YWindowProperty icewmTrayOption(handle(), atoms.icewmTrayOption, XA_CARDINAL);
     
-    if (icewmTrayOpt == Success &&  icewmTrayOpt.format() == 32 &&
-        icewmTrayOpt.count() == 1 && icewmTrayOpt.type() == XA_CARDINAL) {
-        long const to(icewmTrayOpt.template data<long>());
-        if (IcewmTrayOptionCount > to) {
-            trayopt = to;
+    if (icewmTrayOption.valid(XA_CARDINAL, 32)) {
+        icewm::TrayOption newOption;
+        icewmTrayOption.copy(newOption);
+
+        if (IcewmTrayOptionCount > newOption) {
+            option = newOption;
             return true;
         }
     }
@@ -943,9 +939,8 @@ bool YFrameClient::updateIcewmTrayHint(long &trayopt) {
 #ifdef CONFIG_WM_SESSION
 void YFrameClient::updatePid() {
     YWindowProperty icewmPid(handle(), atoms.icewmPid, XA_CARDINAL);
-    if (icewmPid == Success && icewmPid.format() == 32 &&
-        icewmPid.count() == 1 && icewmPid.type() == XA_CARDINAL)
-        fPid = icewmPid.template data<pid_t>();
+    if (icewmPid.valid(XA_CARDINAL, 32))
+        icewmPid.copy(fPid);
     else    
         warn(_("Window %p has no _ICEWM_PID property. "
 	       "Export the LD_PRELOAD variable to preload the preice library."),
@@ -956,9 +951,8 @@ void YFrameClient::updatePid() {
 void YFrameClient::updateClientLeader() {
     YWindowProperty wmClientLeader(handle(), atoms.wmClientLeader, XA_WINDOW);
 
-    if (wmClientLeader == Success && wmClientLeader.format() == 32 &&
-        wmClientLeader.count() == 1 && wmClientLeader.type() == XA_WINDOW)
-        fClientLeader = wmClientLeader.template data<Window>();
+    if (wmClientLeader.valid(XA_WINDOW, 32))
+        wmClientLeader.copy(fClientLeader);
 }
 
 void YFrameClient::updateWindowRole() {
@@ -985,18 +979,15 @@ bool YFrameClient::updateTrayWindowFor(void) {
     fTrayWindowFor = None;
 
 #ifdef CONFIG_WMSPEC_HINTS
-    YWindowProperty trayWin(handle(), atoms.kdeNetwmSystemTrayWindowFor);
-    if (trayWin == Success && trayWin.format() == 32 &&
-        trayWin.count() == 1 && trayWin.type() == XA_WINDOW) {
-        fTrayWindowFor = trayWin.template data<Window>();
-        if (None == fTrayWindowFor) fTrayWindowFor = desktop->handle();
+    YWindowProperty kdeTrayWindow(handle(), atoms.kdeNetwmSystemTrayWindowFor);
+    if (kdeTrayWindow.valid(XA_WINDOW, 32)) {
+        kdeTrayWindow.copy(fTrayWindowFor);
+        if (fTrayWindowFor == None) fTrayWindowFor = desktop->handle();
         return true;
     }
 #endif /* CONFIG_WMSPEC_HINTS */
-
-    YWindowProperty dockWin(handle(), atoms.kwmDockwindow);
-    if (dockWin == Success && dockWin.format() == 32 &&
-        dockWin.count() == 1 && dockWin.type() == atoms.kwmDockwindow) {
+    YWindowProperty kwmDockWindow(handle(), atoms.kwmDockwindow);
+    if (kwmDockWindow.valid(atoms.kwmDockwindow, 32)) {
         fTrayWindowFor = desktop->handle();
         return true;
     }

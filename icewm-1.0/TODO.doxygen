@@ -1,165 +1,172 @@
-Those files need a nicer formating and doxygen comments.
+Those files need:
 
-        aaddressbar.cc
-        aaddressbar.h
-        aapm.cc
-        aapm.h
-        aclock.cc
-        aclock.h
-        acpustatus.cc
-        acpustatus.h
-        amailbox.cc
-        amailbox.h
-        apppstatus.cc
-        apppstatus.h
-        atasks.cc
-        atasks.h
-        aworkspaces.cc
-        aworkspaces.h
-        base.h
-        bindkey.h
-        browse.cc
-        browse.h
-        config.h
-        debug.h
-        decorate.cc
-        default.h
-        genpref.cc
-        gnomeapps.h
-        gnome.cc
-        guievent.h
-        iceclock.cc
-        icehelp.cc
-        iceicon.cc
-        icelist.cc
-        icerun.cc
-        icesame.cc
-        icesh.cc
-        iceskt.cc
-        icesound.cc
-        iceview.cc
-        icewmbg.cc
-        icewmhint.cc
-        icons.cc
-        intl.h
-        misc.cc
-        movesize.cc
-        MwmUtil.h
-        objbar.cc
-        objbar.h
-        objbutton.h
-        obj.h
-        objmenu.h
-        prefs.h
-        sysdep.h
-        testdockapp.cc
-        testlists.cc
-        testlocale.cc
-        testtrayapp.cc
-        testwinhints.cc
-        themes.cc
-        themes.h
-        WinMgr.h
-        wmabout.cc
-        wmabout.h
-        wmaction.cc
-        wmaction.h
-        wmapp.cc
-        wmapp.h
-        wmbutton.cc
-        wmbutton.h
-        wmclient.cc
-        wmclient.h
-        wmconfig.cc
-        wmconfig.h
-        wmcontainer.cc
-        wmcontainer.h
-        wmdialog.cc
-        wmdialog.h
-        wmframe.cc
-        wmframe.h
-        wmmgr.cc
-        wmmgr.h
-        wmminiicon.cc
-        wmminiicon.h
-        wmoption.cc
-        wmoption.h
-        wmprog.cc
-        wmprog.h
-        wmsession.cc
-        wmsession.h
-        wmstatus.cc
-        wmstatus.h
-        wmswitch.cc
-        wmswitch.h
-        wmtaskbar.cc
-        wmtaskbar.h
-        wmtitle.cc
-        wmtitle.h
-        wmtraywin.cc
-        wmtraywin.h
-        wmwinlist.cc
-        wmwinlist.h
-        wmwinmenu.cc
-        wmwinmenu.h
-        yactionbutton.h
-        yaction.h
-        yapp.cc
-        yapp.h
-        yarray.h
-        yatoms.h
-        ybase.h
-        ybutton.cc
-        ybutton.h
-        ycmdline.cc
-        ycmdline.h
-        ycursor.cc
-        ycursor.h
-        ydialog.cc
-        ydialog.h
-        yfull.h
-        yhistory.cc
-        yhistory.h
-        yinput.cc
-        yinputline.h
-        ykey.h
-        ylabel.cc
-        ylabel.h
-        ylib.h
-        ylistbox.cc
-        ylistbox.h
-        ylists.h
-        ylocale.cc
-        ylocale.h
-        ymenu.cc
-        ymenu.h
-        ymenuitem.cc
-        ymenuitem.h
-        ymsgbox.cc
-        ymsgbox.h
-        ypaint.cc
-        ypaint.h
-        yparser.cc
-        yparser.h
-        ypaths.cc
-        ypaths.h
-        ypixbuf.cc
-        ypixbuf.h
-        ypopup.cc
-        ypopup.h
-        yscrollbar.cc
-        yscrollbar.h
-        yscrollview.cc
-        yscrollview.h
-        ysocket.cc
-        ysocket.h
-        ystring.h
-        ytimer.cc
-        ytimer.h
-        ytooltip.cc
-        ytooltip.h
-        yurl.cc
-        yurl.h
-        yutil.h
-        ywindow.cc
-        ywindow.h
+    - nicer formating (F)
+    - doxygen comments (D)
+    - header file checkups ($BASENAME.cc must not need any headers expect
+      config.h and default.h to include $BASENAME.h) (H)
+    - a LGPL compliant copyright header (C)
+
+
+    --- aaddressbar.cc
+    --- aaddressbar.h
+    --- aapm.cc
+    --- aapm.h
+    --- aclock.cc
+    --- aclock.h
+    --- acpustatus.cc
+    --- acpustatus.h
+    --- amailbox.cc
+    --- amailbox.h
+    --- apppstatus.cc
+    --- apppstatus.h
+    --- atasks.cc
+    --- atasks.h
+    --- aworkspaces.cc
+    --- aworkspaces.h
+    --- base.h
+    --- bindkey.h
+    --- browse.cc
+    --- browse.h
+    --- config.h
+    --- debug.h
+    --- decorate.cc
+    --- default.h
+    --- genpref.cc
+    --- gnomeapps.h
+    --- gnome.cc
+    --- guievent.h
+    --- iceclock.cc
+    --- icehelp.cc
+    --- iceicon.cc
+    --- icelist.cc
+    --- icerun.cc
+    --- icesame.cc
+    --- icesh.cc
+    --- iceskt.cc
+    --- icesound.cc
+    --- iceview.cc
+    --- icewmbg.cc
+    --- icewmhint.cc
+    --- icons.cc
+    --- intl.h
+    --- misc.cc
+    --- movesize.cc
+    --- MwmUtil.h
+    --- objbar.cc
+    --- objbar.h
+    --- objbutton.h
+    --- obj.h
+    --- objmenu.h
+    --- prefs.h
+    --- sysdep.h
+    --- testdockapp.cc
+    --- testlists.cc
+    --- testlocale.cc
+    --- testtrayapp.cc
+    --- testwinhints.cc
+    --- themes.cc
+    --- themes.h
+    --- WinMgr.h
+    --- wmabout.cc
+    --- wmabout.h
+    --- wmaction.cc
+    --- wmaction.h
+    --- wmapp.cc
+    --- wmapp.h
+    --- wmbutton.cc
+    --- wmbutton.h
+    --- wmclient.cc
+    --- wmclient.h
+    --- wmconfig.cc
+    --- wmconfig.h
+    --- wmcontainer.cc
+    --- wmcontainer.h
+    --- wmdialog.cc
+    --- wmdialog.h
+    --- wmframe.cc
+    --- wmframe.h
+    --- wmmgr.cc
+    --- wmmgr.h
+    --- wmminiicon.cc
+    --- wmminiicon.h
+    --- wmoption.cc
+    --- wmoption.h
+    --- wmprog.cc
+    --- wmprog.h
+    --- wmsession.cc
+    --- wmsession.h
+    --- wmstatus.cc
+    --- wmstatus.h
+    --- wmswitch.cc
+    --- wmswitch.h
+    --- wmtaskbar.cc
+    --- wmtaskbar.h
+    --- wmtitle.cc
+    --- wmtitle.h
+    --- wmtraywin.cc
+    --- wmtraywin.h
+    --- wmwinlist.cc
+    --- wmwinlist.h
+    --- wmwinmenu.cc
+    --- wmwinmenu.h
+    --- yactionbutton.h
+    --- yaction.h
+    --- yapp.cc
+    --- yapp.h
+    --- yarray.h
+    --- yatoms.h
+    --- ybase.h
+    --- ybutton.cc
+    --- ybutton.h
+    --- ycmdline.cc
+    --- ycmdline.h
+    --- ycursor.cc
+    --- ycursor.h
+    --- ydialog.cc
+    --- ydialog.h
+    --- yfull.h
+    --- yhistory.cc
+    --- yhistory.h
+    --- yinput.cc
+    --- yinputline.h
+    --- ykey.h
+    --- ylabel.cc
+    --- ylabel.h
+    --- ylib.h
+    --- ylistbox.cc
+    --- ylistbox.h
+    --- ylists.h
+    --- ylocale.cc
+    --- ylocale.h
+    --- ymenu.cc
+    --- ymenu.h
+    --- ymenuitem.cc
+    --- ymenuitem.h
+    --- ymsgbox.cc
+    --- ymsgbox.h
+    --- ypaint.cc
+    --- ypaint.h
+    --- yparser.cc
+    --- yparser.h
+    --- ypaths.cc
+    --- ypaths.h
+    --- ypixbuf.cc
+    --- ypixbuf.h
+    --- ypopup.cc
+    --- ypopup.h
+    --- yscrollbar.cc
+    --- yscrollbar.h
+    --- yscrollview.cc
+    --- yscrollview.h
+    --- ysocket.cc
+    --- ysocket.h
+    --- ystring.h
+    --- ytimer.cc
+    --- ytimer.h
+    --- ytooltip.cc
+    --- ytooltip.h
+    --- yurl.cc
+    --- yurl.h
+    --- yutil.h
+    --- ywindow.cc
+    --- ywindow.h

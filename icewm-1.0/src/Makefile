@@ -131,7 +131,7 @@ all: base
 base: $(BINARIES) ../lib/preferences
 
 clean:
-	rm -f $(BINARIES) $(TESTBINS) *.o *.p *~
+	rm -f $(BINARIES) $(TESTBINS) *.o *.p *~ .targets
 
 ################################################################################
 

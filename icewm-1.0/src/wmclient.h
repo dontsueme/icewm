@@ -4,12 +4,11 @@
 #include "ywindow.h"
 #include "ymenu.h"
 #include "MwmUtil.h"
+#include "WinMgr.h"
 
 class YFrameWindow;
 class YTrayWindow;
 class WindowListItem;
-
-typedef int FrameState;
 
 #ifndef __YIMP_UTIL__
 //!!! remove these if possible
@@ -41,13 +40,11 @@ public:
     virtual void wmRaise() = 0;
     virtual void wmLower() = 0;
     virtual void wmMinimize() = 0;
-    virtual void wmOccupyWorkspace(long workspace) = 0;
-    virtual void wmOccupyOnlyWorkspace(long workspace) = 0;
+    virtual void wmOccupyWorkspace(icewm::Workspace workspace) = 0;
+    virtual void wmOccupyOnlyWorkspace(icewm::Workspace workspace) = 0;
     virtual void popupSystemMenu() = 0;
-    virtual void popupSystemMenu(int x, int y,
-                         int x_delta, int y_delta,
-                         unsigned int flags,
-                         YWindow *forWindow = 0) = 0;
+    virtual void popupSystemMenu(int x, int y, int x_delta, int y_delta,
+                                 unsigned int flags, YWindow *forWindow = 0) = 0;
 };
 
 class YFrameClient: public YWindow  {
@@ -71,11 +68,6 @@ public:
     void trayWindow(YTrayWindow *trayWindow);
     YTrayWindow *trayWindow() const { return fTrayWindow; };
 
-    enum {
-        wpDeleteWindow = 1 << 0,
-        wpTakeFocus    = 1 << 1
-    } WindowProtocols;
-
     void sendMessage(Atom msg, Time timeStamp = CurrentTime);
 
     enum {
@@ -89,8 +81,8 @@ public:
 				 
     void gravityOffsets(int &xp, int &yp);
 
-    FrameState frameState();
-    void frameState(FrameState state);
+    wm::State wmState();
+    void wmState(wm::State state);
 
     Colormap colormap() const { return fColormap; }
     void colormap(Colormap cmap);
@@ -122,22 +114,23 @@ public:
     const char *iconTitle() { return fIconTitle; }
 
 #if CONFIG_GNOME_HINTS
-    bool updateWinIcons(Atom &type, int &count, long *&elem);
-    bool updateWinWorkspace(long & workspace);
-    bool updateWinLayer(long & layer);
-    bool updateWinState(long & mask, long & state);
-    bool updateWinHints(long & hints);
+    gnome::Hints winHints(void) const { return fWinHints; }
 
-    void winWorkspace(long workspace);
-    void winLayer(long layer);
-    void winState(long mask, long state);
-    void winHints(long hints);
-    long winHints(void) const { return fWinHints; }
+    bool updateWinIcons(Atom &type, int &count, long *&elem);
+    bool updateWinWorkspace(gnome::Workspace & workspace);
+    bool updateWinLayer(gnome::Layer & layer);
+    bool updateWinState(gnome::State & mask, gnome::State & state);
+    bool updateWinHints(gnome::Hints & hints);
+
+    void winWorkspace(gnome::Workspace workspace);
+    void winLayer(gnome::Layer layer);
+    void winState(gnome::State mask, gnome::State state);
+    void winHints(gnome::Hints hints);
 #endif
 
 #ifdef CONFIG_TRAY	    
-    bool updateIcewmTrayHint(long & trayopt);
-    void icewmTrayHint(long trayopt);
+    bool updateIcewmTrayOption(icewm::TrayOption & option);
+    void icewmTrayOption(icewm::TrayOption option);
 #endif
 
 #ifdef CONFIG_MOTIF_HINTS
@@ -189,7 +182,7 @@ protected:
 private:
     YFrameWindow *fFrame;
 
-    int fProtocols;
+    wm::Protocols fProtocols;
     bool fHaveButtonGrab;
     unsigned fBorder;
     XSizeHints *fSizeHints;
@@ -209,7 +202,7 @@ private:
     MwmHints *fMwmHints;
 #endif
 #ifdef CONFIG_GNOME_HINTS
-    long fWinHints;
+    gnome::Hints fWinHints;
 #endif    
 #if CONFIG_KDE_TRAY_WINDOWS
     YTrayWindow *fTrayWindow;

@@ -44,21 +44,28 @@ public:
     YWindowProperty(Window window, Atom property, Atom type = AnyPropertyType,
     		    long length = 1, long offset = 0, Bool deleteProp = False);
     virtual ~YWindowProperty();
-    
+
     Atom type() const { return fType; }
     int format() const { return fFormat; }
     unsigned long count() const { return fCount; }
     unsigned long after() const { return fAfter; }
 
-    template <class T>
-    T data(unsigned index = 0) const { return ((T*) fData)[index]; }
-    template <class T>
-    T *ptr() const { return (T*) fData; }
-    template <class T>
-    T *release() { T *data((T*)fData); fData = NULL; return data; }
+    template <class Type>
+    Type data(unsigned index = 0) const { return ((Type*) fData)[index]; }
+    template <class Type>
+    void copy(Type &data, unsigned index = 0) const { data = fData[index]; }
+    template <class Type>
+    Type *ptr() const { return (Type*) fData; }
+    template <class Type>
+    Type *release() { Type *data((Type*)fData); fData = NULL; return data; }
 
     operator int() const { return fStatus; }
+    bool valid(Atom type, int format, unsigned count = 1) {
+        return (fStatus == Success &&
+                fType == type && fFormat == format && fCount == count);
+    }
 
+    
 private:
     Atom fType;
     int fFormat;

@@ -659,7 +659,7 @@ static void initMenus() {
     moveMenu = new YMenu();
     assert(moveMenu != 0);
     moveMenu->shared();
-    for (int w = 0; w < workspaceCount; w++) {
+    for (icewm::Workspace w = 0; w < workspaceCount; ++w) {
         char s[128];
         sprintf(s, "%lu. %s", (unsigned long)(w + 1), workspaceNames[w]);
         moveMenu->addItem(s, 0, 0, workspaceActionMoveTo[w]);
@@ -899,7 +899,7 @@ void YWMApp::actionPerformed(YAction *action, unsigned int /*modifiers*/) {
             windowList->showFocused(-1, -1);
 #endif
     } else {
-        for (int w = 0; w < workspaceCount; w++) {
+        for (icewm::Workspace w = 0; w < workspaceCount; ++w) {
             if (workspaceActionActivate[w] == action) {
                 manager->activateWorkspace(w);
                 return ;

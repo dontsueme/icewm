@@ -85,12 +85,12 @@ public:
     void wmSize();
     void wmOccupyAll();
     void wmOccupyAllOrCurrent();
-    void wmOccupyWorkspace(long workspace);
-    void wmOccupyOnlyWorkspace(long workspace);
-    void wmMoveToWorkspace(long workspace);
-    void wmSetLayer(long layer);
+    void wmOccupyWorkspace(icewm::Workspace workspace);
+    void wmOccupyOnlyWorkspace(icewm::Workspace workspace);
+    void wmMoveToWorkspace(icewm::Workspace workspace);
+    void wmSetLayer(icewm::Layer layer);
 #ifdef CONFIG_TRAY
-    void wmSetTrayOption(long option);
+    void wmSetTrayOption(icewm::TrayOption option);
 #endif
     void wmToggleDontCover();
 
@@ -321,17 +321,20 @@ public:
     void updateTaskBar();
 #endif    
 
-    long workspace() const { return fWinWorkspace; }
-    void workspace(long workspace);
-    long layer() const { return fWinLayer; }
-    void layer(long layer);
+    icewm::Workspace workspace() const { return fWorkspace; }
+    icewm::Layer layer() const { return fLayer; }
+    gnome::State state() const { return fWinState; }
 #ifdef CONFIG_TRAY
-    long trayOption() const { return fIcewmTrayOption; }
-    void trayOption(long option);
+    icewm::TrayOption trayOption() const { return fTrayOption; }
+#endif
+
+    void workspace(icewm::Workspace workspace);
+    void layer(icewm::Layer layer);
+    void state(gnome::State mask, gnome::State state);
+#ifdef CONFIG_TRAY
+    void trayOption(icewm::TrayOption option);
 #endif
     void dontCover(bool flag);
-    long state() const { return fWinState; }
-    void state(long mask, long state);
 
     bool isMaximized() const { return (state() & (WinStateMaximizedHoriz |
                                                   WinStateMaximizedVert)); }
@@ -350,6 +353,17 @@ public:
 
     bool isIconic() const { return isMinimized() && minimizeToDesktop && fMiniIcon; }
 
+    bool allWorkspaces() const { return frameOptions() & foAllWorkspaces; }
+    bool ignoreTaskBar() const { return frameOptions() & foIgnoreTaskBar; }
+    bool ignoreWinList() const { return frameOptions() & foIgnoreWinList; }
+    bool fullKeys() const { return frameOptions() & foFullKeys; }
+    bool ignoreQSwitch() const { return frameOptions() & foIgnoreQSwitch; }
+    bool noFocusOnAppRaise() const { return frameOptions() & foNoFocusOnAppRaise; }
+    bool ignoreNoFocusHint() const { return frameOptions() & foIgnoreNoFocusHint; }
+    bool ignorePosition() const { return frameOptions() & foIgnorePosition; }
+    bool dontCover() const { return limitByDockLayer ? layer() == WinLayerDock
+                                                     : frameOptions() & foDontCover; }
+    
     MiniIcon *miniIcon() const { return fMiniIcon; }
 
     bool isManaged() const { return fManaged; }
@@ -357,17 +371,12 @@ public:
 
     void sticky(bool sticky);
 
-    bool visibleOn(long ws) const { return isSticky() || ws == workspace(); }
+    bool visibleOn(icewm::Workspace ws) const { return isSticky() || ws == workspace(); }
     bool visibleNow() const { return visibleOn(manager->activeWorkspace()); }
 
     bool isModal();
     bool hasModal();
     bool isFocusable();
-
-    bool dontCover() const {
-        return limitByDockLayer ? layer() == WinLayerDock
-                                : frameOptions() & foDontCover;
-    }
 
 #ifndef LITE
     virtual YIcon *icon() const { return updateClientIcon(); }
@@ -381,14 +390,6 @@ public:
     bool isButton(char c);
 
 private:
-    /*typedef enum {
-        fsMinimized       = 1 << 0,
-        fsMaximized       = 1 << 1,
-        fsRolledup        = 1 << 2,
-        fsHidden          = 1 << 3,
-        fsWorkspaceHidden = 1 << 4
-    } FrameStateFlags;*/
-
     bool fFocused;
     unsigned long fFrameFunctions;
     unsigned long fFrameDecorations;
@@ -445,13 +446,13 @@ private:
     static YTimer *fAutoRaiseTimer;
     static YTimer *fDelayFocusTimer;
 
-    long fWinWorkspace;
-    long fWinLayer;
+    icewm::Workspace fWorkspace;
+    icewm::Layer fLayer;
 #ifdef CONFIG_TRAY
-    long fIcewmTrayOption;
+    icewm::TrayOption fTrayOption;
 #endif
-    long fWinState;
-    long fWinStateMask;
+    gnome::State fWinState;
+    gnome::State fWinStateMask;
     bool fManaged;
     long fWinOptionMask;
 

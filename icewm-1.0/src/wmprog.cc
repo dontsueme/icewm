@@ -525,7 +525,7 @@ void StartMenu::refresh() {
 #ifndef NO_CONFIGURE_MENUS
     if (itemCount()) addSeparator();
 #ifdef CONFIG_WINLIST
-    int const oldItemCount(itemCount());
+    unsigned const oldItemCount(itemCount());
 #endif    
 #ifdef CONFIG_GNOME_MENUS
     {

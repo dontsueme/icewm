@@ -128,7 +128,7 @@
  * this where WIN_WORKSPACE_COUNT comes into play.
  */
 
-#define WinWorkspaceInvalid             0xFFFFFFFFL
+#define WinWorkspaceInvalid             0xFFFFFFFFUL
 
 /* workspaces */
 #define XA_WIN_WORKSPACES               "_WIN_WORKSPACES"
@@ -188,19 +188,19 @@
  * windows could (?) move when switching workspaces (annoying).
  */
  
-#define WinLayerCount          16
-#define WinLayerInvalid        0xFFFFFFFFL
+#define WinLayerCount          16U
+#define WinLayerInvalid        0xFFFFFFFFUL
 
-#define WinLayerDesktop        0L
-#define WinLayerBelow          2L
-#define WinLayerNormal         4L
-#define WinLayerOnTop          6L
-#define WinLayerDock           8L
-#define WinLayerAboveDock      10L
-#define WinLayerMenu           12L
+#define WinLayerDesktop        0UL
+#define WinLayerBelow          2UL
+#define WinLayerNormal         4UL
+#define WinLayerOnTop          6UL
+#define WinLayerDock           8UL
+#define WinLayerAboveDock      10UL
+#define WinLayerMenu           12UL
 
 /* task bar tray */
-#define XA_ICEWM_TRAYOPT	"_ICEWM_TRAYOPT"
+#define XA_ICEWM_TRAY_OPTION	"_ICEWM_TRAY_OPTION"
 /* Type: CARD32
  *       window task bar tray option
  *
@@ -218,19 +218,19 @@
  *
  *     xev.type = ClientMessage;
  *     xev.window = toplevel_window;
- *     xev.message_type = ATOM_ICEWM_TRAYOPT;
+ *     xev.message_type = ATOM_ICEWM_TRAY_OPTION;
  *     xev.format = 32;
- *     xev.data.l[0] = tray_opt;
+ *     xev.data.l[0] = trayOption;
  *     xev.data.l[1] = timeStamp;
  *     XSendEvent(display, root, False, SubstructureNotifyMask, (XEvent *) &xev);
  */
 
-#define IcewmTrayOptionCount	3
-#define IcewmTrayInvalid        0xFFFFFFFFL
+#define IcewmTrayOptionCount	3U
+#define IcewmTrayInvalid        0xFFFFFFFFUL
 
-#define IcewmTrayIgnore		0L
-#define IcewmTrayMinimized	1L
-#define IcewmTrayExclusive	2L
+#define IcewmTrayIgnore		0UL
+#define IcewmTrayMinimized	1UL
+#define IcewmTrayExclusive	2UL
 
 /* state */
 #define XA_WIN_STATE           "_WIN_STATE"
@@ -350,9 +350,37 @@
 #define XA_ICEWM_FONTPATH               "_ICEWM_FONTPATH"
 #define XA_ICEWM_PID                    "_ICEWM_PID"
 
-#ifdef CONFIG_WMSPEC_HINTS
+/******************************************************************************/
 
+struct wm {
+    typedef unsigned long       Protocols;
+    typedef unsigned long       State;
+
+    static Protocols const      DeleteWindow  = 1 << 0;
+    static Protocols const      TakeFocus =     1 << 1;
+};
+
+struct icewm {
+    typedef unsigned long       Workspace;
+    typedef unsigned long       Layer;
+#ifdef CONFIG_TRAY
+    typedef unsigned long       TrayOption;
+#endif
+};
+
+#ifdef CONFIG_GNOME_HINTS
+struct gnome {
+    typedef icewm::Workspace    Workspace;
+    typedef icewm::Layer        Layer;
+    typedef unsigned long       State;
+    typedef unsigned long       Hints;
+};
+#endif
+
+#ifdef CONFIG_WMSPEC_HINTS
 struct netwm {
+    typedef icewm::Workspace    Desktop;
+
     enum MoveResizeDirection {
         moveResizeSizeTopLeft =     0,
         moveResizeSizeTop =         1,
@@ -371,7 +399,6 @@ struct netwm {
         stateToggle =               2
     };
 };
-
 #endif
 
 #endif

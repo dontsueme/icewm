@@ -243,12 +243,12 @@ void WindowOptions::combineOptions(WindowOption &cm, WindowOption &n) {
     cm.decor_mask |= n.decor_mask;
     cm.options |= n.options & ~cm.option_mask;
     cm.option_mask |= n.option_mask;
-    if (n.workspace != (long)WinWorkspaceInvalid)
+    if (n.workspace != WinWorkspaceInvalid)
         cm.workspace = n.workspace;
-    if (n.layer != (long)WinLayerInvalid)
+    if (n.layer != WinLayerInvalid)
         cm.layer = n.layer;
 #ifdef CONFIG_TRAY
-    if (n.tray != (long)IcewmTrayInvalid)
+    if (n.tray != IcewmTrayInvalid)
         cm.tray = n.tray;
 #endif
     if (n.gflags & XValue)

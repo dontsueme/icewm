@@ -69,7 +69,7 @@ Atom ATOM_WIN_WORKSPACE_COUNT;
 Atom ATOM_WIN_STATE;
 Atom ATOM_WIN_HINTS;
 Atom ATOM_WIN_LAYER;
-Atom ATOM_WIN_TRAYOPT;
+Atom ATOM_WIN_TRAY_OPTION;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -328,15 +328,15 @@ Status setLayer(Window window, long layer) {
     return XSendEvent(display, root, False, SubstructureNotifyMask, (XEvent *) &xev);
 }
 
-Status setTrayHint(Window window, long trayopt) {
+Status setTrayOption(Window window, long option) {
     XClientMessageEvent xev;
     memset(&xev, 0, sizeof(xev));
 
     xev.type = ClientMessage;
     xev.window = window;
-    xev.message_type = ATOM_WIN_TRAYOPT;
+    xev.message_type = ATOM_WIN_TRAY_OPTION;
     xev.format = 32;
-    xev.data.l[0] = trayopt;
+    xev.data.l[0] = option;
     xev.data.l[1] = CurrentTime;
 
     return XSendEvent(display, root, False, SubstructureNotifyMask, (XEvent *) &xev);
@@ -529,7 +529,7 @@ int main(int argc, char **argv) {
     ATOM_WIN_STATE = XInternAtom(display, XA_WIN_STATE, False);
     ATOM_WIN_HINTS = XInternAtom(display, XA_WIN_HINTS, False);
     ATOM_WIN_LAYER = XInternAtom(display, XA_WIN_LAYER, False);
-    ATOM_WIN_TRAYOPT = XInternAtom(display, XA_ICEWM_TRAYOPT, False);
+    ATOM_WIN_TRAY_OPTION = XInternAtom(display, XA_ICEWM_TRAY_OPTION, False);
     
 /******************************************************************************/
 
@@ -658,11 +658,11 @@ int main(int argc, char **argv) {
 	} else if (!strcmp(action, "setTrayOption")) {
 	    CHECK_ARGUMENT_COUNT (1)
 	    
-	    unsigned trayopt(trayOptions.parseExpression(*argp++));
-	    CHECK_EXPRESSION(trayOptions, trayopt, argp[-1])
+	    unsigned trayOption(trayOptions.parseExpression(*argp++));
+	    CHECK_EXPRESSION(trayOptions, trayOption, argp[-1])
 
-	    MSG(("setTrayOption: %d", trayopt));
-	    setTrayHint(window, trayopt);
+	    MSG(("setTrayOption: %d", trayOption));
+	    setTrayOption(window, trayOption);
 	} else {
 	    msg(_("Unknown action: `%s'"), action);
 	    THROW(1);

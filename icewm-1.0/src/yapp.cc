@@ -1326,7 +1326,7 @@ void YAtoms::init() {
         { &icewmWinOpt,             XA_ICEWM_WINOPT                         },
 #endif
 #ifdef CONFIG_TRAY
-        { &icewmTrayOpt,            XA_ICEWM_TRAYOPT                        },
+        { &icewmTrayOption,         XA_ICEWM_TRAY_OPTION                    },
 #endif
 #ifdef CONFIG_GUIEVENTS
         { &icewmGuiEvent,           XA_ICEWM_GUI_EVENT                      },          

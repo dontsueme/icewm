@@ -88,10 +88,10 @@ YWindow(parent) {
     PRECONDITION(client != 0);
     fClient = client;
 
-    fWinWorkspace = manager->activeWorkspace();
-    fWinLayer = WinLayerNormal;
+    fWorkspace = manager->activeWorkspace();
+    fLayer = WinLayerNormal;
 #ifdef CONFIG_TRAY
-    fIcewmTrayOption = IcewmTrayIgnore;
+    fTrayOption = IcewmTrayIgnore;
 #endif
     fWinState = 0;
     fWinOptionMask = ~0;
@@ -423,7 +423,7 @@ void YFrameWindow::unmanage(bool reparent) {
         client()->size(posWidth, posHeight);
 
         if (phase != phaseRestart)
-            client()->frameState(WithdrawnState);
+            client()->wmState(WithdrawnState);
 
         if (!client()->destroyed())
             XRemoveFromSaveSet(app->display(), client()->handle());
@@ -940,20 +940,20 @@ void YFrameWindow::actionPerformed(YAction *action, unsigned int modifiers) {
     } else if (action == actionDontCover) {
         wmToggleDontCover();
     } else {
-        for (int l(0); l < WinLayerCount; l++) {
+        for (icewm::Layer l(0); l < WinLayerCount; ++l) {
             if (action == layerActionSet[l]) {
                 wmSetLayer(l);
                 return ;
             }
         }
-        for (int w(0); w < workspaceCount; w++) {
+        for (icewm::Workspace w(0); w < workspaceCount; ++w) {
             if (action == workspaceActionMoveTo[w]) {
                 wmMoveToWorkspace(w);
                 return ;
             }
         }
 #ifdef CONFIG_TRAY
-        for (int o(0); o < IcewmTrayOptionCount; o++) {
+        for (icewm::TrayOption o(0); o < IcewmTrayOptionCount; ++o) {
             if (action == trayOptionActionSet[o]) {
                 wmSetTrayOption(o);
                 return;
@@ -964,12 +964,12 @@ void YFrameWindow::actionPerformed(YAction *action, unsigned int modifiers) {
     }
 }
 
-void YFrameWindow::wmSetLayer(long layer) {
+void YFrameWindow::wmSetLayer(icewm::Layer layer) {
     this->layer(layer);
 }
 
 #ifdef CONFIG_TRAY
-void YFrameWindow::wmSetTrayOption(long option) {
+void YFrameWindow::wmSetTrayOption(icewm::TrayOption option) {
     trayOption(option);
 }
 #endif
@@ -1217,7 +1217,7 @@ void YFrameWindow::wmClose() {
         YServerLock __lock__;
         client()->protocols();
 
-        if (client()->protocols() & YFrameClient::wpDeleteWindow)
+        if (client()->protocols() & wm::DeleteWindow)
             client()->sendMessage(atoms.wmDeleteWindow);
         else
             wmConfirmKill();
@@ -1660,18 +1660,18 @@ void YFrameWindow::wmOccupyAll() {
 #endif
 }
 
-void YFrameWindow::wmOccupyWorkspace(long workspace) {
+void YFrameWindow::wmOccupyWorkspace(icewm::Workspace workspace) {
     PRECONDITION(workspace < workspaceCount);
     this->workspace(workspace);
 }
 
-void YFrameWindow::wmOccupyOnlyWorkspace(long workspace) {
+void YFrameWindow::wmOccupyOnlyWorkspace(icewm::Workspace workspace) {
     PRECONDITION(workspace < workspaceCount);
     this->workspace(workspace);
     sticky(false);
 }
 
-void YFrameWindow::wmMoveToWorkspace(long workspace) {
+void YFrameWindow::wmMoveToWorkspace(icewm::Workspace workspace) {
     wmOccupyOnlyWorkspace(workspace);
 }
 
@@ -1814,12 +1814,12 @@ void YFrameWindow::defaultOptions() {
         fFrameIcon = ::getIcon(wo.icon);
 #endif
     }
-    if (wo.workspace != (long)WinWorkspaceInvalid && wo.workspace < workspaceCount)
+    if (wo.workspace != WinWorkspaceInvalid && wo.workspace < workspaceCount)
         workspace(wo.workspace);
-    if (wo.layer != (long)WinLayerInvalid && wo.layer < WinLayerCount)
+    if (wo.layer != WinLayerInvalid && wo.layer < WinLayerCount)
         layer(wo.layer);
 #ifdef CONFIG_TRAY
-    if (wo.tray != (long)IcewmTrayInvalid && wo.tray < IcewmTrayOptionCount)
+    if (wo.tray != IcewmTrayInvalid && wo.tray < IcewmTrayOptionCount)
         trayOption(wo.tray);
 #endif
 #endif
@@ -1940,7 +1940,7 @@ void YFrameWindow::updateIcon() {
 YFrameWindow *YFrameWindow::nextLayer() {
     if (fNextFrame) return fNextFrame;
 
-    for (long l(layer() - 1); l > -1; --l)
+    for (icewm::Layer l(layer()); l-- > 0; )
         if (manager->top(l)) return manager->top(l);
 
     return 0;
@@ -1949,7 +1949,7 @@ YFrameWindow *YFrameWindow::nextLayer() {
 YFrameWindow *YFrameWindow::prevLayer() {
     if (fPrevFrame) return fPrevFrame;
 
-    for (long l(layer() + 1); l < WinLayerCount; ++l)
+    for (icewm::Layer l(layer() + 1); l < WinLayerCount; ++l)
         if (manager->bottom(l)) return manager->bottom(l);
 
     return 0;
@@ -2060,18 +2060,16 @@ bool YFrameWindow::isFocusable() {
     if (hints->input)
         return true;
 #if 1
-    if (client()->protocols() & YFrameClient::wpTakeFocus)
+    if (client()->protocols() & wm::TakeFocus)
         return true;
 #endif
     return false;
 }
 
-void YFrameWindow::workspace(long workspace) {
-    if (workspace >= workspaceCount || workspace < 0)
-        return ;
-    if (workspace != fWinWorkspace) {
-        fWinWorkspace = workspace;
-        client()->updateWinWorkspace(fWinWorkspace);
+void YFrameWindow::workspace(icewm::Workspace workspace) {
+    if (workspace < workspaceCount &&
+        workspace != fWorkspace) {
+        client()->winWorkspace(fWorkspace = workspace);
         updateState();
         if (clickFocus || !strongPointerFocus)
             manager->focusTopWindow();
@@ -2081,17 +2079,14 @@ void YFrameWindow::workspace(long workspace) {
     }
 }
 
-void YFrameWindow::layer(long layer) {
-    if (layer >= WinLayerCount || layer < 0)
-        return ;
-
-    if (layer != fWinLayer) {
-        long oldLayer = fWinLayer;
+void YFrameWindow::layer(icewm::Layer layer) {
+    if (layer < WinLayerCount && layer != fLayer) {
+        icewm::Layer const oldLayer(fLayer);
 
         removeFrame();
-        fWinLayer = layer;
+        fLayer = layer;
         insertFrame();
-        client()->updateWinLayer(fWinLayer);
+        client()->winLayer(fLayer);
         manager->restackWindows(this);
 
         if (limitByDockLayer &&
@@ -2101,12 +2096,9 @@ void YFrameWindow::layer(long layer) {
 }
 
 #ifdef CONFIG_TRAY
-void YFrameWindow::trayOption(long option) {
-    if (option >= IcewmTrayOptionCount || option < 0)
-        return ;
-    if (option != fIcewmTrayOption) {
-        fIcewmTrayOption = option;
-        client()->icewmTrayHint(fIcewmTrayOption);
+void YFrameWindow::trayOption(icewm::TrayOption option) {
+    if (option < IcewmTrayOptionCount && option != fTrayOption) {
+        client()->icewmTrayOption(fTrayOption = option);
 #ifdef CONFIG_TASKBAR
         updateTaskBar();
 #endif
@@ -2120,9 +2112,9 @@ void YFrameWindow::updateState() {
 
     client()->winState(WIN_STATE_ALL, fWinState);
 
-    FrameState newState = NormalState;
-    bool show_frame = true;
-    bool show_client = true;
+    wm::State newState(NormalState);
+    bool showFrame(true);
+    bool showClient(true);
 
     // some code is probably against the ICCCM.
     // some applications misbehave either way.
@@ -2130,40 +2122,39 @@ void YFrameWindow::updateState() {
     // or rolling up the window).
 
     if (isHidden()) {
-        show_frame = false;
-        show_client = false;
+        showFrame = false;
+        showClient = false;
         newState = IconicState;
     } else if (!visibleNow()) {
-        show_frame = false;
-        show_client = false;
+        showFrame = false;
+        showClient = false;
         newState = isMinimized() || isIconic() ? IconicState : NormalState;
     } else if (isMinimized()) {
-        show_frame = minimizeToDesktop;
-        show_client = false;
+        showFrame = minimizeToDesktop;
+        showClient = false;
         newState = IconicState;
     } else if (isRollup()) {
-        show_frame = true;
-        show_client = false;
+        showFrame = true;
+        showClient = false;
         newState = NormalState; // ?
     } else {
-        show_frame = true;
-        show_client = true;
+        showFrame = true;
+        showClient = true;
     }
 
     MSG(("updateState: winState=%lX, frame=%d, client=%d",
-         fWinState, show_frame, show_client));
+         fWinState, showFrame, showClient));
 
-    client()->frameState(newState);
+    client()->wmState(newState);
 
-    if (show_client) {
+    if (showClient) {
         client()->show();
         fClientContainer->show();
     }
 
-    if (show_frame) show();
-    else hide();
+    if (showFrame) show(); else hide();
 
-    if (!show_client) {
+    if (!showClient) {
         fClientContainer->hide();
         client()->hide();
     }
@@ -2304,11 +2295,11 @@ void YFrameWindow::updateLayout() {
     }
 }
 
-void YFrameWindow::state(long mask, long state) {
+void YFrameWindow::state(gnome::State mask, gnome::State state) {
     updateNormalSize(); // !!! fix this to move below (or remove totally)
 
-    long fOldState = fWinState;
-    long fNewState = (fWinState & ~mask) | (state & mask);
+    gnome::State fOldState(fWinState);
+    gnome::State fNewState((fWinState & ~mask) | (state & mask));
 
     // !!! this should work
     //if (fNewState == fOldState)
@@ -2475,10 +2466,10 @@ YIcon *YFrameWindow::updateClientIcon() const {
 #endif
 
 void YFrameWindow::updateProperties() {
-    client()->winWorkspace(fWinWorkspace);
-    client()->winLayer(fWinLayer);
+    client()->winWorkspace(fWorkspace);
+    client()->winLayer(fLayer);
 #ifdef CONFIG_TRAY
-    client()->icewmTrayHint(fIcewmTrayOption);
+    client()->icewmTrayOption(fTrayOption);
 #endif
     client()->winState(WIN_STATE_ALL, fWinState);
 }

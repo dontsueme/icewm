@@ -4,6 +4,7 @@
 #ifndef NO_WINDOW_OPTIONS
 
 #include <X11/Xproto.h>
+#include "WinMgr.h"
 
 struct WindowOption {
     char *name;
@@ -11,10 +12,10 @@ struct WindowOption {
     unsigned long functions, function_mask;
     unsigned long decors, decor_mask;
     unsigned long options, option_mask;
-    long workspace;
-    long layer;
+    icewm::Workspace workspace;
+    icewm::Layer layer;
 #ifdef CONFIG_TRAY
-    long tray;
+    icewm::TrayOption tray;
 #endif
     int gflags;
     int gx, gy;

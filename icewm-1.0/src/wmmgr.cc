@@ -58,15 +58,13 @@ fMinX(0), fMinY(0), fMaxX(width()), fMaxY(height()),
 fArrangeCount(0),
 fArrangeInfo(NULL) {
 
-#ifdef CONFIG_GNOME_HINTS
-    for (int l(0); l < WinLayerCount; l++) {
-        layerActionSet[l] = new YAction();
-        fTop[l] = fBottom[l] = 0;
+    for (icewm::Layer layer(0); layer < WinLayerCount; ++layer) {
+        layerActionSet[layer] = new YAction();
+        fTop[layer] = fBottom[layer] = NULL;
     }
-#endif // CONFIG_GNOME_HINTS
 #ifdef CONFIG_TRAY
-    for (int k(0); k < IcewmTrayOptionCount; k++)
-        trayOptionActionSet[k] = new YAction();
+    for (icewm::TrayOption option(0); option < IcewmTrayOptionCount; ++option)
+        trayOptionActionSet[option] = new YAction();
 #endif // CONFIG_TRAY
 
     style(wsManager);
@@ -181,7 +179,7 @@ void YWindowManager::registerProtocols() {
 #endif // CONFIG_KDE_HINTS
 
 #ifdef CONFIG_TRAY
-	atoms.icewmTrayOpt,
+	atoms.icewmTrayOption,
 #endif // CONFIG_TRAY
     };
 
@@ -255,7 +253,7 @@ void YWindowManager::unregisterProtocols() {
 }
 
 void YWindowManager::initWorkspaces() {
-    yint32 workspace(0);
+    icewm::Workspace workspace(0);
 
 #ifdef CONFIG_GNOME_HINTS
     XTextProperty names;
@@ -292,7 +290,7 @@ void YWindowManager::initWorkspaces() {
     YWindowProperty netCurrentDesktop(handle(),
                                       atoms.netCurrentDesktop, XA_CARDINAL);
     if (Success == netCurrentDesktop && netCurrentDesktop.count()) {
-        workspace = netCurrentDesktop.template data<long>();
+        workspace = netCurrentDesktop.template data<netwm::Desktop>();
         if (workspace >= ::workspaceCount) workspace = 0;
     }
     else
@@ -840,7 +838,7 @@ void YWindowManager::focus(YFrameWindow *f, bool /*canWarp*/) {
         XSetInputFocus(app->display(), w, RevertToNone, CurrentTime);
     }
 
-    if (c && w == c->handle() && c->protocols() & YFrameClient::wpTakeFocus) {
+    if (c && w == c->handle() && c->protocols() & wm::TakeFocus) {
         c->sendMessage(atoms.wmTakeFocus);
     }
 
@@ -922,7 +920,7 @@ void YWindowManager::activate(YFrameWindow *window, bool canWarp) {
     }
 }
 
-void YWindowManager::top(long layer, YFrameWindow *top) {
+void YWindowManager::top(icewm::Layer layer, YFrameWindow *top) {
     if (true || !clientMouseActions) // some programs are buggy
         if (fTop[layer]) {
             if (raiseOnClickClient)
@@ -1492,14 +1490,14 @@ YFrameWindow *YWindowManager::manageFrame(YFrameClient *client,
     MSG(("Map - Frame: %d", frame->visible()));
     MSG(("Map - Client: %d", client->visible()));
 
-    long layer;
+    gnome::Layer layer;
     if (client->updateWinLayer(layer)) frame->layer(layer);
 
-    long stateMask, state;
+    gnome::State stateMask, state;
     if (client->updateWinState(stateMask, state)) {
         frame->state(stateMask, state);
     } else {
-        FrameState state(client->frameState());
+        wm::State state(client->wmState());
 
         if (WithdrawnState == state) {
             XWMHints const *wmHints(frame->client()->hints());
@@ -1520,14 +1518,14 @@ YFrameWindow *YWindowManager::manageFrame(YFrameClient *client,
         }
     }
 
-    long workspace(0);
+    gnome::Workspace workspace(0);
     if (frame->client()->updateWinWorkspace(workspace))
         frame->workspace(workspace);
 
 #ifdef CONFIG_TRAY
-    long trayopt(0);
-    if (frame->client()->updateIcewmTrayHint(trayopt))
-        frame->trayOption(trayopt);
+    icewm::TrayOption trayoption(0);
+    if (frame->client()->updateIcewmTrayOption(trayoption))
+        frame->trayOption(trayoption);
 #endif
 
     if ((limitSize || limitPosition) &&
@@ -1729,31 +1727,30 @@ bool YWindowManager::focusTop(YFrameWindow *f) {
     return true;
 }
 
-YFrameWindow *YWindowManager::topLayer(long layer) {
-    for (long l = layer; l >= 0; l--)
+YFrameWindow *YWindowManager::topLayer(icewm::Layer layer) {
+    for (icewm::Layer l(layer + 1); l-- > 0; )
         if (fTop[l]) return fTop[l];
 
-    return 0;
+    return NULL;
 }
 
-YFrameWindow *YWindowManager::bottomLayer(long layer) {
-    for (long l = layer; l < WinLayerCount; l++)
+YFrameWindow *YWindowManager::bottomLayer(icewm::Layer layer) {
+    for (icewm::Layer l(layer); l < WinLayerCount; ++l)
         if (fBottom[l]) return fBottom[l];
 
-    return 0;
+    return NULL;
 }
 
 void YWindowManager::restackWindows(YFrameWindow *win) {
-    int count = 0;
+    unsigned count(0);
     YFrameWindow *f;
     YPopupWindow *p;
-    long ll;
 
     for (f = win; f; f = f->prev())
         //if (f->visibleNow())
             count++;
 
-    for (ll = win->layer() + 1; ll < WinLayerCount; ll++) {
+    for (icewm::Layer ll(win->layer() + 1); ll < WinLayerCount; ++ll) {
         f = bottom(ll);
         for (; f; f = f->prev())
             //if (f->visibleNow())
@@ -1796,7 +1793,7 @@ void YWindowManager::restackWindows(YFrameWindow *win) {
     if (w == 0)
         return ;
 
-    int i = 0;
+    unsigned i(0);
 
     w[i++] = fTopWin->handle();
 
@@ -1828,7 +1825,7 @@ void YWindowManager::restackWindows(YFrameWindow *win) {
         w[i++] = statusMoveSize->handle();
 #endif
 
-    for (ll = WinLayerCount - 1; ll > win->layer(); ll--) {
+    for (icewm::Layer ll(WinLayerCount - 1); ll > win->layer(); --ll) {
         for (f = top(ll); f; f = f->next())
             //if (f->visibleNow())
                 w[i++] = f->handle();
@@ -1868,36 +1865,36 @@ void YWindowManager::restackWindows(YFrameWindow *win) {
     delete w;
 }
 
-int YWindowManager::minX(long layer) const {
-    return layer < WinLayerDock && layer >= 0 ? fMinX : 0;
+int YWindowManager::minX(icewm::Layer layer) const {
+    return layer < WinLayerDock ? fMinX : 0;
 }
 
-int YWindowManager::minY(long layer) const {
-    return layer < WinLayerDock && layer >= 0 ? fMinY : 0;
+int YWindowManager::minY(icewm::Layer layer) const {
+    return layer < WinLayerDock ? fMinY : 0;
 }
 
-int YWindowManager::maxX(long layer) const {
-    return layer < WinLayerDock && layer >= 0 ? fMaxX : width();
+int YWindowManager::maxX(icewm::Layer layer) const {
+    return layer < WinLayerDock ? fMaxX : width();
 }
 
-int YWindowManager::maxY(long layer) const {
-    return layer < WinLayerDock && layer >= 0 ? fMaxY : height();
+int YWindowManager::maxY(icewm::Layer layer) const {
+    return layer < WinLayerDock ? fMaxY : height();
 }
 
 int YWindowManager::minX(YFrameWindow const *frame) const {
-    return minX(!frame->dontCover() ? frame->layer() : -1);
+    return minX(!frame->dontCover() ? frame->layer() : WinLayerInvalid);
 }
 
 int YWindowManager::minY(YFrameWindow const *frame) const {
-    return minY(!frame->dontCover() ? frame->layer() : -1);
+    return minY(!frame->dontCover() ? frame->layer() : WinLayerInvalid);
 }
 
 int YWindowManager::maxX(YFrameWindow const *frame) const {
-    return maxX(!frame->dontCover() ? frame->layer() : -1);
+    return maxX(!frame->dontCover() ? frame->layer() : WinLayerInvalid);
 }
 
 int YWindowManager::maxY(YFrameWindow const *frame) const {
-    return maxY(!frame->dontCover() ? frame->layer() : -1);
+    return maxY(!frame->dontCover() ? frame->layer() : WinLayerInvalid);
 }
 
 void YWindowManager::updateWorkArea() {
@@ -2020,11 +2017,11 @@ void YWindowManager::resizeWindows() {
 	}
 }
 
-void YWindowManager::activateWorkspace(long workspace) {
+void YWindowManager::activateWorkspace(icewm::Workspace workspace) {
     if (workspace != fActiveWorkspace) {
 #ifdef CONFIG_TASKBAR
         if (taskBar && taskBar->workspacesPane() &&
-	    fActiveWorkspace != (long)WinWorkspaceInvalid) {
+	    fActiveWorkspace != WinWorkspaceInvalid) {
             if (taskBar->workspacesPane()->workspaceButton(fActiveWorkspace))
                 taskBar->workspacesPane()->workspaceButton(fActiveWorkspace)->pressed(0);
         }
@@ -2037,7 +2034,7 @@ void YWindowManager::activateWorkspace(long workspace) {
             taskBar->workspacesPane()->workspaceButton(fActiveWorkspace)->pressed(1);
 #endif
 
-        long ws(fActiveWorkspace);
+        icewm::Workspace ws(fActiveWorkspace);
 #ifdef CONFIG_GNOME_HINTS
         XChangeProperty(app->display(), handle(),
                         atoms.winWorkspace, XA_CARDINAL, 32,
@@ -2098,12 +2095,9 @@ void YWindowManager::activateWorkspace(long workspace) {
     }
 }
 
-void YWindowManager::winWorkspace(long workspace) {
-    if (workspace >= workspaceCount() || workspace < 0) {
-        MSG(("invalid workspace switch %ld", (long)workspace));
-        return ;
-    }
-    activateWorkspace(workspace);
+void YWindowManager::winWorkspace(icewm::Workspace workspace) {
+    if (workspace < workspaceCount()) activateWorkspace(workspace);
+    else MSG(("invalid workspace switch %ld", workspace));
 }
 
 void YWindowManager::wmCloseSession() { // ----------------- shutdow started ---
@@ -2131,24 +2125,6 @@ void YWindowManager::iconPosition(YFrameWindow *frame, int *iconX, int *iconY) {
             y = 0;
         }
     }
-}
-
-int YWindowManager::windowCount(long workspace) {
-    int count = 0;
-
-    for (int layer = 0 ; layer <= WinLayerCount; layer++) {
-        for (YFrameWindow *frame = top(layer); frame; frame = frame->next()) {
-            if (!frame->visibleOn(workspace))
-                continue;
-            if (frame->frameOptions() & YFrameWindow::foIgnoreWinList)
-                continue;
-            if (workspace != activeWorkspace() &&
-                frame->visibleOn(activeWorkspace()))
-                continue;
-            count++;
-        }
-    }
-    return count;
 }
 
 void YWindowManager::resetColormap(bool active) {
@@ -2280,16 +2256,18 @@ void YWindowManager::popupWindowListMenu() {
 }
 #endif
 
-void YWindowManager::switchToWorkspace(long nw, bool takeCurrent) {
-    if (nw >= 0 && nw < workspaceCount()) {
-        YFrameWindow *frame = focus();
+void YWindowManager::switchToWorkspace(icewm::Workspace workspace,
+                                       bool takeCurrent) {
+    if (workspace < workspaceCount()) {
+        YFrameWindow *frame(focus());
+
         if (takeCurrent && frame && !frame->isSticky()) {
             frame->wmOccupyAll();
             frame->wmRaise();
-            activateWorkspace(nw);
-            frame->wmOccupyOnlyWorkspace(nw);
+            activateWorkspace(workspace);
+            frame->wmOccupyOnlyWorkspace(workspace);
         } else {
-            activateWorkspace(nw);
+            activateWorkspace(workspace);
         }
 #ifdef CONFIG_TASKBAR
         if (taskBar) taskBar->popOut();
@@ -2298,15 +2276,12 @@ void YWindowManager::switchToWorkspace(long nw, bool takeCurrent) {
 }
 
 void YWindowManager::switchToPrevWorkspace(bool takeCurrent) {
-    long nw = (activeWorkspace() + workspaceCount() - 1) % workspaceCount();
-
-    switchToWorkspace(nw, takeCurrent);
+    switchToWorkspace((activeWorkspace() + workspaceCount() - 1) %
+                       workspaceCount(), takeCurrent);
 }
 
 void YWindowManager::switchToNextWorkspace(bool takeCurrent) {
-    long nw = (activeWorkspace() + 1) % workspaceCount();
-
-    switchToWorkspace(nw, takeCurrent);
+    switchToWorkspace((activeWorkspace() + 1) % workspaceCount(), takeCurrent);
 }
 
 void YWindowManager::switchToLastWorkspace(bool takeCurrent) {
