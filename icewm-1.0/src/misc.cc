@@ -454,7 +454,7 @@ unsigned strTokens(const char * str, const char * delim) {
 }
 
 #ifndef HAVE_BASENAME
-const * basename(char const *path) {
+extern "C" char * basename(char const *path) {
     char * base = ::strrchr(path, DIR_DELIMINATOR);
     return (base ? base + 1 : path);
 }
