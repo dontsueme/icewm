@@ -86,11 +86,11 @@
                              trim($line));
 
         if ($line[0] == '-')
-          $line = "\n<li>".substr($line,2);
+          echo "\n<li>".substr($line,2);
         else if ($line[0] == "!")
-          $line = "\n<li><em>In progress: </em>".substr($line,strpos($line,'-')+1);
-
-        echo $line;
+          echo "\n<li><em>In progress: </em>".substr($line,strpos($line,'-')+1);
+        echo
+          echo " $line";
       }
     }
 
