@@ -17,12 +17,12 @@ public:
     virtual void handleButton(const XButtonEvent &button);
     virtual void handleCrossing(const XCrossingEvent &crossing);
 
-    void setAction(YAction * action);
-    void setPopup(YMenu * popup);
-    void setImage(YIcon::Image * image);
-    void setText(const char * str, int hot = -1);
+    void action(YAction * action);
+    void popup(YMenu * popup);
+    void image(YIcon::Image * image);
+    void text(const char * str, int hot = -1);
 
-    void setPressed(int pressed);
+    void pressed(int pressed);
     virtual bool isFocusTraversable();
 
     virtual void donePopup(YPopupWindow *popup);
@@ -33,17 +33,17 @@ public:
     void actionListener(YAction::Listener *listener) { fListener = listener; }
     YAction::Listener *actionListener() const { return fListener; }
 
-    void setSelected(bool selected);
-    void setArmed(bool armed, bool mousedown);
+    void selected(bool selected);
+    void armed(bool armed, bool mousedown);
     bool isPressed() const { return fPressed; } 
     bool isSelected() const { return fSelected; }
     bool isArmed() const { return fArmed; }
     bool isPopupActive() const { return fPopupActive; }
 
     virtual void actionPerformed(YAction *action, unsigned int modifiers);
-    virtual YFont * getFont();
-    virtual YColor * getColor();
-    virtual YSurface getSurface();
+    virtual YFont * font();
+    virtual YColor * color();
+    virtual YSurface surface();
     
 private:
     void paint(Graphics &g, int const d, int const x, int const y,

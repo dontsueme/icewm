@@ -33,8 +33,10 @@ public:
     bool hasColormap();
     bool hasGNOME();
 
+    void sync(bool discard = false) { XSync(display(), discard); }
+
     void saveEventTime(XEvent &xev);
-    Time getEventTime() const { return fLastEventTime; }
+    Time eventTime() const { return fLastEventTime; }
 
     int grabEvents(YWindow *win, Cursor ptr, unsigned int eventMask,
                    bool grabMouse = true, bool grabKeyboard = true,
@@ -85,7 +87,7 @@ public:
     void smCancelShutdown();
 #endif
 
-    void setClipboardText(char *data, int len);
+    void clipboardText(char *data, int len);
 
     static YCursor leftPointer;
     static YCursor rightPointer;
@@ -136,5 +138,17 @@ private:
 };
 
 extern YApplication *app;
+
+class YServerLock {
+public:
+    YServerLock() { XGrabServer(app->display()); }
+    virtual ~YServerLock() { XUngrabServer(app->display()); }
+};
+
+class YSynchronServerLock :
+public YServerLock {
+public:
+    YSynchronServerLock(bool discard = false) { app->sync(discard); }
+};
 
 #endif

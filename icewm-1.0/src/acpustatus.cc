@@ -55,9 +55,9 @@ CPUStatus::CPUStatus(YWindow *aParent): YWindow(aParent) {
         cpu[i][IWM_USER] = cpu[i][IWM_NICE] = cpu[i][IWM_SYS] = 0;
         cpu[i][IWM_IDLE] = 1;
     }
-    setSize(taskBarCPUSamples, 20);
+    size(taskBarCPUSamples, 20);
     last_cpu[IWM_USER] = last_cpu[IWM_NICE] = last_cpu[IWM_SYS] = last_cpu[IWM_IDLE] = 0;
-    getStatus();
+    status();
     updateStatus();
     updateToolTip();
 }
@@ -89,7 +89,7 @@ void CPUStatus::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/,
             if (sys) {
                 n = (h * (total - sys)) / total; // check rounding
                 if (n >= y) n = y;
-                g.setColor(color[IWM_SYS]);
+                g.color(color[IWM_SYS]);
                 g.drawLine(i, y, i, n);
                 y = n - 1;
             }
@@ -97,7 +97,7 @@ void CPUStatus::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/,
             if (nice) {
                 n = (h * (total - sys - nice))/ total;
                 if (n >= y) n = y;
-                g.setColor(color[IWM_NICE]);
+                g.color(color[IWM_NICE]);
                 g.drawLine(i, y, i, n);
                 y = n - 1;
             }
@@ -105,18 +105,18 @@ void CPUStatus::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/,
             if (user) {
                 n = (h * (total - sys - nice - user))/ total;
                 if (n >= y) n = y;
-                g.setColor(color[IWM_USER]);
+                g.color(color[IWM_USER]);
                 g.drawLine(i, y, i, n);
                 y = n - 1;
             }
         }
         if (idle) {
 	    if (color[IWM_IDLE]) {
-		g.setColor(color[IWM_IDLE]);
+		g.color(color[IWM_IDLE]);
 		g.drawLine(i, 0, i, y);
             } else {
 #ifdef CONFIG_GRADIENTS
-		class YPixbuf * gradient(parent()->getGradient());
+		class YPixbuf * gradient(parent()->gradient());
 
 		if (gradient)
 		    g.copyPixbuf(*gradient,
@@ -152,7 +152,7 @@ void CPUStatus::updateToolTip() {
     l15 = (float)sys.loads[2] / 65536.0;
     sprintf(load, _("CPU Load: %3.2f %3.2f %3.2f, %d processes."),
             l1, l5, l15, sys.procs);
-    setToolTip(load);
+    toolTip(load);
 #endif
 }
 
@@ -174,11 +174,11 @@ void CPUStatus::updateStatus() {
         cpu[i - 1][IWM_SYS]  = cpu[i][IWM_SYS];
         cpu[i - 1][IWM_IDLE] = cpu[i][IWM_IDLE];
     }
-    getStatus(),
+    status(),
     repaint();
 }
 
-void CPUStatus::getStatus() {
+void CPUStatus::status() {
 #ifdef linux
     char *p, buf[128];
     long cur[IWM_STATES];

@@ -49,7 +49,7 @@ YTimeout & YTimeout::operator -= (timeval const & other) {
  * Timer infrastructure
  ******************************************************************************/
 
-YSingleList<YTimer> YTimer::timers;
+YTimer::TimerList YTimer::timers;
 
 
 void YTimer::start() {
@@ -84,11 +84,12 @@ void YTimer::nextTimeout(YTimeout & timeout) {
     timeout+= curtime;
 
     if (timers.filled()) {
-        timeout = timers.head()->timeout();
+        timeout = (*timers.head())->timeout();
 
-        for (YTimer::Iterator timer(timers); timer; ++timer)
-            if (timer->running() && timeout > timer->timeout())
-                timeout = timer->timeout();
+        for (TimerList::Iterator timer(timers); timer; ++timer) {
+            if ((*timer)->running() && timeout > (*timer)->timeout())
+                timeout = (*timer)->timeout();
+        }
     }
 
     if (curtime >= timeout) timeout = 1;
@@ -101,11 +102,14 @@ void YTimer::nextTimeout(YTimeout & timeout) {
 void YTimer::handleTimeouts(void) {
     YTimeOfDay curtime;
 
-    for (YTimer::Iterator timer(timers); timer; ++timer)
-        if (timer->running() && curtime > timer->timeout()) {
-            timer->stop();
+    for (TimerList::Iterator ti(timers); ti; ) {
+        YTimer & timer(**ti); ++ti;
 
-            Listener * listener(timer->timerListener());
-            if (listener && listener->handleTimer(timer)) timer->start();
+        if (timer.running() && curtime > timer.timeout()) {
+            timer.stop();
+
+            Listener * listener(timer.timerListener());
+            if (listener && listener->handleTimer(&timer)) timer.start();
         }
+    }
 }

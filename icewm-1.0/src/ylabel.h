@@ -10,8 +10,8 @@ public:
 
     virtual void paint(Graphics &g, int x, int y, unsigned int width, unsigned int height);
 
-    void setText(const char *label);
-    const char *getText() const { return fLabel; }
+    void text(const char *label);
+    const char *text() const { return fLabel; }
 private:
     char *fLabel;
 

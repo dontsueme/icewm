@@ -231,6 +231,11 @@ inline unsigned highbit(T mask) {
 
 /******************************************************************************/
 
+#define STATIC_VARIABLE(Variable, Value) \
+    if (NULL == (Variable)) { (Variable) = (Value); } else {}
+
+/******************************************************************************/
+
 #define THROW(Result) { rc = (Result); goto exceptionHandler; }
 #define TRY(Command) { if ((rc = (Command))) THROW(rc); }
 #define CATCH(Handler) { exceptionHandler: { Handler } return rc; }

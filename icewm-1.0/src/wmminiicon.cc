@@ -23,7 +23,7 @@ static YColor *activeMinimizedWindowFg = 0;
 
 MiniIcon::MiniIcon(YWindow *aParent, YFrameWindow *frame): YWindow(aParent) {
     if (minimizedWindowFont == 0)
-        minimizedWindowFont = YFont::getFont(minimizedWindowFontName);
+        minimizedWindowFont = YFont::font(minimizedWindowFontName);
     if (normalMinimizedWindowBg == 0)
         normalMinimizedWindowBg = new YColor(clrNormalMinimizedWindow);
     if (normalMinimizedWindowFg == 0)
@@ -35,9 +35,9 @@ MiniIcon::MiniIcon(YWindow *aParent, YFrameWindow *frame): YWindow(aParent) {
 
     fFrame = frame;
     selected = 0;
-    setGeometry(0, 0, 120, 24);
+    geometry(0, 0, 120, 24);
     
-    setToolTip(getFrame()->client()->iconTitle());
+    toolTip(this->frame()->client()->iconTitle());
 }
 
 MiniIcon::~MiniIcon() {
@@ -45,13 +45,13 @@ MiniIcon::~MiniIcon() {
 
 void MiniIcon::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsigned int /*height*/) {
 #ifdef CONFIG_TASKBAR
-    bool focused = getFrame()->focused();
+    bool focused = frame()->focused();
     YColor *bg = focused ? activeMinimizedWindowBg : normalMinimizedWindowBg;;
     YColor *fg = focused ? activeMinimizedWindowFg : normalMinimizedWindowFg;;
     int tx = 2;
     int x, y, w, h;
 
-    g.setColor(bg);
+    g.color(bg);
     g.draw3DRect(0, 0, width() - 1, height() - 1, true);
     g.fillRect(1, 1, width() - 2, height() - 2);
 
@@ -60,33 +60,34 @@ void MiniIcon::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, 
     h = height() - 6;
 
     if (selected == 2) {
-        g.setColor(bg->darker());
+        g.color(bg->darker());
         g.draw3DRect(x, y, w, h, false);
         g.fillRect(x + 1, y + 1, w - 1, h - 1);
     } else {
-        g.setColor(bg->brighter());
+        g.color(bg->brighter());
         g.drawRect(x + 1, y + 1, w, h);
-        g.setColor(bg->darker());
+        g.color(bg->darker());
         g.drawRect(x, y, w, h);
-        g.setColor(bg);
+        g.color(bg);
         g.fillRect(x + 2, y + 2, w - 2, h - 2);
     }
 
-    if (getFrame()->clientIcon() && getFrame()->clientIcon()->small()) {
-        //int y = (height() - 3 - frame()->clientIcon()->small()->height()) / 2;
-        g.drawImage(getFrame()->clientIcon()->small(), 2 + tx + 1, 4);
+    if (frame()->updateClientIcon() &&
+        frame()->updateClientIcon()->small()) {
+        //int y = (height() - 3 - frame()->updateClientIcon()->small()->height()) / 2;
+        g.drawImage(frame()->updateClientIcon()->small(), 2 + tx + 1, 4);
     }
 
-    const char *str = getFrame()->client()->iconTitle();
+    const char *str = frame()->client()->iconTitle();
 
     if (strIsEmpty(str))
-        str = getFrame()->client()->windowTitle();
+        str = frame()->client()->windowTitle();
 
     if (str) {
-        g.setColor(fg);
+        g.color(fg);
         YFont *font = minimizedWindowFont;
         if (font) {
-            g.setFont(font);
+            g.font(font);
             int ty = (height() - 1 + font->height()) / 2 - font->descent();
             if (ty < 2) ty = 2;
 
@@ -101,8 +102,8 @@ void MiniIcon::handleButton(const XButtonEvent &button) {
     if (button.type == ButtonPress) {
         if (!(button.state & ControlMask) &&
             (buttonRaiseMask & (1 << (button.button - 1))))
-            getFrame()->wmRaise();
-        manager->setFocus(getFrame(), false);
+            frame()->wmRaise();
+        manager->focus(frame(), false);
         if (button.button == 1) {
             selected = 2;
             repaint();
@@ -111,11 +112,11 @@ void MiniIcon::handleButton(const XButtonEvent &button) {
         if (button.button == 1) {
             if (selected == 2) {
                 if (button.state & app->AltMask) {
-                    getFrame()->wmLower();
+                    frame()->wmLower();
                 } else {
                     if (!(button.state & ControlMask))
-                        getFrame()->wmRaise();
-                    getFrame()->activate();
+                        frame()->wmRaise();
+                    frame()->activate();
                 }
             }
             selected = 0;
@@ -127,10 +128,10 @@ void MiniIcon::handleButton(const XButtonEvent &button) {
 
 void MiniIcon::handleClick(const XButtonEvent &up, int /*count*/) {
     if (up.button == 3) {
-        getFrame()->popupSystemMenu(up.x_root, up.y_root, -1, -1,
-                                    YPopupWindow::pfCanFlipVertical |
-                                    YPopupWindow::pfCanFlipHorizontal |
-                                    YPopupWindow::pfPopupMenu);
+        frame()->popupSystemMenu(up.x_root, up.y_root, -1, -1,
+                                 YPopupWindow::pfCanFlipVertical |
+                                 YPopupWindow::pfCanFlipHorizontal |
+                                 YPopupWindow::pfPopupMenu);
     }
 }
 
@@ -156,7 +157,7 @@ void MiniIcon::handleDrag(const XButtonEvent &down, const XMotionEvent &motion) 
         //x += down.x;
         //y += down.y;
 
-        long l = getFrame()->getLayer();
+        long l = frame()->layer();
         int mx = manager->minX(l), Mx = manager->maxX(l);
         int my = manager->minY(l), My = manager->maxY(l);
 
@@ -165,7 +166,7 @@ void MiniIcon::handleDrag(const XButtonEvent &down, const XMotionEvent &motion) 
         if (x < mx) x = mx;
         if (y < my) y = my;
 
-        getFrame()->setPosition(x, y);
+        frame()->position(x, y);
     }
 }
 #endif

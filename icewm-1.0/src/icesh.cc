@@ -110,7 +110,7 @@ Symbol hintIdentifiers[] = {
     { "SkipWindowMenu", WinHintsSkipWindowMenu  },
     { "SkipTaskBar",    WinHintsSkipTaskBar     },
     { "FocusOnClick",   WinHintsFocusOnClick    },
-    { "DoNotCover",     WinHintsDoNotCover      },
+    { "DontCover",      WinHintsDontCover       },
     { "All",            WIN_HINTS_ALL           },
     { NULL,             0                	}
 };
@@ -127,9 +127,9 @@ Symbol layerIdentifiers[] = {
 };
 
 Symbol trayOptionIdentifiers[] = {
-    { "Ignore",		WinTrayIgnore		},
-    { "Minimized",	WinTrayMinimized	},
-    { "Exclusive",	WinTrayExclusive	},
+    { "Ignore",		IcewmTrayIgnore		},
+    { "Minimized",	IcewmTrayMinimized	},
+    { "Exclusive",	IcewmTrayExclusive	},
     { NULL,		0			}
 };
 
@@ -146,7 +146,7 @@ SymbolTable hints = {
 };    
 
 SymbolTable trayOptions = {
-    trayOptionIdentifiers, 0, WinTrayOptionCount - 1, WinTrayInvalid
+    trayOptionIdentifiers, 0, IcewmTrayOptionCount - 1, IcewmTrayInvalid
 };
     
 /******************************************************************************/

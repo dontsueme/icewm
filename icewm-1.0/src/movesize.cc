@@ -193,7 +193,7 @@ void YFrameWindow::drawMoveSizeFX(int x, int y, int w, int h, bool /*interior*/)
     static Graphics * gc(NULL);
 
     if (font == NULL)
-	font = YFont::getFont(moveSizeFontName, false);
+	font = YFont::font(moveSizeFontName, false);
 
     if (gc == NULL) {
         XGCValues gcv;
@@ -205,8 +205,8 @@ void YFrameWindow::drawMoveSizeFX(int x, int y, int w, int h, bool /*interior*/)
 
         gc = new Graphics(*desktop, GCFunction | GCGraphicsExposures | 
 				    GCLineWidth | GCSubwindowMode, &gcv);
-        gc->setFont(font);
-        gc->setColor(new YColor(clrActiveBorder));
+        gc->font(font);
+        gc->color(new YColor(clrActiveBorder));
     }
 
     const int dBase(font->height() + 4);
@@ -240,7 +240,7 @@ void YFrameWindow::drawMoveSizeFX(int x, int y, int w, int h, bool /*interior*/)
 		{ client.l, client.t, cw, ch }
 	    };
 
-	    gc->drawRects(border, frameDecors() & fdBorder ? 2 : 1);
+	    gc->drawRects(border, frameDecorations() & fdBorder ? 2 : 1);
 	} else {
             XRectangle border[] = {
 		{ frame.l, frame.t, frame.r - frame.l + 1, client.t - frame.t + 1 },
@@ -480,10 +480,10 @@ int YFrameWindow::handleMoveKeys(const XKeyEvent &key, int &newX, int &newY) {
         newY = considerVertBorder ? manager->maxY(this) - height()
                                   : manager->maxY(this) - height() - borderY();
     else if (k == XK_KP_Begin) {
-	newX = (manager->minX(getLayer()) + 
-		manager->maxX(getLayer()) - (int)width()) / 2;
-	newY = (manager->minY(getLayer()) + 
-		manager->maxY(getLayer()) - (int)height()) / 2;
+	newX = (manager->minX(layer()) + 
+		manager->maxX(layer()) - (int)width()) / 2;
+	newY = (manager->minY(layer()) + 
+		manager->maxY(layer()) - (int)height()) / 2;
     } else if (k == XK_Return || k == XK_KP_Enter)
         return -1;
     else if (k ==  XK_Escape) {
@@ -653,8 +653,7 @@ void YFrameWindow::outlineMove() {
     int xx(x()), yy(y());
     unsigned modifiers(0);
 
-    XGrabServer(app->display());
-    XSync(app->display(), False);
+    YSynchronServerLock __lock__;
 
     for(;;) {
         XEvent xev;
@@ -677,7 +676,7 @@ void YFrameWindow::outlineMove() {
 			if (xx != ox || yy != oy) {
 			    drawMoveSizeFX(ox, oy, width(), height());
 #ifndef LITE
-			    statusMoveSize->setStatus(this, xx, yy, width(), height());
+			    statusMoveSize->status(this, xx, yy, width(), height());
 #endif
 			    drawMoveSizeFX(xx, yy, width(), height());
 			}
@@ -710,7 +709,7 @@ void YFrameWindow::outlineMove() {
                 if (xx != ox || yy != oy) {
                     drawMoveSizeFX(ox, oy, width(), height());
 #ifndef LITE
-                    statusMoveSize->setStatus(this, xx, yy, width(), height());
+                    statusMoveSize->status(this, xx, yy, width(), height());
 #endif
                     drawMoveSizeFX(xx, yy, width(), height());
                 }
@@ -723,9 +722,8 @@ void YFrameWindow::outlineMove() {
 end:
     drawMoveSizeFX(xx, yy, width(), height());
 
-    XSync(app->display(), False);
+    app->sync();
     moveWindow(xx, yy);
-    XUngrabServer(app->display());
 }
 
 void YFrameWindow::outlineResize() {
@@ -737,8 +735,7 @@ void YFrameWindow::outlineResize() {
         incY = client()->sizeHints()->height_inc;
     }
 
-    XGrabServer(app->display());
-    XSync(app->display(), False);
+    YSynchronServerLock __lock__;
 
     for(;;) {
         XEvent xev;
@@ -760,7 +757,7 @@ void YFrameWindow::outlineResize() {
 			if (ox != xx || oy != yy || ow != ww || oh != hh) {
 			    drawMoveSizeFX(ox, oy, ow, oh);
 #ifndef LITE
-			    statusMoveSize->setStatus(this, xx, yy, ww, hh);
+			    statusMoveSize->status(this, xx, yy, ww, hh);
 #endif
 			    drawMoveSizeFX(xx, yy, ww, hh);
 			}
@@ -792,7 +789,7 @@ void YFrameWindow::outlineResize() {
                 if (ox != xx || oy != yy || ow != ww || oh != hh) {
                     drawMoveSizeFX(ox, oy, ow, oh);
 #ifndef LITE
-                    statusMoveSize->setStatus(this, xx, yy, ww, hh);
+                    statusMoveSize->status(this, xx, yy, ww, hh);
 #endif
                     drawMoveSizeFX(xx, yy, ww, hh);
                 }
@@ -805,9 +802,8 @@ void YFrameWindow::outlineResize() {
 end:
     drawMoveSizeFX(xx, yy, ww, hh);
 
-    XSync(app->display(), False);
-    setGeometry(xx, yy, ww, hh);
-    XUngrabServer(app->display());
+    app->sync();
+    geometry(xx, yy, ww, hh);
 }
 
 void YFrameWindow::manualPlace() {
@@ -829,7 +825,7 @@ void YFrameWindow::manualPlace() {
                          PointerMotionMask))
         return;
 
-    XGrabServer(app->display());
+    YServerLock __lock__;
 #ifndef LITE
     statusMoveSize->begin(this);
 #endif
@@ -856,7 +852,7 @@ void YFrameWindow::manualPlace() {
 			if (xx != ox || yy != oy) {
 			    drawMoveSizeFX(ox, oy, width(), height());
 #ifndef LITE
-                            statusMoveSize->setStatus(this, xx, yy, width(), height());
+                            statusMoveSize->status(this, xx, yy, width(), height());
 #endif
                             drawMoveSizeFX(xx, yy, width(), height());
 			}
@@ -888,7 +884,7 @@ void YFrameWindow::manualPlace() {
                 if (xx != ox || yy != oy) {
                     drawMoveSizeFX(ox, oy, width(), height());
 #ifndef LITE
-                    statusMoveSize->setStatus(this, xx, yy, width(), height());
+                    statusMoveSize->status(this, xx, yy, width(), height());
 #endif
                     drawMoveSizeFX(xx, yy, width(), height());
                 }
@@ -906,7 +902,6 @@ end:
 #endif
     moveWindow(xx, yy);
     app->releaseEvents();
-    XUngrabServer(app->display());
 }
 
 bool YFrameWindow::handleKey(const XKeyEvent &key) {
@@ -960,16 +955,16 @@ bool YFrameWindow::handleKey(const XKeyEvent &key) {
                     newY = y() + height() - newHeight;
 
 		drawMoveSizeFX(x(), y(), width(), height());
-                setGeometry(newX, newY, newWidth, newHeight);
+                geometry(newX, newY, newWidth, newHeight);
 		drawMoveSizeFX(x(), y(), width(), height());
 
 #ifndef LITE
-                statusMoveSize->setStatus(this);
+                statusMoveSize->status(this);
 #endif
                 break;
             case -2:
 		drawMoveSizeFX(x(), y(), width(), height());
-                setGeometry(newX, newY, newWidth, newHeight);
+                geometry(newX, newY, newWidth, newHeight);
 		drawMoveSizeFX(x(), y(), width(), height());
                 /* nobreak */
 
@@ -1135,19 +1130,15 @@ void YFrameWindow::startMoveSize(int doMove, int byMouse,
             buttonDownY = mouseYroot - y();
     }
 
-    XSync(app->display(), False);
-    if (!app->grabEvents(this, grabPointer,
-                         ButtonPressMask |
-                         ButtonReleaseMask |
-                         PointerMotionMask))
-    {
-        return ;
-    }
+    app->sync();
 
-    if (doMove)
-        movingWindow = 1;
-    else
-        sizingWindow = 1;
+    if (!app->grabEvents(this, grabPointer, ButtonPressMask |
+                                            ButtonReleaseMask |
+                                            PointerMotionMask))
+        return;
+
+    if (doMove) movingWindow = 1;
+    else sizingWindow = 1;
 
 #ifndef LITE
     statusMoveSize->begin(this);
@@ -1217,7 +1208,7 @@ void YFrameWindow::handleBeginDrag(const XButtonEvent &down, const XMotionEvent 
 }
 
 void YFrameWindow::moveWindow(int newX, int newY) {
-    if (!doNotCover()) {
+    if (!dontCover()) {
 	newX = clamp(newX, (int)(manager->minX(this) + borderX() - width()),
 			   (int)(manager->maxX(this) - borderX()));
 	newY = clamp(newY, (int)(manager->minY(this) + borderY() - height()),
@@ -1227,13 +1218,13 @@ void YFrameWindow::moveWindow(int newX, int newY) {
     if (opaqueMove)
 	drawMoveSizeFX(x(), y(), width(), height());
 
-    setPosition(newX, newY);
+    position(newX, newY);
 
     if (opaqueMove)
 	drawMoveSizeFX(x(), y(), width(), height());
 
 #ifndef LITE
-    statusMoveSize->setStatus(this);
+    statusMoveSize->status(this);
 #endif
 }
 
@@ -1267,11 +1258,11 @@ void YFrameWindow::handleMotion(const XMotionEvent &motion) {
         handleResizeMouse(motion, newX, newY, newWidth, newHeight);
 
 	drawMoveSizeFX(x(), y(), width(), height());
-        setGeometry(newX, newY, newWidth, newHeight);
+        geometry(newX, newY, newWidth, newHeight);
 	drawMoveSizeFX(x(), y(), width(), height());
 
 #ifndef LITE
-        statusMoveSize->setStatus(this);
+        statusMoveSize->status(this);
 #endif
         return ;
     } else if (movingWindow) {

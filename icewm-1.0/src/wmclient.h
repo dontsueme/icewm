@@ -6,6 +6,7 @@
 #include "MwmUtil.h"
 
 class YFrameWindow;
+class YTrayWindow;
 class WindowListItem;
 
 typedef int FrameState;
@@ -17,17 +18,19 @@ typedef struct XSizeHints;
 typedef struct XClassHint;
 #endif
 
-class ClientData {
+class YClientPeer {
 public:
+    virtual ~YClientPeer() {}
+
 #ifdef CONFIG_WINLIST
-    virtual void setWinListItem(WindowListItem *i) = 0;
+    virtual void winListItem(WindowListItem *i) = 0;
 #endif
     virtual YFrameWindow *owner() const = 0;
 #ifndef LITE
-    virtual YIcon *getIcon() const = 0;
+    virtual YIcon *icon() const = 0;
 #endif
-    virtual const char *getTitle() const = 0;
-    virtual const char *getIconTitle() const = 0;
+    virtual const char *title() const = 0;
+    virtual const char *iconTitle() const = 0;
     virtual void activateWindow(bool raise) = 0;
     virtual bool isHidden() const = 0;
     virtual bool isMinimized() const = 0;
@@ -49,7 +52,7 @@ public:
 
 class YFrameClient: public YWindow  {
 public:
-    YFrameClient(YWindow *parent, YFrameWindow *frame, Window win = 0);
+    YFrameClient(YWindow *parent = NULL, Window win = None);
     virtual ~YFrameClient();
 
     virtual void handleProperty(const XPropertyEvent &property);
@@ -61,10 +64,12 @@ public:
     virtual void handleShapeNotify(const XShapeEvent &shape);
 #endif
 
-    unsigned int getBorder() const { return fBorder; }
-    void setBorder(unsigned int border) { fBorder = border; }
-    void setFrame(YFrameWindow *newFrame);
-    YFrameWindow *getFrame() const { return fFrame; };
+    unsigned border() const { return fBorder; }
+    void border(unsigned border) { fBorder = border; }
+    void frame(YFrameWindow *frame);
+    YFrameWindow *frame() const { return fFrame; };
+    void trayWindow(YTrayWindow *trayWindow);
+    YTrayWindow *trayWindow() const { return fTrayWindow; };
 
     enum {
         wpDeleteWindow = 1 << 0,
@@ -74,96 +79,108 @@ public:
     void sendMessage(Atom msg, Time timeStamp = CurrentTime);
 
     enum {
-        csKeepX = 1,
-        csKeepY = 2,
-        csRound = 4
+        csKeepX      = 1 << 0,
+        csKeepY      = 1 << 1,
+        csRound      = 1 << 2,
+        csDockWindow = 1 << 4
     };
     
     void constrainSize(int &w, int &h, long layer, int flags = 0);
 				 
     void gravityOffsets(int &xp, int &yp);
 
+    FrameState frameState();
+    void frameState(FrameState state);
+
     Colormap colormap() const { return fColormap; }
-    void setColormap(Colormap cmap);
+    void colormap(Colormap cmap);
 
-    FrameState getFrameState();
-    void setFrameState(FrameState state);
+    void updateProtocols();
+    unsigned long protocols() const { return fProtocols; }
 
-    void getWMHints();
+    void updateWMHints();
     XWMHints *hints() const { return fHints; }
 
-    void getSizeHints();
+    void updateSizeHints();
     XSizeHints *sizeHints() const { return fSizeHints; }
 
-    unsigned long protocols() const { return fProtocols; }
-    void getProtocols();
-
-    void getTransient();
-    Window ownerWindow() const { return fTransientFor; }
-
-    void getClassHint();
+    void updateClassHint();
     XClassHint *classHint() const { return fClassHint; }
 
-    void getNameHint();
-    void getIconNameHint();
-    void setWindowTitle(const char *title);
-    void setIconTitle(const char *title);
+    void updateTransient();
+    Window ownerWindow() const { return fTransientFor; }
+
+    void updateNameHint();
+    void updateIconNameHint();
+    void windowTitle(const char *title);
+    void iconTitle(const char *title);
 #ifdef CONFIG_I18N
-    void setWindowTitle(const XTextProperty & title);
-    void setIconTitle(const XTextProperty & title);
+    void windowTitle(const XTextProperty & title);
+    void iconTitle(const XTextProperty & title);
 #endif
     const char *windowTitle() { return fWindowTitle; }
     const char *iconTitle() { return fIconTitle; }
 
-    bool getWinIcons(Atom *type, int *count, long **elem);
+#if CONFIG_GNOME_HINTS
+    bool updateWinIcons(Atom &type, int &count, long *&elem);
+    bool updateWinWorkspace(long & workspace);
+    bool updateWinLayer(long & layer);
+    bool updateWinState(long & mask, long & state);
+    bool updateWinHints(long & hints);
 
-    void setWinWorkspaceHint(long workspace);
-    bool getWinWorkspaceHint(long *workspace);
-
-    void setWinLayerHint(long layer);
-    bool getWinLayerHint(long *layer);
+    void winWorkspace(long workspace);
+    void winLayer(long layer);
+    void winState(long mask, long state);
+    void winHints(long hints);
+    long winHints(void) const { return fWinHints; }
+#endif
 
 #ifdef CONFIG_TRAY	    
-    void setWinTrayHint(long tray_opt);
-    bool getWinTrayHint(long *tray_opt);
+    bool updateIcewmTrayHint(long & trayopt);
+    void icewmTrayHint(long trayopt);
 #endif
-
-    void setWinStateHint(long mask, long state);
-    bool getWinStateHint(long *mask, long *state);
-
-    void setWinHintsHint(long hints);
-    bool getWinHintsHint(long *hints);
-    long winHints() const { return fWinHints; }
 
 #ifdef CONFIG_MOTIF_HINTS
+    void updateMwmHints();
     MwmHints *mwmHints() const { return fMwmHints; }
-    void getMwmHints();
-    void setMwmHints(const MwmHints &mwm);
-    long mwmFunctions();
-    long mwmDecors();
+    void mwmHints(unsigned long functions, unsigned long decoration);
+    void mwmHints(const MwmHints &mwm);
+    unsigned long mwmFunctions();
+    unsigned long mwmDecorations();
 #endif
 
-#ifndef NO_KWM_HINTS
-    bool getKwmIcon(int *count, Pixmap **pixmap);
+#ifdef CONFIG_KDE_HINTS
+    bool updateKwmIcon(int &count, Pixmap *&pixmap);
+#endif
+
+#if CONFIG_KDE_TRAY_WINDOWS
+    bool updateTrayWindowFor(void);
+    Window trayWindowFor(void) const { return fTrayWindowFor; }
 #endif
 
 #ifdef CONFIG_SHAPE
+    void updateShape();
     bool shaped() const { return fShaped; }
-    void queryShape();
 #endif
 
 #ifdef CONFIG_WM_SESSION
-    void getPidHint();
+    void updatePid();
     pid_t pid() const { return fPid; }
 #endif
 
-    void getClientLeader();
-    void getWindowRole();
+#ifdef CONFIG_SESSION
+    void updateClientLeader();
+    void updateWindowRole();
 
     Window clientLeader() const { return fClientLeader; }
     const char *windowRole() const { return fWindowRole; }
 
-    char *getClientId(Window leader);
+    char *clientId(Window leader);
+#endif
+
+#ifdef CONFIG_DOCK
+    bool isDockApp() const;
+#endif
 
 protected:
     void deleteContext();
@@ -171,29 +188,39 @@ protected:
 
 private:
     YFrameWindow *fFrame;
+
     int fProtocols;
-    int haveButtonGrab;
-    unsigned int fBorder;
+    bool fHaveButtonGrab;
+    unsigned fBorder;
     XSizeHints *fSizeHints;
     XClassHint *fClassHint;
     XWMHints *fHints;
     Colormap fColormap;
+    Window fTransientFor;
+
+#ifdef CONFIG_SHAPE
     bool fShaped;
-    long fWinHints;
-
-    char *fWindowTitle;
-    char *fIconTitle;
-
+#endif
+#ifdef CONFIG_SESSION
     Window fClientLeader;
     char *fWindowRole;
-
+#endif
+#ifdef CONFIG_MOTIF_HINTS
     MwmHints *fMwmHints;
-
-    Window fTransientFor;
-    
+#endif
+#ifdef CONFIG_GNOME_HINTS
+    long fWinHints;
+#endif    
+#if CONFIG_KDE_TRAY_WINDOWS
+    YTrayWindow *fTrayWindow;
+    Window fTrayWindowFor;
+#endif    
 #ifdef CONFIG_WM_SESSION
     pid_t fPid;
 #endif
+
+    char *fWindowTitle;
+    char *fIconTitle;
 };
 
 #endif

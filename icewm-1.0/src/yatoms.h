@@ -52,7 +52,7 @@ struct YAtoms {
          xdndFinished,
          xdndSelection,
          xdndTypelist;
-#endif
+#endif // CONFIG_XDND_HINTS
 
 /******************************************************************************
  * Motif related atoms
@@ -60,7 +60,7 @@ struct YAtoms {
 
 #ifdef CONFIG_MOTIF_HINTS
     Atom mwmHints;                     // ???
-#endif
+#endif // CONFIG_MOTIF_HINTS
 
 /******************************************************************************
  * GNOME (GNU Network Object Model Environment)
@@ -85,20 +85,22 @@ struct YAtoms {
          winDesktopButtonProxy,
          winArea,
          winAreaCount;
-#endif
+#endif // CONFIG_GNOME_HINTS
 
 /******************************************************************************
  * KDE (K Desktop Environment)
  ******************************************************************************/
 
 #ifdef CONFIG_KDE_HINTS
-    Atom kwmWinIcon,
-         kwmDockwindow;
+    Atom kwmWinIcon;
+#ifdef CONFIG_TRAY
+    Atom kwmDockwindow;
 #ifdef CONFIG_WMSPEC_HINTS
     Atom kdeNetSystemTrayWindows,
          kdeNetwmSystemTrayWindowFor;
-#endif
-#endif
+#endif // CONFIG_TRAY
+#endif // CONFIG_WMSPEC_HINTS
+#endif // CONFIG_KDE_HINTS
 
 /******************************************************************************
  * wm-spec (Window Manager Specification aka NetWM)
@@ -147,7 +149,7 @@ struct YAtoms {
          netwmPid,
          netwmPing,
          netwmHandledIcons;
-#endif
+#endif // CONFIG_WMSPEC_HINTS
 
 /******************************************************************************
  * Semitransparency
@@ -170,7 +172,10 @@ struct YAtoms {
 #ifdef CONFIG_GUIEVENTS
     Atom icewmGuiEvent;                 // signal gui events
 #endif
-    Atom icewmFontPath;
+#ifdef CONFIG_WM_SESSION
+    Atom icewmPid;                      // process id
+#endif
+    Atom icewmFontPath;                 // additions to the font path
 };
 
 extern YAtoms atoms;

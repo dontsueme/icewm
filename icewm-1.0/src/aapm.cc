@@ -108,13 +108,13 @@ void ApmStr(char *s, bool Tool) {
 YApm::YApm(YWindow *aParent): YWindow(aParent) {
     if (apmBg == 0 && *clrApm) apmBg = new YColor(clrApm);
     if (apmFg == 0) apmFg = new YColor(clrApmText);
-    if (apmFont == 0) apmFont = YFont::getFont(apmFontName);
+    if (apmFont == 0) apmFont = YFont::font(apmFontName);
 
     apmTimer = new YTimer(2000);
     apmTimer->timerListener(this);
     apmTimer->start();
     autoSize();
- // setDND(true);
+ // dnd(true);
 }
 
 YApm::~YApm() {
@@ -125,14 +125,14 @@ void YApm::updateToolTip() {
     char s[30]={' ',' ',' ', 0, 0, 0, 0};
 
     ApmStr(s,1);
-    setToolTip(s);
+    toolTip(s);
 }
 
 void YApm::autoSize() {
     int maxWidth=54;
 
     if (!prettyClock) maxWidth += 4;
-    setSize(maxWidth, 20);
+    size(maxWidth, 20);
 }
 
 void YApm::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsigned int /*height*/) {
@@ -147,14 +147,14 @@ void YApm::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsi
 
         for (i = 0; x < width(); i++) {
             if (i < len) {
-                p = getPixmap(s[i]);
+                p = pixmap(s[i]);
             } else p = PixSpace;
 
             if (p) {
                 g.drawPixmap(p, x, 0);
                 x += p->width();
             } else if (i >= len) {
-                g.setColor(apmBg);
+                g.color(apmBg);
                 g.fillRect(x, 0, width() - x, height());
                 break;
             }
@@ -163,11 +163,11 @@ void YApm::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsi
         int y = (height() - 1 - apmFont->height()) / 2 + apmFont->ascent();
 
         if (apmBg) {
-	    g.setColor(apmBg);
+	    g.color(apmBg);
 	    g.fillRect(0, 0, width(), height());
 	} else {
 #ifdef CONFIG_GRADIENTS
-	    class YPixbuf * gradient(parent()->getGradient());
+	    class YPixbuf * gradient(parent()->gradient());
 
 	    if (gradient)
 		g.copyPixbuf(*gradient, this->x(), this->y(),
@@ -179,8 +179,8 @@ void YApm::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsi
 					     width(), height());
 	}
 
-        g.setColor(apmFg);
-        g.setFont(apmFont);
+        g.color(apmFg);
+        g.font(apmFont);
         g.drawChars(s, 0, len, 2, y);
     }
 }
@@ -199,7 +199,7 @@ bool YApm::handleTimer(YTimer *t) {
     return true;
 }
 
-YPixmap *YApm::getPixmap(char c) {
+YPixmap *YApm::pixmap(char c) {
     YPixmap *pix = 0;
     switch (c) {
     case '0': case '1': case '2': case '3': case '4':
@@ -220,7 +220,7 @@ int YApm::calcWidth(const char *s, int count) {
         int len = 0;
 
         while (count--) {
-            YPixmap *p = getPixmap(*s++);
+            YPixmap *p = pixmap(*s++);
             if (p) len += p->width();
         }
         return len;

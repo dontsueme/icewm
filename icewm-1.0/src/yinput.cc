@@ -43,7 +43,7 @@ YInputLine::YInputLine(YWindow *parent, char const *historyId):
     fHistory(historyId ? new YHistory(historyId) : NULL),
     fHistoryPopup(historyId ? new YListPopup(NULL) : NULL) {
     if (NULL == inputFont)
-        inputFont = YFont::getFont(inputFontName);
+        inputFont = YFont::font(inputFontName);
     if (NULL == inputBg)
         inputBg = new YColor(clrInput);
     if (NULL == inputFg)
@@ -64,17 +64,17 @@ YInputLine::YInputLine(YWindow *parent, char const *historyId):
             actionPasteSelection = new YAction();
             actionSelectAll = new YAction();
             inputMenu->actionListener(this);
-            inputMenu->addItem(_("Cu_t"), -2, _("Ctrl+X"), actionCut)->setEnabled(true);
-            inputMenu->addItem(_("_Copy"), -2, _("Ctrl+C"), actionCopy)->setEnabled(true);
-            inputMenu->addItem(_("_Paste"), -2, _("Ctrl+V"), actionPaste)->setEnabled(true);
-            inputMenu->addItem(_("Paste _Selection"), -2, 0, actionPasteSelection)->setEnabled(true);
+            inputMenu->addItem(_("Cu_t"), -2, _("Ctrl+X"), actionCut)->enabled(true);
+            inputMenu->addItem(_("_Copy"), -2, _("Ctrl+C"), actionCopy)->enabled(true);
+            inputMenu->addItem(_("_Paste"), -2, _("Ctrl+V"), actionPaste)->enabled(true);
+            inputMenu->addItem(_("Paste _Selection"), -2, 0, actionPasteSelection)->enabled(true);
             inputMenu->addSeparator();
             inputMenu->addItem(_("Select _All"), -2, _("Ctrl+A"), actionSelectAll);
         }
     }
 
     if (inputFont)
-        setSize(width(), inputFont->height() + (inputDrawBorder ? 8 : 2));
+        size(width(), inputFont->height() + (inputDrawBevel ? 8 : 2));
 }
 
 YInputLine::~YInputLine() {
@@ -90,7 +90,7 @@ YInputLine::~YInputLine() {
     delete fHistoryPopup;
 }
 
-void YInputLine::setText(const char *text) {
+void YInputLine::text(const char *text) {
     delete[] fText; fText = newstr(text);
     fCurPos = fSelPos = fLeftOfs = 0; fHisPos = -1;
     if (fText) fCurPos = strlen(fText);
@@ -102,8 +102,8 @@ void YInputLine::paint(Graphics &g, int, int, unsigned int, unsigned int) {
     int x(0), xi(0), y(0), yi(0),
         w(inputWidth()), wi(inputWidth()), h(height()), hi(height());
 
-    g.setColor(inputBg);
-    if (inputDrawBorder) {
+    g.color(inputBg);
+    if (inputDrawBevel) {
 	if (wmLook == lookMetal) {
 	    g.drawBorderM(x, y, width() - 1, h - 1, false);
 	    w -= 4; h -= 4;
@@ -143,13 +143,13 @@ void YInputLine::paint(Graphics &g, int, int, unsigned int, unsigned int) {
         if (xa > x) g.fillRect(x, y, xa, h);
 
         if (xa < xe) {
-            if (inputDrawBorder) g.fillRect(xa, y, xe - xa, 1);
+            if (inputDrawBevel) g.fillRect(xa, y, xe - xa, 1);
 
-            g.setColor(inputSelectionBg);
+            g.color(inputSelectionBg);
             g.fillRect(xa, yi, xe - xa, hi);
-            g.setColor(inputBg);
+            g.color(inputBg);
 
-            if (inputDrawBorder) g.fillRect(xa, y + h - 1, xe - xa, 1);
+            if (inputDrawBevel) g.fillRect(xa, y + h - 1, xe - xa, 1);
         }
 
         if (xe < x + w) g.fillRect(xe, y, x + w - xe, h);
@@ -158,11 +158,11 @@ void YInputLine::paint(Graphics &g, int, int, unsigned int, unsigned int) {
     if (inputFont) {
         int const yp(yi + 1 + inputFont->ascent());
 
-        g.setFont(inputFont);
-        g.setColor(inputFg);
+        g.font(inputFont);
+        g.color(inputFg);
         
         XRectangle clipRect = { 0, 0, wi, hi };
-        g.setClipRects(xi, yi, &clipRect);
+        g.clipRects(xi, yi, &clipRect);
 
         if (fCurPos == fSelPos || !fHasFocus || !fText) {
             if (fText) g.drawChars(fText, 0, textLen, xi - fLeftOfs, yp);
@@ -171,16 +171,16 @@ void YInputLine::paint(Graphics &g, int, int, unsigned int, unsigned int) {
                 g.drawChars(fText, 0, bgn, xi - fLeftOfs, yp);
 
             if (bgn < end) {
-                g.setColor(inputSelectionFg);
+                g.color(inputSelectionFg);
                 g.drawChars(fText, bgn, end - bgn, minOfs, yp);
-                g.setColor(inputFg);
+                g.color(inputFg);
             }
 
             if (end < textLen)
                 g.drawChars(fText, end, textLen - end, maxOfs, yp);
         }
 
-        g.setClipMask();
+        g.clipMask();
         
         if (fHasFocus && fCursorVisible) {
             int const curOfs(fText ? inputFont->textWidth(fText, fCurPos) : 0);
@@ -192,10 +192,10 @@ void YInputLine::paint(Graphics &g, int, int, unsigned int, unsigned int) {
     if (fHistory) {
         int const len(Graphics::arrowLength(arrowSize));
 
-        g.setColor(inputPopupBg);
+        g.color(inputPopupBg);
         g.fillRect(x + w, x, arrowSize + 6, h);
 
-        g.setColor(inputPopupFg);
+        g.color(inputPopupFg);
         g.drawArrow(Down, x + w + 2, yi + (hi - len)/2 + 1, arrowSize);
     }
 }
@@ -346,7 +346,7 @@ bool YInputLine::handleKey(const XKeyEvent &key) {
             default: {
                 char c;
 
-                if (getCharFromEvent(key, &c) && insertChar(c)) return true;
+                if (charFromEvent(key, &c) && insertChar(c)) return true;
             }
         }
     }
@@ -357,7 +357,7 @@ void YInputLine::handleButton(const XButtonEvent &button) {
     if (button.type == ButtonPress) {
         if (button.button == 1) {
             if (fHasFocus == false) {
-                setWindowFocus();
+                windowFocus();
             } else {
                 fSelecting = true;
                 fCurPos = fSelPos = offsetToPos(button.x + fLeftOfs);
@@ -386,7 +386,7 @@ void YInputLine::handleMotion(const XMotionEvent &motion) {
         else {
             autoScroll(0, &motion);
             int c = offsetToPos(motion.x + fLeftOfs);
-            if (getClickCount() == 2) {
+            if (clickCount() == 2) {
                 if (c >= fSelPos) {
                     if (fSelPos > fCurPos)
                         fSelPos = fCurPos;
@@ -554,7 +554,7 @@ void YInputLine::limit() {
         int const curOfs(inputFont->textWidth(fText, fCurPos));
         int const curLen(inputFont->textWidth(fText, textLen));
 
-        int const width(inputWidth() - (inputDrawBorder ? 6 : 1));
+        int const width(inputWidth() - (inputDrawBevel ? 6 : 1));
 
         fLeftOfs = clamp(fLeftOfs, curOfs - width, curOfs);
         fLeftOfs = clamp(fLeftOfs, 0, curLen - width);
@@ -717,16 +717,16 @@ void YInputLine::cutSelection() {
 void YInputLine::copySelection() {
     if (hasSelection() && fText) {
         if (fCurPos > fSelPos)
-            app->setClipboardText(fText + fSelPos, fCurPos - fSelPos);
+            app->clipboardText(fText + fSelPos, fCurPos - fSelPos);
         else
-            app->setClipboardText(fText + fCurPos, fSelPos - fCurPos);
+            app->clipboardText(fText + fCurPos, fSelPos - fCurPos);
     }
 }
 
 bool YInputLine::selectHistoryItem(int item) {
     if (fHistory && fHistory->count()) {
         (item+= fHistory->count())%= fHistory->count();
-        setText(fHistory->get(item));
+        text(fHistory->get(item));
         fHisPos = item;
         return true;
     }
@@ -760,7 +760,7 @@ bool YInputLine::showHistoryPopup(char const *prefix) {
         }
 
         if (count == 1 && pfxLen) {
-            selectHistoryItem(fHistoryPopup->get(0)->getId());
+            selectHistoryItem(fHistoryPopup->item(0)->id());
             return true;
         } else if (count > 0) {
             fHistoryPopup->select(fHisPos >= 0 && !pfxLen ?
@@ -774,7 +774,7 @@ bool YInputLine::showHistoryPopup(char const *prefix) {
             x-= (w > width() ? w - width() : 0);
             y = (y > (int) (desktop->height() - h) ? y - h : y + height());
 
-            fHistoryPopup->setGeometry(x, y, w + 4, h);
+            fHistoryPopup->geometry(x, y, w + 4, h);
             fHistoryPopup->popup(NULL, this, 0);
 
             return true;
@@ -787,7 +787,7 @@ bool YInputLine::showHistoryPopup(char const *prefix) {
 
 int YInputLine::inputWidth() const {
     return width() - (fHistory ? Graphics::arrowSize(inputFont->height() - 2)
-                               + (inputDrawBorder ? 6 : 4) : 0);
+                               + (inputDrawBevel ? 6 : 4) : 0);
 }
 
 void YInputLine::actionPerformed(YAction *action, unsigned int /*modifiers*/) {

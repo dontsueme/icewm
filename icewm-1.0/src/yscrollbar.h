@@ -27,22 +27,22 @@ public:
                YWindow *aParent);
     virtual ~YScrollBar();
 
-    Orientation getOrientation() const { return fOrientation; }
-    int getMaximum() const { return fMaximum; }
-    int getMinimum() const { return fMinimum; }
-    int getVisibleAmount() const { return fVisibleAmount; }
-    int getUnitIncrement() const { return fUnitIncrement; }
-    int getBlockIncrement() const { return fBlockIncrement; }
-    int getValue() const { return fValue; }
+    Orientation orientation() const { return fOrientation; }
+    int maximum() const { return fMaximum; }
+    int minimum() const { return fMinimum; }
+    int visibleAmount() const { return fVisibleAmount; }
+    int unitIncrement() const { return fUnitIncrement; }
+    int blockIncrement() const { return fBlockIncrement; }
+    int value() const { return fValue; }
 
-    void setOrientation(Orientation anOrientation);
-    void setMaximum(int aMaximum);
-    void setMinimum(int aMinimum);
-    void setVisibleAmount(int aVisibleAmount);
-    void setUnitIncrement(int anUnitIncrement);
-    void setBlockIncrement(int aBlockIncrement);
-    void setValue(int aValue);
-    void setValues(int aValue, int aVisibleAmount, int aMin, int aMax);
+    void orientation(Orientation anOrientation);
+    void maximum(int aMaximum);
+    void minimum(int aMinimum);
+    void visibleAmount(int aVisibleAmount);
+    void unitIncrement(int anUnitIncrement);
+    void blockIncrement(int aBlockIncrement);
+    void value(int aValue);
+    void values(int aValue, int aVisibleAmount, int aMin, int aMax);
 
     bool handleScrollKeys(const XKeyEvent &key);
     bool handleScrollMouse(const XButtonEvent &button);
@@ -73,8 +73,8 @@ private:
     } fScrollTo;
 
     void doScroll();
-    void getCoord(int &beg, int &end, int &min, int &max, int &nn);
-    ScrollOp getOp(int x, int y);
+    void coord(int &beg, int &end, int &min, int &max, int &nn);
+    ScrollOp op(int x, int y);
 
     int fGrabDelta;
     Listener *fListener;

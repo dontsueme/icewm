@@ -5,8 +5,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
-class YSocket:
-public YSingleList<YSocket>::Item {
+class YSocket {
 public:
     class Listener {
     public:
@@ -48,7 +47,8 @@ private:
     void startMonitoring();
     void stopMonitoring();
 
-    static YSingleList<YSocket> sockets;
+    typedef YSingleList<YSocket> SocketList;
+    static SocketList sockets;
 };
 
 #endif

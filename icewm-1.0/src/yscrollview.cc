@@ -18,26 +18,22 @@
 extern YColor *scrollBarBg;
 
 
-YScrollView::YScrollView(YWindow *aParent): YWindow(aParent) {
-    scrollVert = new YScrollBar(YScrollBar::Vertical, this);
-    scrollVert->show();
-    scrollHoriz = new YScrollBar(YScrollBar::Horizontal, this);
-    scrollHoriz->show();
-    scrollable = 0;
+YScrollView::YScrollView(YWindow *aParent):
+YWindow(aParent),
+fScrollVert(YScrollBar::Vertical, this),
+fScrollHoriz(YScrollBar::Horizontal, this),
+fScrollable(NULL) {
+    fScrollVert.show();
+    fScrollHoriz.show();
 }
 
-YScrollView::~YScrollView() {
-    delete scrollVert; scrollVert = 0;
-    delete scrollHoriz; scrollHoriz = 0;
+void YScrollView::view(YScrollable *scrollable) {
+    fScrollable = scrollable;
 }
 
-void YScrollView::setView(YScrollable *s) {
-    scrollable = s;
-}
-
-void YScrollView::getGap(int &dx, int &dy) {
-    unsigned const cw(scrollable->contentWidth());
-    unsigned const ch(scrollable->contentHeight());
+void YScrollView::gap(int &dx, int &dy) {
+    unsigned const cw(fScrollable->contentWidth());
+    unsigned const ch(fScrollable->contentHeight());
 
     dx = dy = 0;
 
@@ -51,25 +47,22 @@ void YScrollView::getGap(int &dx, int &dy) {
 }
 
 void YScrollView::layout() {
-    if (!scrollable)   // !!! fix
-        return ;
+    if (fScrollable) {
+        int dx, dy;
+        gap(dx, dy);
 
-    int const w(width()), h(height());
-    int dx, dy;
+        int const w(width()), h(height());
+        int const sw(max(0, w - dx));
+        int const sh(max(0, h - dy));
 
-    getGap(dx, dy);
+        fScrollVert.geometry(w - dx, 0, dx, sh);
+        fScrollHoriz.geometry(0, h - dy, sw, dy);
 
-    int sw(max(0, w - dx));
-    int sh(max(0, h - dy));
+        dx = min(dx, w);
+        dy = min(dy, h);
 
-    scrollVert->setGeometry(w - dx, 0, dx, sh);
-    scrollHoriz->setGeometry(0, h - dy, sw, dy);
-
-    if (dx > w) dx = w;
-    if (dy > h) dy = h;
-
-    YWindow *ww = scrollable->getWindow(); //!!! ???
-    ww->setGeometry(0, 0, w - dx, h - dy);
+        fScrollable->window()->geometry(0, 0, w - dx, h - dy);
+    }
 }
 
 void YScrollView::configure(const int x, const int y, 
@@ -82,9 +75,9 @@ void YScrollView::configure(const int x, const int y,
 void YScrollView::paint(Graphics &g, int x, int y, unsigned w, unsigned h) {
     int dx, dy;
     
-    getGap(dx, dy);
+    gap(dx, dy);
     
-    g.setColor(scrollBarBg);
+    g.color(scrollBarBg);
     if (dx && dy) g.fillRect(width() - dx, height() - dy, dx, dy);
 
     YWindow::paint(g, x, y, w, h);

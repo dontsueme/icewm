@@ -39,7 +39,7 @@ WindowOptions::~WindowOptions() {
     winOptionsCount = 0;
 }
 
-WindowOption *WindowOptions::getWindowOption(const char *name, bool create, bool remove) {
+WindowOption *WindowOptions::windowOption(const char *name, bool create, bool remove) {
     int L = 0, R = winOptionsCount, M, cmp;
     while (L < R) {
         M = (L + R) / 2;
@@ -86,15 +86,15 @@ WindowOption *WindowOptions::getWindowOption(const char *name, bool create, bool
     winOptions[L].workspace = WinWorkspaceInvalid;
     winOptions[L].layer = WinLayerInvalid;
 #ifdef CONFIG_TRAY
-    winOptions[L].tray = WinTrayInvalid;
+    winOptions[L].tray = IcewmTrayInvalid;
 #endif
     winOptions[L].name = newstr(name);
 
     return winOptions + L;
 }
 
-void WindowOptions::setWinOption(const char *class_instance, const char *opt, const char *arg) {
-    WindowOption *op = getWindowOption(class_instance, true);
+void WindowOptions::winOption(const char *class_instance, const char *opt, const char *arg) {
+    WindowOption *op = windowOption(class_instance, true);
 
     //msg("%s-%s-%s", class_instance, opt, arg);
 
@@ -153,7 +153,7 @@ void WindowOptions::setWinOption(const char *class_instance, const char *opt, co
         char *endptr;
         long const t(strtol(arg, &endptr, 10));
         
-        op->tray = WinTrayInvalid;
+        op->tray = IcewmTrayInvalid;
 
         if (arg[0] && !endptr[0])
             op->tray = t;
@@ -162,9 +162,9 @@ void WindowOptions::setWinOption(const char *class_instance, const char *opt, co
                 const char *name;
                 int tray;
             } tray_ops[] = {
-                { "Ignore", WinTrayIgnore },
-                { "Minimized", WinTrayMinimized },
-                { "Exclusive", WinTrayExclusive }
+                { "Ignore", IcewmTrayIgnore },
+                { "Minimized", IcewmTrayMinimized },
+                { "Exclusive", IcewmTrayExclusive }
             };
             for (unsigned int i = 0; i < ACOUNT(tray_ops); i++)
                 if (strcmp(tray_ops[i].name, arg) == 0)
@@ -202,7 +202,7 @@ void WindowOptions::setWinOption(const char *class_instance, const char *opt, co
             { 2, "noFocusOnAppRaise", YFrameWindow::foNoFocusOnAppRaise }, //
             { 2, "ignoreNoFocusHint", YFrameWindow::foIgnoreNoFocusHint }, //
             { 2, "ignorePositionHint", YFrameWindow::foIgnorePosition }, //
-            { 2, "doNotCover", YFrameWindow::foDoNotCover } //
+            { 2, "doNotCover", YFrameWindow::foDontCover } //
         };
 
         for (unsigned int a = 0; a < ACOUNT(options); a++) {
@@ -248,7 +248,7 @@ void WindowOptions::combineOptions(WindowOption &cm, WindowOption &n) {
     if (n.layer != (long)WinLayerInvalid)
         cm.layer = n.layer;
 #ifdef CONFIG_TRAY
-    if (n.tray != (long)WinTrayInvalid)
+    if (n.tray != (long)IcewmTrayInvalid)
         cm.tray = n.tray;
 #endif
     if (n.gflags & XValue)
@@ -319,10 +319,10 @@ char *parseWinOptions(char *data) {
 
         if (*p != 0) {
             *p = 0;
-            defOptions->setWinOption(class_instance, opt, w);
+            defOptions->winOption(class_instance, opt, w);
             delete class_instance;
         } else {
-            defOptions->setWinOption(class_instance, opt, w);
+            defOptions->winOption(class_instance, opt, w);
             delete class_instance;
             break;
         }

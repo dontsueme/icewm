@@ -41,15 +41,15 @@ YWindowManagerStatus::YWindowManagerStatus(YWindow *aParent,
     if (statusFg == 0)
         statusFg = new YColor(clrMoveSizeStatusText);
     if (statusFont == 0)
-        statusFont = YFont::getFont(statusFontName);
+        statusFont = YFont::font(statusFontName);
 
     int sW = statusFont->textWidth(templFunc());
     int sH = statusFont->height();
     
-    setGeometry((manager->width() - sW) / 2,
-                (manager->height() - sH) - 8, // / 2,
-                sW + 2, sH + 4);
-    setStyle(wsOverrideRedirect);
+    geometry((manager->width() - sW) / 2,
+             (manager->height() - sH) - 8, // / 2,
+             sW + 2, sH + 4);
+    style(wsOverrideRedirect);
 }
 
 YWindowManagerStatus::~YWindowManagerStatus() {
@@ -58,25 +58,27 @@ YWindowManagerStatus::~YWindowManagerStatus() {
 void YWindowManagerStatus::paint(Graphics &g, int /*x*/, int /*y*/,
                                  unsigned int /*width*/,
                                  unsigned int /*height*/) {
-    const char *status;
+    const char *strStatus;
     
-    g.setColor(statusBg);
+    g.color(statusBg);
     g.drawBorderW(0, 0, width() - 1, height() - 1, true);
+
     if (switchbackPixmap)
         g.fillPixmap(switchbackPixmap, 1, 1, width() - 3, height() - 3);
     else
         g.fillRect(1, 1, width() - 3, height() - 3);
-    g.setColor(statusFg);
-    g.setFont(statusFont);
+
+    g.color(statusFg);
+    g.font(statusFont);
     
-    status = getStatus();
-    g.drawChars(status, 0, strlen(status),
-                width() / 2 - statusFont->textWidth(status) / 2,
+    strStatus = status();
+    g.drawChars(strStatus, 0, strlen(strStatus),
+                width() / 2 - statusFont->textWidth(strStatus) / 2,
                 height() - statusFont->descent() - 2);
 }
 
 void YWindowManagerStatus::begin() {
-    setPosition(x(),
+    position(x(),
 #ifdef CONFIG_TASKBAR
                  taskBarAtTop ? 4 :
 #endif
@@ -95,7 +97,7 @@ MoveSizeStatus::MoveSizeStatus(YWindow *aParent)
 MoveSizeStatus::~MoveSizeStatus() {
 }
 
-const char* MoveSizeStatus::getStatus() {
+const char* MoveSizeStatus::status() {
     static char status[50];
     snprintf(status, sizeof(status), "%dx%d+%d+%d", fW, fH, fX, fY);
     return status;
@@ -103,12 +105,13 @@ const char* MoveSizeStatus::getStatus() {
 
 void MoveSizeStatus::begin(YFrameWindow *frame) {
     if (showMoveSizeStatus) {
-        setStatus(frame);
+        status(frame);
         YWindowManagerStatus::begin();
     }
 }
 
-void MoveSizeStatus::setStatus(YFrameWindow *frame, int x, int y, int width, int height) {
+void MoveSizeStatus::status(YFrameWindow *frame, int x, int y,
+                            int width, int height) {
     XSizeHints *sh = frame->client()->sizeHints();
 
     width -= frame->borderX() * 2;
@@ -121,7 +124,7 @@ void MoveSizeStatus::setStatus(YFrameWindow *frame, int x, int y, int width, int
     repaint ();
 }
 
-void MoveSizeStatus::setStatus(YFrameWindow *frame) {
+void MoveSizeStatus::status(YFrameWindow *frame) {
     XSizeHints *sh = frame->client()->sizeHints();
     
     fX = frame->x ();//// + frame->borderX ();
@@ -160,11 +163,11 @@ WorkspaceStatus::~WorkspaceStatus() {
     delete timer;
 }
 
-const char* WorkspaceStatus::getStatus() {
-    return getStatus(manager->workspaceName(workspace));
+const char* WorkspaceStatus::status() {
+    return status(manager->workspaceName(workspace));
 }
 
-const char* WorkspaceStatus::getStatus(const char* name) {
+const char* WorkspaceStatus::status(const char* name) {
     static char *namebuffer = NULL;
     if (namebuffer) delete [] namebuffer;
     namebuffer = strJoin(_("Workspace: "), name, NULL);
@@ -172,11 +175,11 @@ const char* WorkspaceStatus::getStatus(const char* name) {
 }
 
 void WorkspaceStatus::begin(long workspace) {
-    setStatus(workspace);
+    status(workspace);
     YWindowManagerStatus::begin();
 }
 
-void WorkspaceStatus::setStatus(long workspace) {
+void WorkspaceStatus::status(long workspace) {
     this->workspace = workspace;
     repaint();
     
@@ -200,7 +203,7 @@ const char* WorkspaceStatus::templateFunction() {
         }
     }
 
-    return getStatus(longestWorkspaceName);
+    return status(longestWorkspaceName);
 }
 
 #endif

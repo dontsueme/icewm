@@ -8,8 +8,8 @@ public:
     DObject(const char *name, YIcon *icon);
     virtual ~DObject();
 
-    const char *getName() { return fName; }
-    YIcon *getIcon() { return fIcon; }
+    const char *name() { return fName; }
+    YIcon *icon() { return fIcon; }
 
     virtual void open();
 private:

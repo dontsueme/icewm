@@ -19,13 +19,14 @@
 
 #include "intl.h"
 
-AboutDlg *aboutDlg = 0;
+AboutDlg *aboutDlg(NULL);
 
-AboutDlg::AboutDlg(): YDialog() {
-    char const * version(YWindowManager::getName());
-    char * copyright(strJoin("Copyright ", _("(C)"), " 1997-2001 Marko Macek, ",
-			                   _("(C)"), " 2001 Mathias Hasselmann",
-					   NULL));
+AboutDlg::AboutDlg():
+YDialog() {
+    char const * version(YWindowManager::name());
+    char * copyright(strJoin("Copyright ", _("(C)"), " 1997-2001 Marko Macek\n",
+                             "Copyright ", _("(C)"), " 2001 Mathias Hasselmann",
+                             NULL));
 
     fProgTitle = new YLabel(version, this);
     fCopyright = new YLabel(copyright, this);
@@ -47,25 +48,13 @@ AboutDlg::AboutDlg(): YDialog() {
     fThemeAuthorS->show();
     fThemeAuthor->show();
 
-    setWindowTitle(_("icewm - About"));
-    //setIconTitle("icewm - About");
-    setWinLayerHint(WinLayerAboveDock);
-    setWinStateHint(WinStateAllWorkspaces, WinStateAllWorkspaces);
-    setWinHintsHint(WinHintsSkipWindowMenu);
-    {
-        MwmHints mwm;
-
-        memset(&mwm, 0, sizeof(mwm));
-        mwm.flags =
-            MWM_HINTS_FUNCTIONS |
-            MWM_HINTS_DECORATIONS;
-        mwm.functions =
-            MWM_FUNC_MOVE | MWM_FUNC_CLOSE;
-        mwm.decorations =
-            MWM_DECOR_BORDER | MWM_DECOR_TITLE | MWM_DECOR_MENU;
-
-        setMwmHints(mwm);
-    }
+    windowTitle(_("icewm - About"));
+    //iconTitle("icewm - About");
+    winLayer(WinLayerAboveDock);
+    winState(WinStateAllWorkspaces, WinStateAllWorkspaces);
+    winHints(WinHintsSkipWindowMenu);
+    mwmHints(MWM_FUNC_MOVE | MWM_FUNC_CLOSE,
+             MWM_DECOR_BORDER | MWM_DECOR_TITLE | MWM_DECOR_MENU);
 }
 
 #define RX(w) (int((w)->x() + (w)->width()))
@@ -77,45 +66,45 @@ void AboutDlg::autoSize() {
     int W = 0, H;
     int cy;
 
-    fProgTitle->setPosition(dx, dy); dy += fProgTitle->height();
+    fProgTitle->position(dx, dy); dy += fProgTitle->height();
     W = XMAX(W, RX(fProgTitle));
     dy += 4;
-    fCopyright->setPosition(dx, dy); dy += fCopyright->height();
+    fCopyright->position(dx, dy); dy += fCopyright->height();
     W = XMAX(W, RX(fCopyright));
     dy += 20;
 
-    fThemeNameS->setPosition(dx, dy);
-    fThemeDescriptionS->setPosition(dx, dy);
-    fThemeAuthorS->setPosition(dx, dy);
+    fThemeNameS->position(dx, dy);
+    fThemeDescriptionS->position(dx, dy);
+    fThemeAuthorS->position(dx, dy);
     
     dx = XMAX(dx, RX(fThemeNameS));
     dx = XMAX(dx, RX(fThemeDescriptionS));
     dx = XMAX(dx, RX(fThemeAuthorS));
     dx += 20;
 
-    fThemeNameS->setPosition(dx1, dy);
+    fThemeNameS->position(dx1, dy);
     cy = fThemeNameS->height();
     W = XMAX(W, RX(fThemeName));
-    fThemeName->setPosition(dx, dy);
+    fThemeName->position(dx, dy);
     cy = XMAX(cy, int(fThemeName->height()));
     W = XMAX(W, RX(fThemeName));
     dy += cy;
     dy += 4;
     
-    fThemeDescriptionS->setPosition(dx1, dy);
+    fThemeDescriptionS->position(dx1, dy);
     cy = fThemeDescriptionS->height();
     W = XMAX(W, RX(fThemeDescriptionS));
-    fThemeDescription->setPosition(dx, dy);
+    fThemeDescription->position(dx, dy);
     cy = XMAX(cy, int(fThemeDescription->height()));
     W = XMAX(W, RX(fThemeDescription));
 
     dy += cy;
     dy += 4;
     
-    fThemeAuthorS->setPosition(dx1, dy);
+    fThemeAuthorS->position(dx1, dy);
     cy = fThemeAuthorS->height();
     W = XMAX(W, RX(fThemeAuthorS));
-    fThemeAuthor->setPosition(dx, dy);
+    fThemeAuthor->position(dx, dy);
     cy = XMAX(cy, int(fThemeAuthor->height()));
     W = XMAX(W, RX(fThemeAuthor));
     dy += cy;
@@ -123,21 +112,21 @@ void AboutDlg::autoSize() {
     H = dy + 20;
     
     W += 20;
-    setSize(W, H);
+    size(W, H);
 }
 
 void AboutDlg::showFocused() {
-    if (getFrame() == 0)
+    if (NULL == frame())
         manager->manageClient(handle(), false);
-    if (getFrame() != 0) {
-        getFrame()->setPosition(desktop->width() / 2 - getFrame()->width() / 2,
-                                desktop->height() / 2 - getFrame()->height() / 2);
-        getFrame()->activate(true);
+
+    if (frame()) {
+        frame()->position(desktop->width() / 2 - frame()->width() / 2,
+                             desktop->height() / 2 - frame()->height() / 2);
+        frame()->activate(true);
     }
 }
 
 void AboutDlg::handleClose() {
-    if (!getFrame()->isHidden())
-        getFrame()->wmHide();
+    if (!frame()->isHidden()) frame()->wmHide();
 }
 #endif

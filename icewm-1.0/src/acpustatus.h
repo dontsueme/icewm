@@ -32,7 +32,7 @@ public:
     virtual void handleClick(const XButtonEvent &up, int count);
 
     void updateStatus();
-    void getStatus();
+    void status();
     void updateToolTip();
 
 private:

@@ -25,7 +25,7 @@ bool YApplication::popup(YWindow *forWindow, YPopupWindow *popup) {
             return false;
         }
     }
-    popup->setPrevPopup(fPopup);
+    popup->prevPopup(fPopup);
     fPopup = popup;
     return true;
 }
@@ -50,7 +50,7 @@ YPopupWindow::YPopupWindow(YWindow *aParent): YWindow(aParent) {
     fPrevPopup = 0;
     fFlags = 0;
     fUp = false;
-    setStyle(wsSaveUnder | wsOverrideRedirect);
+    style(wsSaveUnder | wsOverrideRedirect);
 }
 
 YPopupWindow::~YPopupWindow() {
@@ -153,7 +153,7 @@ bool YPopupWindow::popup(YWindow *forWindow,
             y = 0;
     }
 
-    setPosition(x, y);
+    position(x, y);
 
     return popup(forWindow, popDown, fFlags);
 }

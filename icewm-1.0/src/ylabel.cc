@@ -18,10 +18,10 @@ YColor *YLabel::labelBg = 0;
 YFont *YLabel::labelFont = 0;
 
 YLabel::YLabel(const char *label, YWindow *parent): YWindow(parent) {
-    setBitGravity(NorthWestGravity);
+    bitGravity(NorthWestGravity);
 
     if (labelFont == 0)
-        labelFont = YFont::getFont(labelFontName);
+        labelFont = YFont::font(labelFontName);
     if (labelBg == 0)
         labelBg = new YColor(clrLabel);
     if (labelFg == 0)
@@ -37,7 +37,7 @@ YLabel::~YLabel() {
 
 void YLabel::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsigned int /*height*/) {
 #ifdef CONFIG_GRADIENTS
-    YPixbuf * gradient(parent() ? parent()->getGradient() : NULL);
+    YPixbuf * gradient(parent() ? parent()->gradient() : NULL);
 
     if (gradient)
         g.copyPixbuf(*gradient, x() - 1, y() - 1, width(), height(), 0, 0);
@@ -46,7 +46,7 @@ void YLabel::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, un
     if (dialogbackPixmap) 
         g.fillPixmap(dialogbackPixmap, 0, 0, width(), height(), x() - 1, y() - 1);
     else {
-	g.setColor(labelBg);
+	g.color(labelBg);
         g.fillRect(0, 0, width(), height());
     }
 
@@ -56,8 +56,8 @@ void YLabel::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, un
         int h = labelFont->height();
         char *s = fLabel, *n;
         
-        g.setColor(labelFg);
-        g.setFont(labelFont);
+        g.color(labelFg);
+        g.font(labelFont);
 
         while (*s) {
             n = s;
@@ -71,7 +71,7 @@ void YLabel::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, un
     }
 }
 
-void YLabel::setText(const char *label) {
+void YLabel::text(const char *label) {
     delete fLabel;
     fLabel = newstr(label);
     autoSize();
@@ -99,6 +99,6 @@ void YLabel::autoSize() {
         }
         h *= r;
     }
-    setSize(1 + w + 1, 1 + h + 1);
+    size(1 + w + 1, 1 + h + 1);
 }
 #endif

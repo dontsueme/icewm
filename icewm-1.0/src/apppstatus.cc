@@ -47,7 +47,7 @@ NetStatus::NetStatus(char const * netdev, YWindow *aParent):
     color[2] = *clrNetIdle
 	     ? new YColor(clrNetIdle) : NULL;
 
-    setSize(NET_SAMPLES, 20);
+    size(NET_SAMPLES, 20);
 
     fUpdateTimer = new YTimer();
     if (fUpdateTimer) {
@@ -58,7 +58,7 @@ NetStatus::NetStatus(char const * netdev, YWindow *aParent):
     prev_ibytes = prev_obytes = 0;
     // set prev values for first updateStatus
     maxBytes = 0; // initially
-    getCurrent(0, 0, 0);
+    current(0, 0, 0);
     wasUp = false;
 
     // test for isdn-device
@@ -155,7 +155,7 @@ void NetStatus::updateToolTip() {
     } else
         snprintf(status, sizeof(status), "%s:", fNetDev);
 
-    setToolTip(status);
+    toolTip(status);
 }
 
 void NetStatus::handleClick(const XButtonEvent &up, int count) {
@@ -193,13 +193,13 @@ void NetStatus::paint(Graphics &g, int /*x*/, int /*y*/,
             //msg("in: %d:%d:%d, out: %d:%d:%d", in, t, ppp_in[i], out, l, ppp_out[i]);
 
             if (t < h - 1) {
-                g.setColor(color[0]);
+                g.color(color[0]);
                 g.drawLine(i, t, i, h - 1);
                 t--;
             }
 
             if (l > 0) {
-                g.setColor(color[1]);
+                g.color(color[1]);
                 //g.drawLine(i, h - tot -1, i, h - in);
                 g.drawLine(i, 0, i, l);
                 l++;
@@ -207,16 +207,16 @@ void NetStatus::paint(Graphics &g, int /*x*/, int /*y*/,
 
             if (l < t) {
 /*	    
-                g.setColor(color[2]);
+                g.color(color[2]);
                 //g.drawLine(i, 0, i, h - tot - 2);
                 g.drawLine(i, l, i, t - l);
 */		
 		if (color[2]) {
-		    g.setColor(color[2]);
+		    g.color(color[2]);
 		    g.drawLine(i, l, i, t - 1);
 		} else {
 #ifdef CONFIG_GRADIENTS
-		    class YPixbuf * gradient(parent()->getGradient());
+		    class YPixbuf * gradient(parent()->gradient());
 
 		    if (gradient)
 			g.copyPixbuf(*gradient,
@@ -231,11 +231,11 @@ void NetStatus::paint(Graphics &g, int /*x*/, int /*y*/,
         }
         else {
 	    if (color[2]) {
-		g.setColor(color[2]);
+		g.color(color[2]);
 		g.drawLine(i, 0, i, h - 1);
             } else {
 #ifdef CONFIG_GRADIENTS
-		class YPixbuf * gradient(parent()->getGradient());
+		class YPixbuf * gradient(parent()->gradient());
 
 		if (gradient)
 		    g.copyPixbuf(*gradient,
@@ -381,12 +381,12 @@ void NetStatus::updateStatus() {
     }
 
     int last = NET_SAMPLES - 1;
-    getCurrent(&ppp_in[last], &ppp_out[last], &ppp_tot[last]);
+    current(&ppp_in[last], &ppp_out[last], &ppp_tot[last]);
     repaint();
 }
 
 
-void NetStatus::getCurrent(int *in, int *out, int *tot) {
+void NetStatus::current(int *in, int *out, int *tot) {
 #if 0
     struct ifpppstatsreq req; // from <net/if_ppp.h> in the linux world
 
@@ -497,11 +497,10 @@ void NetStatus::getCurrent(int *in, int *out, int *tot) {
        }
 #endif //FreeBSD
 
-    struct timeval curr_time;
-    gettimeofday(&curr_time, NULL);
+    YTimeOfDay now;
 
-    double delta_t = (double) ((curr_time.tv_sec  - prev_time.tv_sec) * 1000000L
-                             + (curr_time.tv_usec - prev_time.tv_usec)) / 1000000.0;
+    double delta_t = (double) ((now.tv_sec  - prev_time.tv_sec) * 1000000L
+                             + (now.tv_usec - prev_time.tv_usec)) / 1000000.0;
 
     int ni = (int)((cur_ibytes - prev_ibytes) / delta_t);
     int no = (int)((cur_obytes - prev_obytes) / delta_t);
@@ -514,8 +513,8 @@ void NetStatus::getCurrent(int *in, int *out, int *tot) {
         *tot = *in + *out;
     }
 
-    prev_time.tv_sec = curr_time.tv_sec;
-    prev_time.tv_usec = curr_time.tv_usec;
+    prev_time.tv_sec = now.tv_sec;
+    prev_time.tv_usec = now.tv_usec;
 
     if (maxBytes == 0) // skip first read
         maxBytes = 1;

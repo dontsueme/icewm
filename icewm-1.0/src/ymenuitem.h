@@ -18,13 +18,13 @@ public:
     int hotChar() const { return (fName && fHotCharPos >= 0) ? fName[fHotCharPos] : -1; }
     int hotCharPos() const { return fHotCharPos; }
 
-    YIcon::Image *getIcon() const { return fIcon; }
-    void setIcon(YIcon::Image *icon);
-    void setChecked(bool c);
+    YIcon::Image *icon() const { return fIcon; }
+    void icon(YIcon::Image *icon);
+    void checked(bool c);
     int isChecked() const { return fChecked; }
     int isEnabled() const { return fEnabled; }
-    void setEnabled(bool e) { fEnabled = e; }
-    void setSubmenu(YMenu *submenu) { fSubmenu = submenu; }
+    void enabled(bool enabled = true) { fEnabled = enabled; }
+    void submenu(YMenu *submenu) { fSubmenu = submenu; }
 
     virtual void actionPerformed(YAction::Listener *listener,
                                  YAction *action, unsigned int modifiers);

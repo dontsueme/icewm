@@ -10,24 +10,25 @@ class YScrollView;
 
 class YListItem {
 public:
-    YListItem();
-    virtual ~YListItem();
+    YListItem(): fPrevItem(NULL), fNextItem(NULL), fSelected(false) {}
+    virtual ~YListItem() {}
 
-    YListItem *getNext();
-    YListItem *getPrev();
-    void setNext(YListItem *next);
-    void setPrev(YListItem *prev);
+    YListItem *next() const { return fNextItem; }
+    YListItem *prev() const { return fPrevItem; }
+    void next(YListItem *next) { fNextItem = next; }
+    void prev(YListItem *prev) { fPrevItem = prev; }
 
-    bool getSelected() { return fSelected; }
-    void setSelected(bool aSelected);
+    bool selected() { return fSelected; }
+    void selected(bool selected) { fSelected = selected; }
 
-    virtual int getOffset();
+    virtual int offset() { return 0; }
 
-    virtual const char *getText();
-    virtual YIcon *getIcon();
+    virtual const char *text() { return NULL; }
+    virtual YIcon *icon() { return NULL; }
+
 private:
-    bool fSelected; // !!! remove this from here
     YListItem *fPrevItem, *fNextItem;
+    bool fSelected; // !!! remove this from here
 };
 
 class YListBox:
@@ -60,14 +61,14 @@ public:
     bool hasSelection();
     virtual void activateItem(YListItem *item);
 
-    YListItem *getFirst() const { return fFirst; }
-    YListItem *getLast() const { return fLast; }
+    YListItem *first() const { return fFirst; }
+    YListItem *last() const { return fLast; }
 
-    int getItemCount();
-    YListItem *getItem(int item);
+    int itemCount();
+    YListItem *item(int item);
     int findItemByPoint(int x, int y);
     int findItem(YListItem *item);
-    int getLineHeight();
+    int lineHeight();
     int focusedItem() const { return fFocusedItem; }
 
     int maxWidth();
@@ -77,19 +78,19 @@ public:
 
     virtual int contentWidth();
     virtual int contentHeight();
-    virtual YWindow *getWindow();
+    virtual YWindow *window();
 
-    void focusSelectItem(int no) { setFocusedItem(no, true, false, false); }
+    void focusSelectItem(int no) { focusedItem(no, true, false, false); }
 
     void repaintItem(YListItem *item);
 
 protected:
-    bool isItemSelected(int item);
-    void selectItem(int item, bool sel);
+    bool isItemSelected(int index);
+    void selectItem(int index, bool sel);
     void selectItems(int selStart, int selEnd, bool sel);
     void paintItems(int selStart, int selEnd);
     void clearSelection();
-    void setFocusedItem(int item, bool clear, bool extend, bool virt);
+    void focusedItem(int index, bool clear, bool extend, bool virt);
 
     void applySelection();
     void paintItem(int i);
@@ -101,8 +102,8 @@ protected:
     void focusVisible();
     void ensureVisibility(int item);
 
-    YScrollBar *getHorizontalScrollBar() const { return fVerticalScroll; }
-    YScrollBar *getVerticalScrollBar() const { return fHorizontalScroll; }
+    YScrollBar *horizontalScrollBar() const { return fVerticalScroll; }
+    YScrollBar *verticalScrollBar() const { return fHorizontalScroll; }
 
 private:
     YScrollBar *fVerticalScroll;
@@ -148,8 +149,8 @@ protected:
         ListItem(int id, char const *text):
             fId(id), fText(newstr(text)) {}
         virtual ~ListItem() { delete[] fText; }
-        virtual const char *getText() { return fText; }
-        int getId() const { return fId; }
+        virtual const char *text() { return fText; }
+        int id() const { return fId; }
 
     private:
         int fId;
@@ -162,7 +163,7 @@ public:
         fScrollView(new YScrollView(this)),
         fListBox(new YSimpleListBox(fScrollView, fScrollView, false)) {
         fListBox->show();
-        fScrollView->setView(fListBox);
+        fScrollView->view(fListBox);
         fScrollView->show();
     }
 
@@ -184,8 +185,8 @@ public:
         fListBox->addItem(new ListItem(id, text));
     }
     
-    ListItem *get(int index) {
-        return (ListItem *) fListBox->getItem(index);
+    ListItem *item(int index) {
+        return (ListItem *) fListBox->item(index);
     }
     
     void select(int index) {
@@ -197,8 +198,8 @@ public:
     }
 
     int id() {
-        ListItem const *item((ListItem *)fListBox->getItem(selection()));
-        return (item ? item->getId() : -1);
+        ListItem const *item((ListItem *)fListBox->item(selection()));
+        return (item ? item->id() : -1);
     }
 
     void clear();

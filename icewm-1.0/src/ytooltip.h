@@ -13,7 +13,7 @@ public:
     virtual ~YToolTip();
     virtual void paint(Graphics &g, int x, int y, unsigned int width, unsigned int height);
 
-    void setText(const char *tip);
+    void text(const char *tip);
     virtual bool handleTimer(YTimer *t);
     void locate(YWindow *w, const XCrossingEvent &crossing);
 

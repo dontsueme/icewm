@@ -24,10 +24,10 @@ YToolTip::YToolTip(YWindow *aParent): YWindow(aParent) {
     if (toolTipFg == 0)
         toolTipFg = new YColor(clrToolTipText);
     if (toolTipFont == 0)
-        toolTipFont = YFont::getFont(toolTipFontName);
+        toolTipFont = YFont::font(toolTipFontName);
 
     fText = 0;
-    setStyle(wsOverrideRedirect);
+    style(wsOverrideRedirect);
 }
 
 YToolTip::~YToolTip() {
@@ -41,27 +41,27 @@ YToolTip::~YToolTip() {
 }
 
 void YToolTip::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsigned int /*height*/) {
-    g.setColor(toolTipBg);
+    g.color(toolTipBg);
     g.fillRect(0, 0, width(), height());
-    g.setColor(YColor::black);
+    g.color(YColor::black);
     g.drawRect(0, 0, width() - 1, height() - 1);
     if (fText) {
         int y = toolTipFont->ascent() + 2;
-        g.setFont(toolTipFont);
-        g.setColor(toolTipFg);
+        g.font(toolTipFont);
+        g.color(toolTipFg);
 	g.drawStringMultiline(3, y, fText);
     }
 }
 
-void YToolTip::setText(const char *tip) {
+void YToolTip::text(const char *tip) {
     delete fText; fText = 0;
     if (tip) {
         fText = newstr(tip);
         if (fText) {
 	    YDimension const size(toolTipFont->multilineAlloc(fText));
-            setSize(size.w + 6, size.h + 7);
+            this->size(size.w + 6, size.h + 7);
         } else {
-            setSize(20, 20);
+            size(20, 20);
         }
 
         //!!! merge with below code in locate
@@ -75,7 +75,7 @@ void YToolTip::setText(const char *tip) {
             y = 0;
         if (x < 0)
             x = 0;
-        setPosition(x, y);
+        position(x, y);
     }
     repaint();
 }
@@ -116,6 +116,6 @@ void YToolTip::locate(YWindow *w, const XCrossingEvent &/*crossing*/) {
         y = 0;
     if (x < 0)
         x = 0;
-    setPosition(x, y);
+    position(x, y);
 }
 #endif

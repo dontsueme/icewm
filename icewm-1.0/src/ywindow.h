@@ -42,7 +42,7 @@ private:
 class YWindowProperty {
 public:
     YWindowProperty(Window window, Atom property, Atom type = AnyPropertyType,
-    		    long length = 0, long offset = 0, Bool deleteProp = False);
+    		    long length = 1, long offset = 0, Bool deleteProp = False);
     virtual ~YWindowProperty();
     
     Atom type() const { return fType; }
@@ -51,7 +51,11 @@ public:
     unsigned long after() const { return fAfter; }
 
     template <class T>
-    T data(unsigned index) const { return ((T *) fData)[index]; }
+    T data(unsigned index = 0) const { return ((T*) fData)[index]; }
+    template <class T>
+    T *ptr() const { return (T*) fData; }
+    template <class T>
+    T *release() { T *data((T*)fData); fData = NULL; return data; }
 
     operator int() const { return fStatus; }
 
@@ -92,7 +96,7 @@ public:
     YWindow(YWindow *aParent = 0, Window win = 0);
     virtual ~YWindow();
 
-    void setStyle(unsigned long aStyle);
+    void style(unsigned long aStyle);
 
     void show();
     void hide();
@@ -104,14 +108,14 @@ public:
 
     void reparent(YWindow *parent, int x, int y);
 
-    void setWindowFocus();
+    void windowFocus();
     
-    void setTitle(char const * title);
-    void setClassHint(char const * rName, char const * rClass);
+    void title(char const * title);
+    void classHint(char const * rName, char const * rClass);
 
-    void setGeometry(int x, int y, unsigned width, unsigned height);
-    void setSize(unsigned width, unsigned height);
-    void setPosition(int x, int y);
+    void geometry(int x, int y, unsigned width, unsigned height);
+    void size(unsigned width, unsigned height);
+    void position(int x, int y);
     virtual void configure(const int x, const int y, 
     			   const unsigned width, const unsigned height,
 			   const bool resized);
@@ -160,8 +164,8 @@ public:
     virtual bool handleAutoScroll(const XMotionEvent &mouse);
     void beginAutoScroll(bool autoScroll, const XMotionEvent *motion);
 
-    void setPointer(const YCursor& pointer);
-    void setGrabPointer(const YCursor& pointer);
+    void pointer(const YCursor& pointer);
+    void grabPointer(const YCursor& pointer);
     void grabKeyM(int key, unsigned modifiers);
     void grabKey(int key, unsigned modifiers);
     void grabVKey(int key, unsigned vmodifiers);
@@ -175,10 +179,11 @@ public:
     Window handle();
     YWindow *parent() const { return fParentWindow; }
 
-    Graphics & getGraphics();
+    Graphics & graphics();
 #ifdef CONFIG_GRADIENTS
-    virtual class YPixbuf * getGradient() const { 
-	return (parent() ? parent()->getGradient() : NULL); }
+    virtual class YPixbuf * gradient() const { 
+	return (parent() ? parent()->gradient() : NULL);
+    }
 #endif    
 
     int x() const { return fX; }
@@ -210,33 +215,33 @@ public:
     virtual bool isFocusTraversable();
     bool isFocused();
     bool isEnabled() const { return fEnabled; }
-    void setEnabled(bool enable);
+    void enabled(bool enable);
     void nextFocus();
     void prevFocus();
     bool changeFocus(bool next);
     void requestFocus();
-    void setFocus(YWindow *window);
-    YWindow *getFocusWindow();
+    void focus(YWindow *window);
+    YWindow *focusWindow();
     virtual void gotFocus();
     virtual void lostFocus();
 
     bool isToplevel() const { return fToplevel; }
-    void setToplevel(bool toplevel) { fToplevel = toplevel; }
+    void toplevel(bool toplevel) { fToplevel = toplevel; }
 
     YWindow *toplevel();
 
     void installAccelerator(unsigned key, unsigned mod, YWindow *win);
     void removeAccelerator(unsigned key, unsigned mod, YWindow *win);
 
-    void setToolTip(const char *tip);
+    void toolTip(const char *tip);
 
     void mapToGlobal(int &x, int &y);
     void mapToLocal(int &x, int &y);
 
-    void setWinGravity(int gravity);
-    void setBitGravity(int gravity);
+    void winGravity(int gravity);
+    void bitGravity(int gravity);
 
-    void setDND(bool enabled);
+    void dnd(bool enabled);
 
     void XdndStatus(bool acceptDrop, Atom dropAction);
     virtual void handleXdnd(const XClientMessageEvent &message);
@@ -245,8 +250,8 @@ public:
     virtual void handleDNDLeave();
     virtual void handleDNDPosition(int x, int y);
 
-    bool getCharFromEvent(const XKeyEvent &key, char *c);
-    int getClickCount() { return fClickCount; }
+    bool charFromEvent(const XKeyEvent &key, char *c);
+    int clickCount() { return fClickCount; }
 
     void scrollWindow(int dx, int dy);
 

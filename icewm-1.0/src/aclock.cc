@@ -45,7 +45,7 @@ YClock::YClock(YWindow *aParent): YWindow(aParent) {
     if (clockFg == 0)
         clockFg = new YColor(clrClockText);
     if (clockFont == 0)
-        clockFont = YFont::getFont(clockFontName);
+        clockFont = YFont::font(clockFontName);
 
     clockUTC = false;
     toolTipUTC = false;
@@ -55,7 +55,7 @@ YClock::YClock(YWindow *aParent): YWindow(aParent) {
     clockTimer->start();
     autoSize();
     updateToolTip();
-    setDND(true);
+//    dnd(true);
 }
 
 YClock::~YClock() {
@@ -98,7 +98,7 @@ void YClock::autoSize() {
     }
     if (!prettyClock)
         maxWidth += 4;
-    setSize(maxWidth, 20);
+    size(maxWidth, 20);
 }
 
 void YClock::handleButton(const XButtonEvent &button) {
@@ -129,7 +129,7 @@ void YClock::updateToolTip() {
 
     len = strftime(s, sizeof(s), fmtDate, t);
 
-    setToolTip(s);
+    toolTip(s);
 }
 
 void YClock::handleCrossing(const XCrossingEvent &crossing) {
@@ -183,14 +183,14 @@ void YClock::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, un
         for (i = len - 1; x >= 0; i--) {
             YPixmap *p;
             if (i >= 0)
-                p = getPixmap(s[i]);
+                p = pixmap(s[i]);
             else
                 p = PixSpace;
             if (p) {
                 x -= p->width();
                 g.drawPixmap(p, x, 0);
             } else if (i < 0) {
-                g.setColor(clockBg);
+                g.color(clockBg);
                 g.fillRect(0, 0, x, height());
                 break;
             }
@@ -200,11 +200,11 @@ void YClock::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, un
             + clockFont->ascent();
 
 	if (clockBg) {
-	    g.setColor(clockBg);
+	    g.color(clockBg);
             g.fillRect(0, 0, width(), height());
 	} else {
 #ifdef CONFIG_GRADIENTS
-	    class YPixbuf * gradient(parent()->getGradient());
+	    class YPixbuf * gradient(parent()->gradient());
 
 	    if (gradient)
 		g.copyPixbuf(*gradient, this->x(), this->y(),
@@ -216,8 +216,8 @@ void YClock::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, un
 			     width(), height(), this->x(), this->y());
 	}
 
-        g.setColor(clockFg);
-        g.setFont(clockFont);
+        g.color(clockFg);
+        g.font(clockFont);
         g.drawChars(s, 0, len, 2, y);
     }
     clockTimer->start();
@@ -232,7 +232,7 @@ bool YClock::handleTimer(YTimer *t) {
     return true;
 }
 
-YPixmap *YClock::getPixmap(char c) {
+YPixmap *YClock::pixmap(char c) {
     YPixmap *pix = 0;
     switch (c) {
     case '0':
@@ -282,7 +282,7 @@ int YClock::calcWidth(const char *s, int count) {
         int len = 0;
 
         while (count--) {
-            YPixmap *p = getPixmap(*s++);
+            YPixmap *p = pixmap(*s++);
             if (p)
                 len += p->width();
         }

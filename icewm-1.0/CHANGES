@@ -1,7 +1,8 @@
 1.0.10: 2001-10-22 ???
         - feature: updated default theme to "Infadel R3: Deep Sky"
 !!!     - feature: partial support of the Extended Window Manager
-          Specification (aka net wm-spec) (KDE 2.1, GNOME2)
+          Specification (aka net wm-spec) (KDE 2.1, GNOME2);
+          see TODO.wmspec for details
 !!!     - feature: add KDE tray windows to the tray
 !!!     - feature: allow to specify $DESTDIR on "make install"
 !!!     - feature: allow to select wm specs to support on compile time
@@ -20,6 +21,8 @@
 !!!     - bugfix: avoid overflow of network statistics
 !!!     - bugfix: fixed maximized terminals gap bug (again, sig!)
 !!!     - bugfix: don't autohide taskbar when addressbar has focus
+        - bugfix: unified tray and task pane code
+        - bugfix: heavy code cleanup in YFrameClient/YFrameWindow
         - bugfix: src/.targets was not recreated when install.inc has changed
         - bugfix: replaced calls to XGrabServer by C++ smart locks
         - bugfix: #467231 + closing of start menu when Win* isn't mapped

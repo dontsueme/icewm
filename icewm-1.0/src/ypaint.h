@@ -86,7 +86,7 @@ struct YDimension {
 
 class YFont {
 public:
-    static YFont * getFont(char const * name, bool antialias = true);
+    static YFont * font(char const * name, bool antialias = true);
     virtual ~YFont() {}
 
     virtual operator bool () const = 0;
@@ -102,7 +102,7 @@ public:
     unsigned multilineTabPos(char const * str) const;
     YDimension multilineAlloc(char const * str) const;
 
-    static char * getNameElement(char const * pattern, unsigned const element);
+    static char * nameElement(char const * pattern, unsigned const element);
 };
 
 /******************************************************************************/
@@ -129,7 +129,7 @@ private:
 #ifdef CONFIG_I18N
 class YFontSet : public YFont {
 public:
-    YFontSet(char const * name);
+    YFontSet(char const *name);
     virtual ~YFontSet();
 
     virtual operator bool() const { return (None != fFontSet); }
@@ -137,12 +137,12 @@ public:
     virtual unsigned ascent() const { return fAscent; }
     virtual unsigned textWidth(char const * str, int len) const;
 
-    virtual void drawGlyphs(class Graphics & graphics, int x, int y, 
-    			    char const * str, int len);
+    virtual void drawGlyphs(class Graphics &graphics, int x, int y, 
+    			    char const *str, int len);
 
 private:
-    static XFontSet getFontSetWithGuess(char const * pattern, char *** missing,
-					int * nMissing, char ** defString);
+    static XFontSet fontSetWithGuess(char const *pattern, char ***missing,
+                                     int *nMissing, char **defString);
 
     XFontSet fFontSet;
     int fAscent, fDescent;
@@ -355,18 +355,18 @@ public:
     void fillPolygon(XPoint * points, int const n, int const shape,
 		    int const mode);
     void fillArc(int x, int y, int width, int height, int a1, int a2);
-    void setColor(YColor * aColor);
-    void setFont(YFont * aFont);
-    void setThinLines(void) { setLineWidth(0); }
-    void setWideLines(int width = 1) { setLineWidth(width >= 1 ? width : 1); }
-    void setLineWidth(int width);
-    void setPenStyle(bool dotLine = false); ///!!!hack
-    void setFunction(int function = GXcopy);
+    void color(YColor * aColor);
+    void font(YFont * aFont);
+    void thinLines(void) { lineWidth(0); }
+    void wideLines(int width = 1) { lineWidth(width >= 1 ? width : 1); }
+    void lineWidth(int width);
+    void penStyle(bool dotLine = false); ///!!!hack
+    void function(int function);
     
-    void setClipRects(int x, int y, XRectangle rectangles[], int n = 1,
+    void clipRects(int x, int y, XRectangle rectangles[], int n = 1,
     		      int ordering = Unsorted);
-    void setClipMask(Pixmap mask = None);
-    void setClipOrigin(int x, int y);
+    void clipMask(Pixmap mask = None);
+    void clipOrigin(int x, int y);
 
     void draw3DRect(int x, int y, int w, int h, bool raised);
     void drawBorderW(int x, int y, int w, int h, bool raised);

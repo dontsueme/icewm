@@ -53,8 +53,7 @@ public YTimeout {
 };
 
 
-class YTimer:
-public YSingleList<YTimer>::Item {
+class YTimer {
 public:
     class Listener {
     public:
@@ -86,7 +85,8 @@ private:
     Listener *fListener;
     YTimeout fTimeout;
 
-    static YSingleList<YTimer> timers;
+    typedef YSingleList<YTimer> TimerList;
+    static TimerList timers;
 };
 
 

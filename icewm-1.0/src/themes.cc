@@ -59,7 +59,7 @@ YMenuItem * ThemesMenu::newThemeItem(char const *label, char const *theme) {
 	    YMenuItem *item(new DObjectMenuItem(launcher));
 
 	    if (item) {
-	        item->setChecked(themeName && !strcmp(themeName, theme));
+	        item->checked(themeName && !strcmp(themeName, theme));
 		return item;
 	    }
 	}
@@ -140,7 +140,7 @@ void ThemesMenu::findThemeAlternatives(const char *path, YMenuItem *item) {
                     YMenu *sub(item->submenu());
 
                     if (sub == NULL)
-                        item->setSubmenu(sub = new YMenu());
+                        item->submenu(sub = new YMenu());
 
                     if (sub) {
                         char *tname(newstr(de->d_name, ext - de->d_name));

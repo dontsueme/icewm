@@ -47,11 +47,11 @@ YMenuItem::~YMenuItem() {
     delete fParam; fParam = 0;
 }
 
-void YMenuItem::setChecked(bool c) {
+void YMenuItem::checked(bool c) {
     fChecked = c;
 }
 
-void YMenuItem::setIcon(YIcon::Image * icon) {
+void YMenuItem::icon(YIcon::Image * icon) {
     fIcon = icon;
 }
 

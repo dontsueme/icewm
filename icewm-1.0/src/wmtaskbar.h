@@ -56,12 +56,6 @@ public:
 
     void updateLocation();
 
-#ifdef CONFIG_APPLET_CLOCK
-    YClock *clock() { return fClock; }
-#endif
-
-    WorkspacesPane *workspacesPane() const { return fWorkspaces; }
-
     void popupStartMenu();
     void popupWindowListMenu();
 
@@ -70,6 +64,12 @@ public:
     void popOut();
     void showBar(bool visible);
 
+    void updateProxyPanes();
+
+#ifdef CONFIG_APPLET_CLOCK
+    YClock *clock() { return fClock; }
+#endif
+    WorkspacesPane *workspacesPane() const { return fWorkspaces; }
     AddressBar *addressBar() const { return fAddressBar; }
     TaskPane *taskPane() const { return fTasks; }
 #ifdef CONFIG_TRAY

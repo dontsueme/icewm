@@ -32,7 +32,6 @@
 #include "objbutton.h"
 #include "objmenu.h"
 #include "atasks.h"
-#include "atray.h"
 #include "aworkspaces.h"
 
 #include "aapm.h"
@@ -41,10 +40,6 @@
 
 YColor *taskBarBg(NULL);
 
-YTimer *TaskBarApp::fRaiseTimer(NULL);
-#ifdef CONFIG_TRAY
-YTimer *TrayApp::fRaiseTimer(NULL);
-#endif
 YTimer *WorkspaceButton::fRaiseTimer(NULL);
 
 TaskBar *taskBar(NULL);
@@ -154,18 +149,16 @@ TaskBar::TaskBar(YWindow *aParent):
     initPixmaps();
 
 #if 1
-    setWindowTitle(_("Task Bar"));
-    setIconTitle(_("Task Bar"));
-    setWinStateHint(WinStateAllWorkspaces, WinStateAllWorkspaces);
-    //!!!setWinStateHint(WinStateDockHorizontal, WinStateDockHorizontal);
-    setWinHintsHint(WinHintsSkipFocus |
-    		    WinHintsSkipWindowMenu |
-    		    WinHintsSkipTaskBar |
-		    (taskBarAutoHide ? 0 : WinHintsDoNotCover));
+    windowTitle(_("Task Bar"));
+    iconTitle(_("Task Bar"));
+    winState(WinStateAllWorkspaces, WinStateAllWorkspaces);
+    //!!!winState(WinStateDockHorizontal, WinStateDockHorizontal);
+    winHints(WinHintsSkipFocus | WinHintsSkipWindowMenu | WinHintsSkipTaskBar |
+            (taskBarAutoHide ? 0 : WinHintsDontCover));
     
-    setWinWorkspaceHint(0);
-    setWinLayerHint(taskBarAutoHide ? WinLayerAboveDock :
-		    taskBarKeepBelow ? WinLayerBelow : WinLayerDock);
+    winWorkspace(0);
+    winLayer(taskBarAutoHide ? WinLayerAboveDock :
+	     taskBarKeepBelow ? WinLayerBelow : WinLayerDock);
 
     {
         XWMHints wmh;
@@ -176,45 +169,23 @@ TaskBar::TaskBar(YWindow *aParent):
         //wmh.
 
         XSetWMHints(app->display(), handle(), &wmh);
-        getWMHints();
+        updateWMHints();
     }
-    {
-        MwmHints mwm;
 
-        memset(&mwm, 0, sizeof(mwm));
-        mwm.flags =
-            MWM_HINTS_FUNCTIONS |
-            MWM_HINTS_DECORATIONS;
-        mwm.functions =
-            MWM_FUNC_MOVE /*|
-            MWM_FUNC_RESIZE*/;
-        mwm.decorations =
-            MWM_DECOR_BORDER /*|MWM_DECOR_RESIZEH*/;
-
-        setMwmHints(mwm);
-    }
+    mwmHints(MWM_FUNC_MOVE /*| MWM_FUNC_RESIZE*/,
+             MWM_DECOR_BORDER /*| MWM_DECOR_RESIZEH*/);
 #else
-    setStyle(wsOverrideRedirect);
+    style(wsOverrideRedirect);
 #endif
-    {
-        long arg[2];
-        arg[0] = NormalState;
-        arg[1] = 0;
-        XChangeProperty(app->display(), handle(),
-                        atoms.wmState, atoms.wmState,
-                        32, PropModeReplace,
-                        (unsigned char *)arg, 2);
-    }
-    setPointer(YApplication::leftPointer);
-    setDND(true);
+
+    frameState(NormalState);
+    pointer(YApplication::leftPointer);
+    dnd(true);
 
     fAutoHideTimer = new YTimer(autoHideDelay);
-    if (fAutoHideTimer) {
-        fAutoHideTimer->timerListener(this);
-    }
+    if (fAutoHideTimer) fAutoHideTimer->timerListener(this);
 
-    fTaskBarMenu = new YMenu();
-    if (fTaskBarMenu) {
+    if ((fTaskBarMenu = new YMenu())) {
         fTaskBarMenu->actionListener(this);
         fTaskBarMenu->addItem(_("Tile _Vertically"), -2, KEY_NAME(gKeySysTileVertical), actionTileVertical);
         fTaskBarMenu->addItem(_("T_ile Horizontally"), -2, KEY_NAME(gKeySysTileHorizontal), actionTileHorizontal);
@@ -224,7 +195,7 @@ TaskBar::TaskBar(YWindow *aParent):
         fTaskBarMenu->addItem(_("_Hide All"), -2, KEY_NAME(gKeySysHideAll), actionHideAll);
         fTaskBarMenu->addItem(_("_Undo"), -2, KEY_NAME(gKeySysUndoArrange), actionUndoArrange);
         if (minimizeToDesktop)
-            fTaskBarMenu->addItem(_("Arrange _Icons"), -2, KEY_NAME(gKeySysArrangeIcons), actionArrangeIcons)->setEnabled(false);
+            fTaskBarMenu->addItem(_("Arrange _Icons"), -2, KEY_NAME(gKeySysArrangeIcons), actionArrangeIcons)->enabled(false);
         fTaskBarMenu->addSeparator();
 #ifdef CONFIG_WINMENU
         fTaskBarMenu->addItem(_("_Windows"), -2, actionWindowList, windowListMenu);
@@ -254,15 +225,12 @@ TaskBar::TaskBar(YWindow *aParent):
 
 #ifdef CONFIG_APPLET_CPU_STATUS
 #if (defined(linux) || defined(HAVE_KSTAT_H))
-    if (taskBarShowCPUStatus)
-        fCPUStatus = new CPUStatus(this);
-    else
-        fCPUStatus = 0;
+    fCPUStatus = taskBarShowCPUStatus ? new CPUStatus(this) : NULL;
 #endif
 #endif
 
 #ifdef HAVE_NET_STATUS
-    fNetStatus = 0;
+    fNetStatus = NULL;
 
     if (taskBarShowNetStatus && netDevice) {
 	unsigned cnt(strTokens(netDevice));
@@ -291,11 +259,11 @@ TaskBar::TaskBar(YWindow *aParent):
         fApm = new YApm(this);
         if (fApm->height() + ADD1 > ht) ht = fApm->height() + ADD1;
     } else
-        fApm = 0;
+        fApm = NULL;
 #endif
 
 #ifdef CONFIG_APPLET_MAILBOX
-    fMailBoxStatus = 0;
+    fMailBoxStatus = NULL;
 
     if (taskBarShowMailboxStatus) {
 	char const * mailboxes(mailBoxPath ? mailBoxPath : getenv("MAIL"));
@@ -332,8 +300,8 @@ TaskBar::TaskBar(YWindow *aParent):
     if (taskBarShowStartMenu) {
         fApplications = new ObjectButton(this, rootMenu);
         fApplications->actionListener(this);
-        fApplications->setImage(icewmImage);
-	fApplications->setToolTip(_("Favorite applications"));
+        fApplications->image(icewmImage);
+	fApplications->toolTip(_("Favorite applications"));
         if (fApplications->height() + ADD1 > ht)
             ht = fApplications->height() + ADD1;
     } else
@@ -352,9 +320,9 @@ TaskBar::TaskBar(YWindow *aParent):
 #ifdef CONFIG_WINMENU
     if (taskBarShowWindowListMenu) {
         fWinList = new ObjectButton(this, windowListMenu);
-        fWinList->setImage(windowsImage);
+        fWinList->image(windowsImage);
         fWinList->actionListener(this);
-	fWinList->setToolTip(_("Window list menu"));
+	fWinList->toolTip(_("Window list menu"));
         if (fWinList->height() + ADD1 > ht) ht = fWinList->height() + ADD1;
     } else
         fWinList = 0;
@@ -366,7 +334,7 @@ TaskBar::TaskBar(YWindow *aParent):
         fWorkspaces = 0;
 
     if (taskBarDoubleHeight) {
-        setSize(desktop->width() + 2, 2 * ht + 1);
+        size(desktop->width() + 2, 2 * ht + 1);
 
         updateLocation();
 
@@ -374,7 +342,7 @@ TaskBar::TaskBar(YWindow *aParent):
         rightX = width() - 4;
 #ifdef CONFIG_APPLET_CLOCK
         if (fClock) {
-            fClock->setPosition(rightX - fClock->width(),
+            fClock->position(rightX - fClock->width(),
                                 BASE1 + (ht - ADD1 - fClock->height()) / 2);
             fClock->show();
             rightX -= fClock->width() + 2;
@@ -383,8 +351,8 @@ TaskBar::TaskBar(YWindow *aParent):
 #ifdef CONFIG_APPLET_APM
         if (fApm) {
             rightX -= 2;
-            fApm->setPosition(rightX - fApm->width(),
-                              BASE1 + (ht - ADD1 - fApm->height()) / 2);
+            fApm->position(rightX - fApm->width(),
+                           BASE1 + (ht - ADD1 - fApm->height()) / 2);
             fApm->show();
             rightX -= fApm->width() + 2;
         }
@@ -392,7 +360,7 @@ TaskBar::TaskBar(YWindow *aParent):
 #ifdef CONFIG_APPLET_MAILBOX
         if (fMailBoxStatus)
 	    for (MailBoxStatus ** mbox(fMailBoxStatus); *mbox; ++mbox) {
-		(*mbox)->setPosition(rightX - (*mbox)->width() - 1,
+		(*mbox)->position(rightX - (*mbox)->width() - 1,
                                   BASE2 + (ht - ADD2 - (*mbox)->height()) / 2);
 
 		(*mbox)->show();
@@ -402,8 +370,8 @@ TaskBar::TaskBar(YWindow *aParent):
 #ifdef CONFIG_APPLET_CPU_STATUS
 #if (defined(linux) || defined(HAVE_KSTAT_H))
         if (fCPUStatus) {
-            fCPUStatus->setPosition(rightX - fCPUStatus->width() - 1,
-                                    BASE1 + (ht - ADD1 - fCPUStatus->height()) / 2);
+            fCPUStatus->position(rightX - fCPUStatus->width() - 1,
+                                 BASE1 + (ht - ADD1 - fCPUStatus->height()) / 2);
             fCPUStatus->show();
             rightX -= fCPUStatus->width() + 2;
         }
@@ -415,8 +383,8 @@ TaskBar::TaskBar(YWindow *aParent):
 	    for (NetStatus ** netstat(fNetStatus); *netstat; ++netstat) {
 		rightX -= 2;
 
-		(*netstat)->setPosition(rightX - (*netstat)->width() - 1,
-				  BASE1 + (ht - ADD1 - (*netstat)->height()) / 2);
+		(*netstat)->position(rightX - (*netstat)->width() - 1,
+				     BASE1 + (ht - ADD1 - (*netstat)->height()) / 2);
 
 		// don't do a show() here because PPPStatus takes care of it
 		rightX -= (*netstat)->width() + 2;
@@ -425,22 +393,22 @@ TaskBar::TaskBar(YWindow *aParent):
 
         if (fApplications) {
             leftX += 2;
-            fApplications->setPosition(leftX,
-                                       BASE1 + (ht - ADD1 - fApplications->height()) / 2);
+            fApplications->position(leftX,
+                                    BASE1 + (ht - ADD1 - fApplications->height()) / 2);
             fApplications->show();
             leftX += fApplications->width();
         }
         if (fWinList) {
-            fWinList->setPosition(leftX,
-                                  BASE1 + (ht - ADD1 - fWinList->height()) / 2);
+            fWinList->position(leftX,
+                               BASE1 + (ht - ADD1 - fWinList->height()) / 2);
             fWinList->show();
             leftX += fWinList->width() + 2;
         }
 #ifndef NO_CONFIGURE_MENUS
         if (fObjectBar) {
             leftX += 2;
-            fObjectBar->setPosition(leftX,
-                                    BASE1 + (ht - ADD1 - fObjectBar->height()) / 2);
+            fObjectBar->position(leftX,
+                                 BASE1 + (ht - ADD1 - fObjectBar->height()) / 2);
             fObjectBar->show();
             leftX += fObjectBar->width() + 2;
         }
@@ -451,10 +419,10 @@ TaskBar::TaskBar(YWindow *aParent):
             fAddressBar = new AddressBar(this);
             if (fAddressBar) {
                 leftX += 2;
-                fAddressBar->setGeometry(leftX,
-                                         BASE1 + (ht - ADD1 - fAddressBar->height()) / 2,
-                                         rightX - leftX - 4,
-                                         fAddressBar->height());
+                fAddressBar->geometry(leftX,
+                                      BASE1 + (ht - ADD1 - fAddressBar->height()) / 2,
+                                      rightX - leftX - 4,
+                                      fAddressBar->height());
 
                 fAddressBar->show();
             }
@@ -466,13 +434,13 @@ TaskBar::TaskBar(YWindow *aParent):
 
         if (fWorkspaces) {
             leftX += 2;
-            fWorkspaces->setPosition(leftX, BASE2 + ht);
+            fWorkspaces->position(leftX, BASE2 + ht);
             leftX += 2 + fWorkspaces->width();
             fWorkspaces->show();
         }
         leftX += 2;
     } else {
-        setSize(desktop->width() + 2, ht + 1);
+        size(desktop->width() + 2, ht + 1);
 
         updateLocation();
 
@@ -480,8 +448,8 @@ TaskBar::TaskBar(YWindow *aParent):
         rightX = width() - 4;
 #ifdef CONFIG_APPLET_CLOCK
         if (fClock) {
-            fClock->setPosition(rightX - fClock->width(),
-                                BASE1 + (ht - ADD1 - fClock->height()) / 2);
+            fClock->position(rightX - fClock->width(),
+                             BASE1 + (ht - ADD1 - fClock->height()) / 2);
             fClock->show();
             rightX -= fClock->width() + 2;
         }
@@ -489,7 +457,7 @@ TaskBar::TaskBar(YWindow *aParent):
 #ifdef CONFIG_APPLET_MAILBOX
         if (fMailBoxStatus)
 	    for (MailBoxStatus ** mbox(fMailBoxStatus); *mbox; ++mbox) {
-		(*mbox)->setPosition(rightX - (*mbox)->width() - 1,
+		(*mbox)->position(rightX - (*mbox)->width() - 1,
 				  BASE2 + (ht - ADD2 - (*mbox)->height()) / 2);
 
 		(*mbox)->show();
@@ -499,8 +467,8 @@ TaskBar::TaskBar(YWindow *aParent):
 #ifdef CONFIG_APPLET_CPU_STATUS
 #if (defined(linux) || defined(HAVE_KSTAT_H))
         if (fCPUStatus) {
-            fCPUStatus->setPosition(rightX - fCPUStatus->width() - 1,
-                                    BASE1 + (ht - ADD1 - fCPUStatus->height()) / 2);
+            fCPUStatus->position(rightX - fCPUStatus->width() - 1,
+                                 BASE1 + (ht - ADD1 - fCPUStatus->height()) / 2);
             fCPUStatus->show();
             rightX -= fCPUStatus->width() + 2;
         }
@@ -511,8 +479,8 @@ TaskBar::TaskBar(YWindow *aParent):
 	    for (NetStatus ** netstat(fNetStatus); *netstat; ++netstat) {
 		rightX -= 2;
 
-		(*netstat)->setPosition(rightX - (*netstat)->width() - 1,
-				  BASE1 + (ht - ADD1 - (*netstat)->height()) / 2);
+		(*netstat)->position(rightX - (*netstat)->width() - 1,
+				     BASE1 + (ht - ADD1 - (*netstat)->height()) / 2);
 
 		// don't do a show() here because PPPStatus takes care of it
 		rightX -= (*netstat)->width() + 2;
@@ -521,29 +489,29 @@ TaskBar::TaskBar(YWindow *aParent):
 #ifdef CONFIG_APPLET_APM
         if (fApm) {
             rightX -= 2;
-            fApm->setPosition(rightX - fApm->width(), BASE1 + (ht - ADD1 - fApm->height()) / 2);
+            fApm->position(rightX - fApm->width(), BASE1 + (ht - ADD1 - fApm->height()) / 2);
             fApm->show();
             rightX -= fApm->width() + 2;
         }
 #endif
         if (fApplications) {
             leftX += 2;
-            fApplications->setPosition(leftX,
-                                       BASE1 + (ht - ADD1 - fApplications->height()) / 2);
+            fApplications->position(leftX,
+                                    BASE1 + (ht - ADD1 - fApplications->height()) / 2);
             fApplications->show();
             leftX += fApplications->width();
         }
         if (fWinList) {
-            fWinList->setPosition(leftX,
-                                  BASE1 + (ht - ADD1 - fWinList->height()) / 2);
+            fWinList->position(leftX,
+                               BASE1 + (ht - ADD1 - fWinList->height()) / 2);
             fWinList->show();
             leftX += fWinList->width() + 2;
         }
 #ifndef NO_CONFIGURE_MENUS
         if (fObjectBar) {
             leftX += 2;
-            fObjectBar->setPosition(leftX,
-                                    BASE1 + (ht - ADD1 - fObjectBar->height()) / 2);
+            fObjectBar->position(leftX,
+                                 BASE1 + (ht - ADD1 - fObjectBar->height()) / 2);
             fObjectBar->show();
             leftX += fObjectBar->width() + 2;
         }
@@ -551,7 +519,7 @@ TaskBar::TaskBar(YWindow *aParent):
 
         if (fWorkspaces) {
             leftX += 2;
-            fWorkspaces->setPosition(leftX, BASE2);
+            fWorkspaces->position(leftX, BASE2);
             leftX += 2 + fWorkspaces->width();
             fWorkspaces->show();
         }
@@ -563,12 +531,7 @@ TaskBar::TaskBar(YWindow *aParent):
         fTray = new TrayPane(this);
 
         if (fTray) {
-            int trayWidth(fTray->getRequiredWidth());
-            int w((rightX - leftX ) / 2);
-            if (trayWidth > w)
-		trayWidth = w;
-	    else
-		w = trayWidth;
+            int const w(max((int)fTray->requiredWidth(), (rightX - leftX) / 2));
 
             rightX-= w;
 
@@ -581,7 +544,7 @@ TaskBar::TaskBar(YWindow *aParent):
             } else if (trayDrawBevel)
 		rightX-= 2;
 
-            fTray->setGeometry(rightX, y, w, h);
+            fTray->geometry(rightX, y, w, h);
             fTray->show();
             rightX -= 2;
         }
@@ -598,7 +561,7 @@ TaskBar::TaskBar(YWindow *aParent):
                 h = h / 2 - 1;
                 y += height() / 2 - 1;
             }
-            fTasks->setGeometry(leftX, y, rightX - leftX, h);
+            fTasks->geometry(leftX, y, rightX - leftX, h);
             fTasks->show();
         }
     } else {
@@ -608,10 +571,10 @@ TaskBar::TaskBar(YWindow *aParent):
             fAddressBar = new AddressBar(this);
             if (fAddressBar) {
                 leftX += 2;
-                fAddressBar->setGeometry(leftX,
-                                         BASE1 + (ht - ADD1 - fAddressBar->height()) / 2,
-                                         rightX - leftX - 4,
-                                         fAddressBar->height());
+                fAddressBar->geometry(leftX,
+                                      BASE1 + (ht - ADD1 - fAddressBar->height()) / 2,
+                                      rightX - leftX - 4,
+                                      fAddressBar->height());
 
                 fAddressBar->show();
             }
@@ -687,37 +650,17 @@ void TaskBar::updateLocation() {
     else
         y = taskBarAtTop ? -1 : int(desktop->height() - h);
 
-    {
-        MwmHints mwm;
+    mwmHints(MWM_FUNC_MOVE /*| MWM_FUNC_RESIZE*/,
+             MWM_DECOR_BORDER /*| MWM_DECOR_RESIZEH*/);
+    if (frame()) frame()->updateMwmHints();
 
-        memset(&mwm, 0, sizeof(mwm));
-        mwm.flags =
-            MWM_HINTS_FUNCTIONS |
-            MWM_HINTS_DECORATIONS;
-        mwm.functions =
-            MWM_FUNC_MOVE /*|
-            MWM_FUNC_RESIZE*/;
-        if (fIsHidden)
-            mwm.decorations = 0;
-        else
-            mwm.decorations =
-                MWM_DECOR_BORDER /*|
-                MWM_DECOR_RESIZEH*/;
-
-        XChangeProperty(app->display(), handle(),
-                        atoms.mwmHints, atoms.mwmHints, 32, PropModeReplace,
-                        (unsigned char *)&mwm, sizeof(mwm)/sizeof(long)); /// !!! ???????
-        getMwmHints();
-        if (getFrame())
-            getFrame()->updateMwmHints();
-    }
     /// !!! fix
 #if 1
-    if (fIsMapped && getFrame())
-        getFrame()->configureClient(x, y, width(), height());
+    if (fIsMapped && frame())
+        frame()->configureClient(x, y, width(), height());
     else
 #endif
-        setPosition(x, y);
+        position(x, y);
 }
 
 void TaskBar::handleCrossing(const XCrossingEvent &crossing) {
@@ -753,7 +696,7 @@ void TaskBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, u
     }
 #endif
 
-    g.setColor(taskBarBg);
+    g.color(taskBarBg);
     //g.draw3DRect(0, 0, width() - 1, height() - 1, true);
 
 #ifdef CONFIG_GRADIENTS
@@ -819,11 +762,11 @@ void TaskBar::handleDrag(const XButtonEvent &/*down*/, const XMotionEvent &motio
 
     if (taskBarAtTop != newPosition) {
         taskBarAtTop = newPosition;
-        //setPosition(x(), taskBarAtTop ? -1 : int(manager->height() - height() + 1));
-        manager->setWorkAreaMoveWindows(true);
+        //position(x(), taskBarAtTop ? -1 : int(manager->height() - height() + 1));
+        manager->workAreaMoveWindows(true);
         updateLocation();
         //manager->updateWorkArea();
-        manager->setWorkAreaMoveWindows(false);
+        manager->workAreaMoveWindows(false);
     }
 #endif
 }
@@ -832,7 +775,7 @@ void TaskBar::popupStartMenu() {
     if (fApplications) {
         /*requestFocus();
         fApplications->requestFocus();
-        fApplications->setFocus();*/
+        fApplications->focus();*/
         if (fIsHidden == true)
             popOut();
         fApplications->popupMenu();
@@ -871,13 +814,15 @@ void TaskBar::popOut() {
 
 void TaskBar::showBar(bool visible) {
     if (visible) {
-        if (getFrame() == 0)
+        if (NULL == frame())
             manager->mapClient(handle());
-        if (getFrame() != 0) {
-	    setWinLayerHint(taskBarAutoHide ? WinLayerAboveDock :
-			    taskBarKeepBelow ? WinLayerBelow : WinLayerDock);
-            getFrame()->setState(WinStateAllWorkspaces, WinStateAllWorkspaces);
-            getFrame()->activate(true);
+
+        if (frame()) {
+	    winLayer(taskBarAutoHide ? WinLayerAboveDock :
+		     taskBarKeepBelow ? WinLayerBelow : WinLayerDock);
+            frame()->state(WinStateAllWorkspaces, WinStateAllWorkspaces);
+            frame()->activate(true);
+
             updateLocation();
         }
     }
@@ -889,4 +834,5 @@ void TaskBar::actionPerformed(YAction *action, unsigned int modifiers) {
 
 void TaskBar::handlePopDown(YPopupWindow */*popup*/) {
 }
+
 #endif

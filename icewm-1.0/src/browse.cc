@@ -85,14 +85,14 @@ void BrowseMenu::updatePopup() {
                             if (folder == 0)
                                 folder = getIcon("folder");
 #endif
-                            item->setSubmenu(sub);
+                            item->submenu(sub);
 #ifndef LITE
                             if (sub) {
                                 if (folder)
-                                    item->setIcon(folder->small());
+                                    item->icon(folder->small());
                             } else {
                                 if (file)
-                                    item->setIcon(file->small());
+                                    item->icon(file->small());
                             }
 #endif
                         }

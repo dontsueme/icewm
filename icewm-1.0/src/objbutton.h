@@ -18,14 +18,14 @@ public:
     virtual void actionPerformed(YAction *action, unsigned int modifiers);
     virtual void handleClick(const XButtonEvent &up, int count);
 
-    virtual YFont * getFont();
-    virtual YColor * getColor();
-    virtual YSurface getSurface();
+    virtual YFont * font();
+    virtual YColor * color();
+    virtual YSurface surface();
 
 private:
     DObject *fObject;
 
-    static YFont *font;
+    static YFont *buttonFont;
     static YColor *bgColor;
     static YColor *fgColor;
 };

@@ -39,7 +39,7 @@ DGnomeDesktopEntry::~DGnomeDesktopEntry() {
 }
 
 void DGnomeDesktopEntry::open() {
-    XSync(app->display(), False);
+    app->sync();
     gnome_desktop_entry_launch(fEntry);
 }
 
@@ -82,7 +82,7 @@ void GnomeMenu::createSubmenu(ObjectMenu *menu, const char *path,
 
     if (gmenu != 0) {
         YMenuItem *item = menu->addSubmenu(name, 0, gmenu);
-        if (icon && item) item->setIcon(icon);
+        if (icon && item) item->icon(icon);
     }
 }
 
@@ -194,9 +194,9 @@ void GnomeMenu::addEntry(const char *name, const int plen, ObjectMenu *target,
 			}
 
                         if (icon && icon->valid())
-			    item->setIcon(icon);
+			    item->icon(icon);
 #else
-                        if (folderIcon) item->setIcon(folderIcon);
+                        if (folderIcon) item->icon(folderIcon);
 #endif
                     }
                 }
@@ -216,10 +216,8 @@ void GnomeMenu::addEntry(const char *name, const int plen, ObjectMenu *target,
                     YIcon::Image * icon(new YIcon::Image
 			(dentry->icon, YIcon::sizeSmall, YIcon::sizeSmall));
 
-		    if (icon && icon->valid())
-			item->setIcon(icon);
-		    else
-			delete icon;
+		    if (icon && icon->valid()) item->icon(icon);
+		    else delete icon;
                 }
 #endif
                 target->add(item);

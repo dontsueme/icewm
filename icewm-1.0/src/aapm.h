@@ -21,7 +21,7 @@ public:
 private:
     YTimer *apmTimer;
 
-    YPixmap *getPixmap(char ch);
+    YPixmap *pixmap(char ch);
     int calcWidth(const char *s, int count);
 
     static YColor *apmBg;

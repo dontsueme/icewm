@@ -54,7 +54,7 @@ public:
     bool removeWindowInfo(YFrameWindow *f);
     bool findWindowInfo(YFrameWindow *f);
 private:
-    int windowCount;
+    unsigned windowCount;
     SMWindowInfo **windows;
 };
 

@@ -27,51 +27,11 @@ static YColor *listBoxSelFg(NULL);
 
 int YListBox::fAutoScrollDelta(0);
 
-YListItem::YListItem() {
-    fPrevItem = fNextItem = 0;
-    fSelected = false;
-}
-
-YListItem::~YListItem() {
-}
-
-YListItem *YListItem::getNext() {
-    return fNextItem;
-}
-
-YListItem *YListItem::getPrev() {
-    return fPrevItem;
-}
-
-void YListItem::setNext(YListItem *next) {
-    fNextItem = next;
-}
-
-void YListItem::setPrev(YListItem *prev) {
-    fPrevItem = prev;
-}
-
-void YListItem::setSelected(bool aSelected) {
-    fSelected = aSelected;
-}
-
-const char *YListItem::getText() {
-    return 0;
-}
-
-YIcon *YListItem::getIcon() {
-    return 0;
-}
-
-int YListItem::getOffset() {
-    return 0;
-}
-
-YListBox::YListBox(YScrollView *view, YWindow *aParent, bool drawIcons): 
-    YWindow(aParent), fDrawIcons(drawIcons)
-    INIT_GRADIENT(fGradient, NULL) {
+YListBox::YListBox(YScrollView *view, YWindow *parent, bool drawIcons): 
+YWindow(parent), fView(view), fDrawIcons(drawIcons)
+INIT_GRADIENT(fGradient, NULL) {
     if (listBoxFont == 0)
-        listBoxFont = YFont::getFont(listBoxFontName);
+        listBoxFont = YFont::font(listBoxFontName);
     if (listBoxBg == 0)
         listBoxBg = new YColor(clrListBox);
     if (listBoxFg == 0)
@@ -80,19 +40,19 @@ YListBox::YListBox(YScrollView *view, YWindow *aParent, bool drawIcons):
         listBoxSelBg = new YColor(clrListBoxSelected);
     if (listBoxSelFg == 0)
         listBoxSelFg = new YColor(clrListBoxSelectedText);
-    setBitGravity(NorthWestGravity);
-    fView = view;
+
+    bitGravity(NorthWestGravity);
+
     if (fView) {
-        fVerticalScroll = view->getVerticalScrollBar();;
-        fHorizontalScroll = view->getHorizontalScrollBar();
-    } else {
-        fHorizontalScroll = 0;
-        fVerticalScroll = 0;
-    }
-    if (fVerticalScroll)
+        fVerticalScroll = &view->verticalScrollBar();;
         fVerticalScroll->scrollBarListener(this);
-    if (fHorizontalScroll)
+
+        fHorizontalScroll = &view->horizontalScrollBar();
         fHorizontalScroll->scrollBarListener(this);
+    } else {
+        fHorizontalScroll = NULL;
+        fVerticalScroll = NULL;
+    }
 
     fOffsetX = 0;
     fOffsetY = 0;
@@ -118,36 +78,34 @@ bool YListBox::isFocusTraversable() {
 }
 
 int YListBox::addAfter(YListItem *prev, YListItem *item) {
-    PRECONDITION(item->getPrev() == 0);
-    PRECONDITION(item->getNext() == 0);
+    PRECONDITION(item->prev() == 0);
+    PRECONDITION(item->next() == 0);
 
     freeItems();
 
-    item->setNext(prev->getNext());
-    if (item->getNext())
-        item->getNext()->setPrev(item);
+    item->next(prev->next());
+    if (item->next())
+        item->next()->prev(item);
     else
         fLast = item;
 
-    item->setPrev(prev);
-    prev->setNext(item);
+    item->prev(prev);
+    prev->next(item);
     fItemCount++;
     repaint();
     return 1;
 }
 
 int YListBox::addItem(YListItem *item) {
-    PRECONDITION(item->getPrev() == 0);
-    PRECONDITION(item->getNext() == 0);
+    PRECONDITION(item->prev() == 0);
+    PRECONDITION(item->next() == 0);
 
     freeItems();
 
-    item->setNext(0);
-    item->setPrev(fLast);
-    if (fLast)
-        fLast->setNext(item);
-    else
-        fFirst = item;
+    item->next(0);
+    item->prev(fLast);
+    if (fLast) fLast->next(item);
+    else fFirst = item;
     fLast = item;
     fItemCount++;
     repaint();
@@ -157,17 +115,15 @@ int YListBox::addItem(YListItem *item) {
 void YListBox::removeItem(YListItem *item) {
     freeItems();
 
-    if (item->getPrev())
-        item->getPrev()->setNext(item->getNext());
-    else
-        fFirst = item->getNext();
+    if (item->prev()) item->prev()->next(item->next());
+    else fFirst = item->next();
 
-    if (item->getNext())
-        item->getNext()->setPrev(item->getPrev());
-    else
-        fLast = item->getPrev();
-    item->setPrev(0);
-    item->setNext(0);
+    if (item->next()) item->next()->prev(item->prev());
+    else fLast = item->prev();
+
+    item->prev(NULL);
+    item->next(NULL);
+
     fItemCount--;
     repaint();
 }
@@ -183,13 +139,13 @@ void YListBox::updateItems() {
 
         if (fItems) {
             int n = 0;
-            for (YListItem *a(getFirst()); NULL != a; a = a->getNext()) {
+            for (YListItem *a(first()); NULL != a; a = a->next()) {
                 fItems[n++] = a;
 
-                int cw((fDrawIcons ? 3 + 20 : 3) + a->getOffset());
+                int cw((fDrawIcons ? 3 + 20 : 3) + a->offset());
 
                 if (listBoxFont) {
-                    const char *t(a->getText());
+                    const char *t(a->text());
                     if (t) cw += listBoxFont->textWidth(t) + 3;
                 }
 
@@ -205,14 +161,14 @@ int YListBox::maxWidth() {
 }
 
 int YListBox::findItemByPoint(int /*pX*/, int pY) {
-    int no = (pY + fOffsetY) / getLineHeight();
+    int no = (pY + fOffsetY) / lineHeight();
 
-    if (no >= 0 && no < getItemCount())
+    if (no >= 0 && no < itemCount())
         return no;
     return -1;
 }
 
-int YListBox::getItemCount() {
+int YListBox::itemCount() {
     return fItemCount;
 }
 
@@ -220,26 +176,26 @@ int YListBox::findItem(YListItem *item) {
     YListItem *a = fFirst;
     int n;
 
-    for (n = 0; a; a = a->getNext(), n++)
+    for (n = 0; a; a = a->next(), n++)
         if (item == a)
             return n;
     return -1;
  }
 
-YListItem *YListBox::getItem(int no) {
-    if (no < 0 || no >= getItemCount()) return NULL;
+YListItem *YListBox::item(int no) {
+    if (no < 0 || no >= itemCount()) return NULL;
     updateItems();
 
     if (fItems) {
         return fItems[no];
     } else {
-        int n(0); for (YListItem *a(getFirst()); a; a = a->getNext(), n++)
+        int n(0); for (YListItem *a(first()); a; a = a->next(), n++)
             if (n == no) return a;
     }
     return 0;
 }
 
-int YListBox::getLineHeight() {
+int YListBox::lineHeight() {
     return max(fDrawIcons ? (int) YIcon::sizeSmall : 0,
                             (int) listBoxFont->height()) + 2;
 }
@@ -247,7 +203,7 @@ int YListBox::getLineHeight() {
 void YListBox::ensureVisibility(int item) { //!!! horiz too
     if (item >= 0) {
         int oy = fOffsetY;
-        int lh = getLineHeight();
+        int lh = lineHeight();
         int fy = item * lh;
 
         if (fy + lh >= fOffsetY + (int)height())
@@ -266,7 +222,7 @@ void YListBox::focusVisible() {
     int by = ty + height();
 
     if (fFocusedItem >= 0) {
-        int lh = getLineHeight();
+        int lh = lineHeight();
 
         while (ty > fFocusedItem * lh)
             fFocusedItem++;
@@ -304,7 +260,7 @@ bool YListBox::handleKey(const XKeyEvent &key) {
         bool const clear(!(m & ControlMask));
         bool const extend(m & ShiftMask);
 
-        //int SelPos, OldPos = fFocusedItem, count = getItemCount();
+        //int SelPos, OldPos = fFocusedItem, count = itemCount();
 
         //if (m & ShiftMask) {
         //    SelPos = fFocusedItem;
@@ -315,7 +271,7 @@ bool YListBox::handleKey(const XKeyEvent &key) {
         switch (k) {
             case XK_Return:
             case XK_KP_Enter: {
-                YListItem *i(getItem(fFocusedItem));
+                YListItem *i(item(fFocusedItem));
                 if (i) activateItem(i);
                 break;
             }
@@ -325,12 +281,12 @@ bool YListBox::handleKey(const XKeyEvent &key) {
                 break;
 
             case XK_Home:
-                setFocusedItem(0, clear, extend, false);
+                focusedItem(0, clear, extend, false);
                 break;
 
             case XK_End:
-                if (getItemCount() > 0)
-                    setFocusedItem(getItemCount() - 1, clear, extend, false);
+                if (itemCount() > 0)
+                    focusedItem(itemCount() - 1, clear, extend, false);
                 break;
 
             case XK_Up: {
@@ -338,39 +294,39 @@ bool YListBox::handleKey(const XKeyEvent &key) {
 
 	        focusVisible();
                 if (fFocusedItem > 0)
-                    setFocusedItem(oldFocus == fFocusedItem ? fFocusedItem - 1
-							    : fFocusedItem,
-			           clear, extend, false);
+                    focusedItem(oldFocus == fFocusedItem ? fFocusedItem - 1
+							 : fFocusedItem,
+			        clear, extend, false);
                 break;
 	    }
             case XK_Down: {
 	        int const oldFocus(fFocusedItem);
 
 	        focusVisible();
-                if (fFocusedItem < getItemCount() - 1)
-                    setFocusedItem(oldFocus == fFocusedItem ? fFocusedItem + 1
-							    : fFocusedItem,
-                                   clear, extend, false);
+                if (fFocusedItem < itemCount() - 1)
+                    focusedItem(oldFocus == fFocusedItem ? fFocusedItem + 1
+							: fFocusedItem,
+                                clear, extend, false);
                 break;
 	    }
 #if 0
             case XK_Prior:
-                fVerticalScroll->setValue(fVerticalScroll->getValue() -
-                                          fVerticalScroll->getBlockIncrement());
+                fVerticalScroll->value(fVerticalScroll->value() -
+                                          fVerticalScroll->blockIncrement());
 
-                fOffsetY = fVerticalScroll->getValue();
-                fFocusedItem -= height() / getLineHeight();
+                fOffsetY = fVerticalScroll->value();
+                fFocusedItem -= height() / lineHeight();
                 if (fFocusedItem < 0) fFocusedItem = (count > 0 ? 0 : -1);
 
                 repaint();
                 break;
 
             case XK_Next:
-                fVerticalScroll->setValue(fVerticalScroll->getValue() +
-                                          fVerticalScroll->getBlockIncrement());
+                fVerticalScroll->value(fVerticalScroll->value() +
+                                       fVerticalScroll->blockIncrement());
 
-                fOffsetY = fVerticalScroll->getValue();
-                fFocusedItem += height() / getLineHeight();
+                fOffsetY = fVerticalScroll->value();
+                fFocusedItem += height() / lineHeight();
                 if (fFocusedItem > count - 1)
                     fFocusedItem = count - 1;
 
@@ -381,7 +337,7 @@ bool YListBox::handleKey(const XKeyEvent &key) {
             case '/':
             case '\\':
                 if (m & ControlMask) {
-                    for (int i = 0; i < getItemCount(); i++)
+                    for (int i = 0; i < itemCount(); i++)
                         selectItem(i, k != '\\');
                     break;
                 }
@@ -390,14 +346,14 @@ bool YListBox::handleKey(const XKeyEvent &key) {
             default:
                 if (k < 256) {
                     unsigned char const c(TOUPPER(k));
-                    int const count(getItemCount());
+                    int const count(itemCount());
                     int i(fFocusedItem);
 
                     for (int n = 0; n < count; n++) {
-                        YListItem *it(getItem((++i)%= count));
-                        char const *title(it->getText());
+                        YListItem *it(item((++i)%= count));
+                        char const *title(it->text());
                         if (title && c == TOUPPER(*title)) {
-                            setFocusedItem(i, clear, extend, false);
+                            focusedItem(i, clear, extend, false);
                             break;
                         }
                     }
@@ -428,7 +384,7 @@ bool YListBox::handleKey(const XKeyEvent &key) {
                 fDragging = true;
                 fSelect = true;
             }
-            setSelection();
+            selection();
             ensureVisibility(fFocusedItem);
             repaint();
         }
@@ -448,14 +404,14 @@ void YListBox::handleButton(const XButtonEvent &button) {
 
             if (no != -1) {
                 fSelect = (clear || !isItemSelected(no));
-                setFocusedItem(no, clear, extend, true);
+                focusedItem(no, clear, extend, true);
             } else {
                 fSelect = true;
-                setFocusedItem(no, clear, extend, true);
+                focusedItem(no, clear, extend, true);
             }
         } else if (button.type == ButtonRelease) {
             if (no != -1)
-                setFocusedItem(no, false, true, true);
+                focusedItem(no, false, true, true);
             fDragging = false;
             applySelection();
             autoScroll(0, 0);
@@ -470,7 +426,7 @@ void YListBox::handleClick(const XButtonEvent &up, int count) {
         int no = findItemByPoint(up.x, up.y);
 
         if (no != -1) {
-            YListItem *i = getItem(no);
+            YListItem *i = item(no);
             activateItem(i);
         }
     }
@@ -479,15 +435,15 @@ void YListBox::handleClick(const XButtonEvent &up, int count) {
 void YListBox::handleMotion(const XMotionEvent &motion) {
     if (motion.state & Button1Mask) {
         if (motion.y < 0)
-            autoScroll(-fVerticalScroll->getUnitIncrement(), &motion);
+            autoScroll(-fVerticalScroll->unitIncrement(), &motion);
         else if (motion.y >= int(height()))
-            autoScroll(fVerticalScroll->getUnitIncrement(), &motion);
+            autoScroll(fVerticalScroll->unitIncrement(), &motion);
         else {
             autoScroll(0, &motion);
             int no = findItemByPoint(motion.x, motion.y);
 
             if (no != -1)
-                setFocusedItem(no, false, true, true);
+                focusedItem(no, false, true, true);
         }
     }
     YWindow::handleMotion(motion);
@@ -497,8 +453,8 @@ void YListBox::handleDrag(const XButtonEvent &down, const XMotionEvent &motion) 
     if (down.button == 2) {
         int dx = motion.y - down.y;
 
-        fVerticalScroll->setValue(fVerticalScroll->getValue() - dx);
-        int fy = fVerticalScroll->getValue();
+        fVerticalScroll->value(fVerticalScroll->value() - dx);
+        int fy = fVerticalScroll->value();
         if (fy != fOffsetY) {
             fOffsetY = fy;
             repaint();
@@ -536,9 +492,9 @@ void YListBox::move(YScrollBar *scroll, int pos) {
 }
 
 void YListBox::paintItem(Graphics &g, int n) {
-    YListItem *a = getItem(n);
+    YListItem *a = item(n);
     int x = 3;
-    int lh = getLineHeight();
+    int lh = lineHeight();
     int fh = listBoxFont->height();
     int xpos = 0;
     int y = n * lh;
@@ -547,9 +503,9 @@ void YListBox::paintItem(Graphics &g, int n) {
     if (a == 0)
         return ;
 
-    xpos += a->getOffset();
+    xpos += a->offset();
 
-    bool s(a->getSelected());
+    bool s(a->selected());
 
     if (fDragging) {
         int const beg(fSelectStart < fSelectEnd ? fSelectStart : fSelectEnd);
@@ -560,7 +516,7 @@ void YListBox::paintItem(Graphics &g, int n) {
     }
 
     if (s) {
-        g.setColor(listBoxSelBg);
+        g.color(listBoxSelBg);
         g.fillRect(0, y - fOffsetY, width(), lh);
     } else {
 #ifdef CONFIG_GRADIENTS
@@ -572,36 +528,36 @@ void YListBox::paintItem(Graphics &g, int n) {
 	if (listbackPixmap)
 	    g.fillPixmap(listbackPixmap, 0, y - fOffsetY, width(), lh);
 	else {
-	    g.setColor(listBoxBg);
+	    g.color(listBoxBg);
 	    g.fillRect(0, y - fOffsetY, width(), lh);
 	}
     }
 
     if (fFocusedItem == n) {
-        g.setColor(YColor::black);
-        g.setPenStyle(true);
+        g.color(YColor::black);
+        g.penStyle(true);
 
-        int cw((fDrawIcons ? 3 + 20 : 3) + a->getOffset());
+        int cw((fDrawIcons ? 3 + 20 : 3) + a->offset());
 
         if (listBoxFont) {
-            const char *t(a->getText());
+            const char *t(a->text());
             if (t) cw += listBoxFont->textWidth(t) + 3;
         }
         g.drawRect(0 - fOffsetX, y - fOffsetY, cw - 1, lh - 1);
-        g.setPenStyle(false);
+        g.penStyle(false);
     }
 
     if (fDrawIcons) {
-        YIcon *icon = a->getIcon();
+        YIcon *icon = a->icon();
         if (icon && icon->small())
             g.drawImage(icon->small(), xpos + x - fOffsetX, y - fOffsetY + 1);
     }
 
-    const char *title(a->getText());
+    const char *title(a->text());
 
     if (title) {
-	g.setColor(s ? listBoxSelFg : listBoxFg);
-	g.setFont(listBoxFont);
+	g.color(s ? listBoxSelFg : listBoxFg);
+	g.font(listBoxFont);
 
         g.drawChars(title, 0, strlen(title),
                     xpos + x + (fDrawIcons ? 20 : 0) - fOffsetX,
@@ -610,7 +566,7 @@ void YListBox::paintItem(Graphics &g, int n) {
 }
 
 void YListBox::paint(Graphics &g, int /*x*/, int ry, unsigned int /*width*/, unsigned int rheight) {
-    int const lh(getLineHeight());
+    int const lh(lineHeight());
     int const min((fOffsetY + ry) / lh);
     int const max((fOffsetY + ry + rheight) / lh);
 
@@ -628,15 +584,15 @@ void YListBox::paint(Graphics &g, int /*x*/, int ry, unsigned int /*width*/, uns
 	if (listbackPixmap)
             g.fillPixmap(listbackPixmap, 0, y, width(), height() - y);
         else {
-	    g.setColor(listBoxBg);
+	    g.color(listBoxBg);
             g.fillRect(0, y, width(), height() - y);
 	}
     }
 }
 
 void YListBox::paintItem(int i) {
-    if (i >= 0 && i < getItemCount())
-        paintItem(getGraphics(), i);
+    if (i >= 0 && i < itemCount())
+        paintItem(graphics(), i);
 }
 
 void YListBox::activateItem(YListItem */*item*/) {
@@ -655,14 +611,14 @@ bool YListBox::hasSelection() {//!!!fix
 }
 
 void YListBox::resetScrollBars() {
-    int lh = getLineHeight();
-    int y =  getItemCount() * lh;
-    fVerticalScroll->setValues(fOffsetY, height(), 0, y);
-    fVerticalScroll->setBlockIncrement(height());
-    fVerticalScroll->setUnitIncrement(lh);
-    fHorizontalScroll->setValues(fOffsetX, width(), 0, maxWidth());
-    fHorizontalScroll->setBlockIncrement(width());
-    fHorizontalScroll->setUnitIncrement(8);
+    int lh = lineHeight();
+    int y =  itemCount() * lh;
+    fVerticalScroll->values(fOffsetY, height(), 0, y);
+    fVerticalScroll->blockIncrement(height());
+    fVerticalScroll->unitIncrement(lh);
+    fHorizontalScroll->values(fOffsetX, width(), 0, maxWidth());
+    fHorizontalScroll->blockIncrement(width());
+    fHorizontalScroll->unitIncrement(8);
     if (fView)
         fView->layout();
 }
@@ -678,7 +634,7 @@ bool YListBox::handleAutoScroll(const XMotionEvent & /*mouse*/) {
             no = findItemByPoint(0, height() - 1);
 
         if (no != -1)
-            setFocusedItem(no, false, true, true);
+            focusedItem(no, false, true, true);
     }
     return true;
 }
@@ -688,24 +644,23 @@ void YListBox::autoScroll(int delta, const XMotionEvent *motion) {
     beginAutoScroll(delta, motion);
 }
 
-bool YListBox::isItemSelected(int item) {
-    YListItem *i = getItem(item);
-    if (i)
-        return i->getSelected();
-    return false;
+bool YListBox::isItemSelected(int index) {
+    YListItem *i(item(index));
+    return i && i->selected();
 }
 
-void YListBox::selectItem(int item, bool select) {
-    YListItem *i = getItem(item);
-    if (i && i->getSelected() != select) {
-        i->setSelected(select);
-        //msg("%d=%d", item, select);
-        paintItem(getGraphics(), item);
+void YListBox::selectItem(int index, bool select) {
+    YListItem *i(item(index));
+
+    if (i && i->selected() != select) {
+        i->selected(select);
+        //msg("%d=%d", index, select);
+        paintItem(graphics(), index);
     }
 }
 
 void YListBox::clearSelection() {
-    for (int i = 0; i < getItemCount(); i++)
+    for (int i = 0; i < itemCount(); i++)
         selectItem(i, false);
     fSelectStart = fSelectEnd = -1;
 }
@@ -719,9 +674,8 @@ void YListBox::applySelection() {
         int end = (fSelectStart < fSelectEnd) ? fSelectEnd : fSelectStart;
 
         for (int n = beg; n <= end ; n++) {
-            YListItem *i = getItem(n);
-            if (i)
-                i->setSelected(fSelect);
+            YListItem *i = item(n);
+            if (i) i->selected(fSelect);
         }
     }
     fSelectStart = fSelectEnd = -1;
@@ -738,7 +692,7 @@ void YListBox::paintItems(int selStart, int selEnd) {
     int end = (selStart < selEnd) ? selEnd : selStart;
 
     for (int i = beg; i <= end; i++)
-        paintItem(getGraphics(), i);
+        paintItem(graphics(), i);
 }
 
 void YListBox::selectItems(int selStart, int selEnd, bool sel) {
@@ -752,7 +706,7 @@ void YListBox::selectItems(int selStart, int selEnd, bool sel) {
         selectItem(i, sel);
 }
 
-void YListBox::setFocusedItem(int item, bool clear, bool extend, bool virt) {
+void YListBox::focusedItem(int item, bool clear, bool extend, bool virt) {
     int oldItem = fFocusedItem;
 
     //msg("%d (%d-%d=%d): clear:%d extend:%d virt:%d",
@@ -799,28 +753,24 @@ void YListBox::setFocusedItem(int item, bool clear, bool extend, bool virt) {
         fFocusedItem = item;
 
         if (oldItem != -1)
-            paintItem(getGraphics(), oldItem);
+            paintItem(graphics(), oldItem);
         if (fFocusedItem != -1)
-            paintItem(getGraphics(), fFocusedItem);
+            paintItem(graphics(), fFocusedItem);
 
         ensureVisibility(fFocusedItem);
     }
 }
 
-bool YListBox::isSelected(int item) {
-    YListItem *a = getItem(item);
-
-    if (a == 0)
-        return false;
-    return isSelected(a);
+bool YListBox::isSelected(int index) {
+    YListItem *i(item(index));
+    return i && isSelected(i);
 }
 
 bool YListBox::isSelected(YListItem *item) { // !!! remove this !!!
-    bool s = item->getSelected();
+    bool s = item->selected();
     int n = findItem(item);
 
-    if (n == -1)
-        return false;
+    if (n == -1) return false;
 
     if (fDragging) {
         int beg = (fSelectStart < fSelectEnd) ? fSelectStart : fSelectEnd;
@@ -839,10 +789,10 @@ int YListBox::contentWidth() {
 }
 
 int YListBox::contentHeight() {
-    return getItemCount() * getLineHeight();
+    return itemCount() * lineHeight();
 }
 
-YWindow *YListBox::getWindow() {
+YWindow *YListBox::window() {
     return this;
 }
 
@@ -856,7 +806,7 @@ bool YSimpleListBox::handleKey(const XKeyEvent &key) {
                 break;
 
             case XK_End:
-                focusSelectItem(getItemCount() - 1);
+                focusSelectItem(itemCount() - 1);
                 break;
 
             case XK_Up: {
@@ -872,7 +822,7 @@ bool YSimpleListBox::handleKey(const XKeyEvent &key) {
 	        int const oldFocus(focusedItem());
 	        focusVisible();
 
-                if (focusedItem() < getItemCount() - 1)
+                if (focusedItem() < itemCount() - 1)
                     focusSelectItem(oldFocus == focusedItem() ?
                                     focusedItem() + 1 : focusedItem());
                 break;
@@ -881,19 +831,19 @@ bool YSimpleListBox::handleKey(const XKeyEvent &key) {
             default:
                 if (k < 256) {
                     unsigned char const c(TOUPPER(k));
-                    int const count(getItemCount());
+                    int const count(itemCount());
                     int i(focusedItem());
 
                     for (int n(0); n < count; n++) {
-                        YListItem *it(getItem((++i)%= count));
-                        char const *title(it->getText());
+                        YListItem *it(item((++i)%= count));
+                        char const *title(it->text());
                         if (title && c == TOUPPER(*title)) {
                             focusSelectItem(i);
                             break;
                         }
                     }
-                } else if (!getVerticalScrollBar()->handleScrollKeys(key) /* &&
-                           !getHorizontalScrollBar()->handleScrollKeys(key) */)
+                } else if (!verticalScrollBar()->handleScrollKeys(key) /* &&
+                           !horizontalScrollBar()->handleScrollKeys(key) */)
                     return YWindow::handleKey(key);
         }
 
@@ -916,11 +866,11 @@ void YListPopup::configure(const int x, const int y,
 			   const unsigned w, const unsigned h,
 			   const bool resized) {
     YPopupWindow::configure(x, y, w, h, resized);
-    if (resized) fScrollView->setGeometry(2, 2, w - 4, h - 4);
+    if (resized) fScrollView->geometry(2, 2, w - 4, h - 4);
 }
     
 void YListPopup::paint(Graphics &g, int, int, unsigned, unsigned) {
-    g.setColor(listBoxBg);
+    g.color(listBoxBg);
 
     if (wmLook == lookMetal) {
         g.drawBorderM(0, 0, width() - 1, height() - 1, true);
@@ -949,12 +899,12 @@ bool YListPopup::handleKey(const XKeyEvent &key) {
             return true;
     }
         
-    if (fScrollView->getVerticalScrollBar()->visible() &&
-        key.x >= fScrollView->getVerticalScrollBar()->x())
-        return fScrollView->getVerticalScrollBar()->handleKey(key);
-    else if (fScrollView->getHorizontalScrollBar()->visible() &&
-             key.y >= fScrollView->getHorizontalScrollBar()->y())
-        return fScrollView->getHorizontalScrollBar()->handleKey(key);
+    if (fScrollView->verticalScrollBar().visible() &&
+        key.x >= fScrollView->verticalScrollBar().x())
+        return fScrollView->verticalScrollBar().handleKey(key);
+    else if (fScrollView->horizontalScrollBar().visible() &&
+             key.y >= fScrollView->horizontalScrollBar().y())
+        return fScrollView->horizontalScrollBar().handleKey(key);
     else
         return fListBox->handleKey(key);
 }
@@ -965,12 +915,12 @@ void YListPopup::handleButton(const XButtonEvent &button) {
         button.y < 0 || button.y >= (int) height())) {
         fListBox->focusSelectItem(-1);
         popdown();
-    } else if (fScrollView->getVerticalScrollBar()->visible() &&
-               button.x >= fScrollView->getVerticalScrollBar()->x())
-        fScrollView->getVerticalScrollBar()->handleButton(button);
-    else if (fScrollView->getHorizontalScrollBar()->visible() &&
-             button.y >= fScrollView->getHorizontalScrollBar()->y())
-        fScrollView->getHorizontalScrollBar()->handleButton(button);
+    } else if (fScrollView->verticalScrollBar().visible() &&
+               button.x >= fScrollView->verticalScrollBar().x())
+        fScrollView->verticalScrollBar().handleButton(button);
+    else if (fScrollView->horizontalScrollBar().visible() &&
+             button.y >= fScrollView->horizontalScrollBar().y())
+        fScrollView->horizontalScrollBar().handleButton(button);
     else {
         fListBox->handleButton(button);
         if (button.type == ButtonRelease && 
@@ -980,18 +930,18 @@ void YListPopup::handleButton(const XButtonEvent &button) {
 }
 
 void YListPopup::handleMotion(const XMotionEvent &motion) {
-    if (fScrollView->getVerticalScrollBar()->visible() &&
-        motion.x >= fScrollView->getVerticalScrollBar()->x())
-        fScrollView->getVerticalScrollBar()->handleMotion(motion);
-    else if (fScrollView->getHorizontalScrollBar()->visible() &&
-             motion.y >= fScrollView->getHorizontalScrollBar()->y())
-        fScrollView->getHorizontalScrollBar()->handleMotion(motion);
+    if (fScrollView->verticalScrollBar().visible() &&
+        motion.x >= fScrollView->verticalScrollBar().x())
+        fScrollView->verticalScrollBar().handleMotion(motion);
+    else if (fScrollView->horizontalScrollBar().visible() &&
+             motion.y >= fScrollView->horizontalScrollBar().y())
+        fScrollView->horizontalScrollBar().handleMotion(motion);
     else
         fListBox->handleMotion(motion);
 }
 
 void YListPopup::clear() {
-    for (YListItem *item; NULL != (item = fListBox->getFirst()); )
+    for (YListItem *item; NULL != (item = fListBox->first()); )
         fListBox->removeItem(item);
 }
 

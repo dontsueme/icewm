@@ -19,9 +19,9 @@ public:
     YMsgBox(int buttons, YWindow *owner = 0);
     virtual ~YMsgBox();
 
-    void setTitle(const char *title);
-    void setText(const char *text);
-    void setPixmap(YPixmap *pixmap);
+    void title(const char *title);
+    void text(const char *text);
+    void pixmap(YPixmap *pixmap);
 
     void msgBoxListener(Listener *listener) { fListener = listener; }
     Listener *msgBoxListener() const { return fListener; }

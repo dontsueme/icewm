@@ -78,7 +78,7 @@ public:
     unsigned int modifiers() { return fMod; }
     void open() { if (fProg) fProg->open(); }
 
-    KProgram *getNext() { return fNext; }
+    KProgram *next() { return fNext; }
 private:
     KProgram *fNext;
     KeySym fKey;

@@ -19,7 +19,7 @@
 
 YColor * ObjectBar::bgColor(NULL);
 
-YFont * ObjectButton::font(NULL);
+YFont * ObjectButton::buttonFont(NULL);
 YColor * ObjectButton::bgColor(NULL);
 YColor * ObjectButton::fgColor(NULL);
 
@@ -32,33 +32,33 @@ class YPixbuf *toolbuttonPixbuf(NULL);
 ObjectBar::ObjectBar(YWindow *parent): YWindow(parent) {
     if (bgColor == 0)
         bgColor = new YColor(clrDefaultTaskBar);
-    setSize(1, 1);
+    size(1, 1);
 }
 
 ObjectBar::~ObjectBar() {
 }
 
 void ObjectBar::addButton(const char *name, YIcon *icon, YButton *button) {
-    button->setToolTip(name);
+    button->toolTip(name);
     if (icon && icon->small()) {
-        button->setImage(icon->small());
-        button->setSize(button->width() + 4, button->width() + 4);
+        button->image(icon->small());
+        button->size(button->width() + 4, button->width() + 4);
     } else
-        button->setText(name);
+        button->text(name);
 
-    button->setPosition(width(), 0);
+    button->position(width(), 0);
     unsigned int h = button->height();
 
     if (h < height())
         h = height();
 
-    setSize(width() + button->width() + 1, h);
+    size(width() + button->width() + 1, h);
     button->show();
 }
 
 void ObjectBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsigned int /*height*/) {
 #ifdef CONFIG_GRADIENTS
-    class YPixbuf * gradient(parent()->getGradient());
+    class YPixbuf * gradient(parent()->gradient());
 
     if (gradient)
 	g.copyPixbuf(*gradient, this->x(), this->y(), width(), height(), 0, 0);
@@ -67,18 +67,18 @@ void ObjectBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/,
     if (taskbackPixmap)
         g.fillPixmap(taskbackPixmap, 0, 0, width(), height());
     else {
-	g.setColor(bgColor);
+	g.color(bgColor);
         g.fillRect(0, 0, width(), height());
     }
 }
 
 void ObjectBar::addObject(DObject *object) {
     YButton *button = new ObjectButton(this, object);
-    addButton(object->getName(), object->getIcon(), button);
+    addButton(object->name(), object->icon(), button);
 }
 
 void ObjectBar::addSeparator() {
-    setSize(width() + 4, height());
+    size(width() + 4, height());
 }
 
 void ObjectBar::addContainer(char *name, YIcon *icon, ObjectContainer *container) {
@@ -88,19 +88,19 @@ void ObjectBar::addContainer(char *name, YIcon *icon, ObjectContainer *container
     }
 }
 
-YFont * ObjectButton::getFont() {
-    return font ? font : font =
-        (*toolButtonFontName ? YFont::getFont(toolButtonFontName)
-			     : YButton::getFont());
+YFont * ObjectButton::font() {
+    return buttonFont ? buttonFont : buttonFont =
+        (*toolButtonFontName ? YFont::font(toolButtonFontName)
+			     : YButton::font());
 }
 
-YColor * ObjectButton::getColor() {
+YColor * ObjectButton::color() {
     return *clrToolButtonText
 	? fgColor ? fgColor : fgColor = new YColor(clrToolButtonText)
-	: YButton::getColor();
+	: YButton::color();
 }
 
-YSurface ObjectButton::getSurface() {
+YSurface ObjectButton::surface() {
     if (bgColor == 0)
         bgColor = new YColor(*clrToolButton ? clrToolButton : clrNormalButton);
 

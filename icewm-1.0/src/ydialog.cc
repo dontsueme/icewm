@@ -25,8 +25,8 @@
 static YColor *dialogBg = 0;
 
 YDialog::YDialog(YWindow *owner):
-    YFrameClient(0, 0) INIT_GRADIENT(fGradient, NULL) {
-    if (dialogBg == 0)
+YFrameClient() INIT_GRADIENT(fGradient, NULL) {
+    if (dialogBg == NULL)
         dialogBg = new YColor(clrDialog);
 
     fOwner = owner;
@@ -39,7 +39,7 @@ YDialog::~YDialog() {
 }
 
 void YDialog::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsigned int /*height*/) {
-    g.setColor(dialogBg);
+    g.color(dialogBg);
     g.draw3DRect(0, 0, width() - 1, height() - 1, true);
 
 #ifdef CONFIG_GRADIENTS

@@ -75,48 +75,55 @@ void YFrameWindow::updateMenu() {
     YMenuItem *item;
 
     if ((item = windowMenu->findAction(actionRollup)))
-        item->setChecked(isRollup());
+        item->checked(isRollup());
     if ((item = windowMenu->findAction(actionOccupyAllOrCurrent)))
-        item->setChecked(isSticky());
-    if ((item = windowMenu->findAction(actionDoNotCover)))
-        item->setChecked(doNotCover());
+        item->checked(isSticky());
+    if ((item = windowMenu->findAction(actionDontCover)))
+        item->checked(dontCover());
     if ((item = windowMenu->findSubmenu(moveMenu)))
-        item->setEnabled(!isSticky());
+        item->enabled(!isSticky());
 
     for (int i(0); i < moveMenu->itemCount(); i++) {
         item = moveMenu->item(i);
         for (int w(0); w < workspaceCount; w++)
             if (item && item->action() == workspaceActionMoveTo[w])
-                item->setEnabled(w != getWorkspace());
+                item->enabled(w != workspace());
     }
 
     for (int j(0); j < layerMenu->itemCount(); j++) {
         item = layerMenu->item(j);
         for (int layer(0); layer < WinLayerCount; layer++)
             if (item && item->action() == layerActionSet[layer]) {
-                bool const e(layer == getLayer());
-                item->setEnabled(!e);
-                item->setChecked(e);
+                bool const e(layer == this->layer());
+                item->enabled(!e);
+                item->checked(e);
             }
     }
 
 #ifdef CONFIG_TRAY
-    if (trayMenu) for (int k(0); k < trayMenu->itemCount(); k++) {
-        item = trayMenu->item(k);
-        for (int opt(0); opt < IcewmTrayOptionCount; opt++)
-            if (item && item->action() == trayOptionActionSet[opt]) {
-                bool const e(opt == getTrayOption());
-                item->setEnabled(!e);
-                item->setChecked(e);
-            }
+    if (trayMenu)  {
+        bool const withTrayMenu(true);
+warn("figure out if we have a tray window");
+
+        if ((item = windowMenu->findSubmenu(trayMenu)))
+            item->enabled(withTrayMenu);
+
+        if (withTrayMenu) for (int k(0); k < trayMenu->itemCount(); k++) {
+            item = trayMenu->item(k);
+            for (int opt(0); opt < IcewmTrayOptionCount; opt++)
+                if (item && item->action() == trayOptionActionSet[opt]) {
+                    bool const e(opt == trayOption());
+                    item->enabled(!e);
+                    item->checked(e);
+                }
+        }
     }
 #endif    
 }
 
 #ifdef CONFIG_SHAPE
 void YFrameWindow::setShape() {
-    if (!shapesSupported)
-        return ;
+    if (!shapesSupported) return;
 
     if (client()->shaped()) {
         MSG(("setting shape w=%d, h=%d", width(), height()));
@@ -134,7 +141,8 @@ void YFrameWindow::setShape() {
             XRectangle rect[6];
             int nrect = 0;
 
-            if ((frameDecors() & (fdResize | fdBorder)) == fdResize + fdBorder) {
+            if ((frameDecorations() & (fdResize | fdBorder)) == 
+                                       fdResize | fdBorder) {
                 rect[0].x = 0;
                 rect[0].y = 0;
                 rect[0].width = width();
@@ -188,18 +196,18 @@ void YFrameWindow::setShape() {
 
 void YFrameWindow::layoutShape() {
 #ifdef CONFIG_SHAPED_DECORATION
-    if (shapesSupported && (frameDecors() & fdBorder))
+    if (shapesSupported && (frameDecorations() & fdBorder))
 	if(isIconic())
 	    XShapeCombineMask(app->display(), handle(),
 		              ShapeBounding, 0, 0, None, ShapeSet);
 	else {
 	    int const a(focused() ? 1 : 0);
-	    int const t((frameDecors() & fdResize) ? 0 : 1);
+	    int const t((frameDecorations() & fdResize) ? 0 : 1);
 
 	    Pixmap shape(YPixmap::createMask(width(), height()));
 	    Graphics g(shape);
 
-	    g.setColor(YColor::white);
+	    g.color(YColor::white);
 	    g.fillRect(0, 0, width(), height());
 
 	    const int xTL(frameTL[t][a] ? frameTL[t][a]->width() : 0),
@@ -314,7 +322,7 @@ void YFrameWindow::configure(const int x, const int y,
         setShape();
 #endif
 
-    if (doNotCover())
+    if (dontCover())
 	manager->updateWorkArea();
 }
 
@@ -325,55 +333,50 @@ void YFrameWindow::layoutTitleBar() {
         titlebar()->show();
 
         int title_width = width() - 2 * borderX();
-        titlebar()->setGeometry(borderX(),
-                                borderY()
+        titlebar()->geometry(borderX(),
+                             borderY()
 #ifdef TITLEBAR_BOTTOM
-                                + height() - titleY() - 2 * borderY()
+                           + height() - titleY() - 2 * borderY()
 #endif
-                                ,
-                                (title_width > 0) ? title_width : 1,
-                                titleY());
+                           , (title_width > 0) ? title_width : 1, titleY());
     }
 }
 
-YFrameButton *YFrameWindow::getButton(char c) {
-    unsigned long decors = frameDecors();
+YFrameButton *YFrameWindow::button(char c) {
+    unsigned long const decorations(frameDecorations());
+
     switch (c) {
-    case 's': if (decors & fdSysMenu) return fMenuButton; break;
-    case 'x': if (decors & fdClose) return fCloseButton; break;
-    case 'm': if (decors & fdMaximize) return fMaximizeButton; break;
-    case 'i': if (decors & fdMinimize) return fMinimizeButton; break;
-    case 'h': if (decors & fdHide) return fHideButton; break;
-    case 'r': if (decors & fdRollup) return fRollupButton; break;
-    case 'd': if (decors & fdDepth) return fDepthButton; break;
-    default:
-        return 0;
+        case 's': return (decorations & fdSysMenu)  ? fMenuButton     : NULL;
+        case 'x': return (decorations & fdClose)    ? fCloseButton    : NULL;
+        case 'm': return (decorations & fdMaximize) ? fMaximizeButton : NULL;
+        case 'i': return (decorations & fdMinimize) ? fMinimizeButton : NULL;
+        case 'h': return (decorations & fdHide)     ? fHideButton     : NULL;
+        case 'r': return (decorations & fdRollup)   ? fRollupButton   : NULL;
+        case 'd': return (decorations & fdDepth)    ? fDepthButton    : NULL;
+        default:  return NULL;
     }
-    return 0;
 }
 
 void YFrameWindow::positionButton(YFrameButton *b, int &xPos, bool onRight) {
     /// !!! clean this up
     if (b == fMenuButton) {
-	const unsigned bw((wmLook == lookPixmap || wmLook == lookMetal || 
-			   wmLook == lookGtk) && NULL == b->getImage(0) ?
-			   titleY() : b->getImage(0)->width());
+	const unsigned bw(NULL == b->image(0) ? titleY() : b->image(0)->width());
         if (onRight) xPos -= bw;
-        b->setGeometry(xPos, 0, bw, titleY());
+        b->geometry(xPos, 0, bw, titleY());
         if (!onRight) xPos += bw;
     } else if (wmLook == lookPixmap || wmLook == lookMetal || wmLook == lookGtk) {
-	const unsigned bw(b->getImage(0) ? b->getImage(0)->width() : titleY());
+	const unsigned bw(b->image(0) ? b->image(0)->width() : titleY());
 
         if (onRight) xPos -= bw;
-        b->setGeometry(xPos, 0, bw, titleY());
+        b->geometry(xPos, 0, bw, titleY());
         if (!onRight) xPos += bw;
     } else if (wmLook == lookWin95) {
         if (onRight) xPos -= titleY();
-        b->setGeometry(xPos, 2, titleY(), titleY() - 3);
+        b->geometry(xPos, 2, titleY(), titleY() - 3);
         if (!onRight) xPos += titleY();
     } else {
         if (onRight) xPos -= titleY();
-        b->setGeometry(xPos, 0, titleY(), titleY());
+        b->geometry(xPos, 0, titleY(), titleY());
         if (!onRight) xPos += titleY();
     }
 }
@@ -382,46 +385,46 @@ void YFrameWindow::layoutButtons() {
     if (titleY() == 0)
         return ;
 
-    unsigned long decors = frameDecors();
+    unsigned long decorations = frameDecorations();
 
     if (fMinimizeButton)
-        if (decors & fdMinimize)
+        if (decorations & fdMinimize)
             fMinimizeButton->show();
         else
             fMinimizeButton->hide();
 
     if (fMaximizeButton)
-        if (decors & fdMaximize)
+        if (decorations & fdMaximize)
             fMaximizeButton->show();
         else
             fMaximizeButton->hide();
 
     if (fRollupButton)
-        if (decors & fdRollup)
+        if (decorations & fdRollup)
             fRollupButton->show();
         else
             fRollupButton->hide();
 
     if (fHideButton)
-        if (decors & fdHide)
+        if (decorations & fdHide)
             fHideButton->show();
         else
             fHideButton->hide();
 
     if (fCloseButton)
-        if ((decors & fdClose))
+        if ((decorations & fdClose))
             fCloseButton->show();
         else
             fCloseButton->hide();
 
     if (fMenuButton)
-        if (decors & fdSysMenu)
+        if (decorations & fdSysMenu)
             fMenuButton->show();
         else
             fMenuButton->hide();
 
     if (fDepthButton)
-        if (decors & fdDepth)
+        if (decorations & fdDepth)
             fDepthButton->show();
         else
             fDepthButton->hide();
@@ -446,7 +449,7 @@ void YFrameWindow::layoutButtons() {
                 b = 0;
                 break;
             default:
-                b = getButton(*bc);
+                b = button(*bc);
                 break;
             }
 
@@ -472,7 +475,7 @@ void YFrameWindow::layoutButtons() {
                 b = 0;
                 break;
             default:
-                b = getButton(*bc);
+                b = button(*bc);
                 break;
             }
 
@@ -483,7 +486,7 @@ void YFrameWindow::layoutButtons() {
 }
 
 void YFrameWindow::layoutResizeIndicators() {
-    if (((frameDecors() & (fdResize | fdBorder)) == (fdResize | fdBorder)) &&
+    if (((frameDecorations() & (fdResize | fdBorder)) == (fdResize | fdBorder)) &&
         !isRollup() && !isMinimized()) {
         if (!indicatorsVisible) {
             indicatorsVisible = 1;
@@ -534,55 +537,37 @@ void YFrameWindow::layoutClient() {
         int w = this->width() - 2 * borderX();
         int h = this->height() - 2 * borderY() - titleY();
 
-        fClientContainer->setGeometry(borderX(), borderY()
+        fClientContainer->geometry(borderX(), borderY()
 #ifndef TITLEBAR_BOTTOM
-                                      + titleY()
+                                 + titleY()
 #endif
-                                  , w, h);
-        fClient->setGeometry(0, 0, w, h);
+                                 , w, h);
+        fClient->geometry(0, 0, w, h);
     }
 }
 
 bool YFrameWindow::canClose() {
-    if (frameFunctions() & ffClose)
-        return true;
-    else
-        return false;
+    return frameFunctions() & ffClose;
 }
 
 bool YFrameWindow::canMaximize() {
-    if (frameFunctions() & ffMaximize)
-        return true;
-    else
-        return false;
+    return frameFunctions() & ffMaximize;
 }
 
 bool YFrameWindow::canMinimize() {
-    if (frameFunctions() & ffMinimize)
-        return true;
-    else
-        return false;
+    return frameFunctions() & ffMinimize;
 }
 
 bool YFrameWindow::canRollup() {
-    if ((frameFunctions() & ffRollup) && titleY() > 0)
-        return true;
-    else
-        return false;
+    return (frameFunctions() & ffRollup) && titleY() > 0;
 }
 
 bool YFrameWindow::canHide() {
-    if (frameFunctions() & ffHide)
-        return true;
-    else
-        return false;
+    return frameFunctions() & ffHide;
 }
 
 bool YFrameWindow::canLower() {
-    if (this != manager->bottom(getLayer()))
-        return true;
-    else
-        return false;
+    return this != manager->bottom(layer());
 }
 
 bool YFrameWindow::canRaise() {

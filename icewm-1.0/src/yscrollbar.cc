@@ -80,14 +80,14 @@ YScrollBar::~YScrollBar() {
         fScrollTimer->timerListener(NULL);
 }
 
-void YScrollBar::setOrientation(Orientation anOrientation) {
+void YScrollBar::orientation(Orientation anOrientation) {
     if (anOrientation != fOrientation) {
         fOrientation = anOrientation;
         repaint();
     }
 }
 
-void YScrollBar::setMaximum(int aMaximum) {
+void YScrollBar::maximum(int aMaximum) {
     if (aMaximum < fMinimum)
         aMaximum = fMinimum;
 
@@ -97,7 +97,7 @@ void YScrollBar::setMaximum(int aMaximum) {
     }
 }
 
-void YScrollBar::setMinimum(int aMinimum) {
+void YScrollBar::minimum(int aMinimum) {
     if (aMinimum > fMaximum)
         aMinimum = fMaximum;
 
@@ -107,7 +107,7 @@ void YScrollBar::setMinimum(int aMinimum) {
     }
 }
 
-void YScrollBar::setVisibleAmount(int aVisibleAmount) {
+void YScrollBar::visibleAmount(int aVisibleAmount) {
     if (fVisibleAmount > fMaximum - fMinimum)
         fVisibleAmount = fMaximum - fMinimum;
     if (fVisibleAmount < 0)
@@ -119,15 +119,15 @@ void YScrollBar::setVisibleAmount(int aVisibleAmount) {
     }
 }
 
-void YScrollBar::setUnitIncrement(int anUnitIncrement) {
+void YScrollBar::unitIncrement(int anUnitIncrement) {
     fUnitIncrement = anUnitIncrement;
 }
 
-void YScrollBar::setBlockIncrement(int aBlockIncrement) {
+void YScrollBar::blockIncrement(int aBlockIncrement) {
     fBlockIncrement = aBlockIncrement;
 }
 
-void YScrollBar::setValue(int aValue) {
+void YScrollBar::value(int aValue) {
     if (aValue > fMaximum - fVisibleAmount)
         aValue = fMaximum - fVisibleAmount;
     if (aValue < fMinimum)
@@ -139,7 +139,7 @@ void YScrollBar::setValue(int aValue) {
     }
 }
 
-void YScrollBar::setValues(int aValue, int aVisibleAmount, int aMin, int aMax) {
+void YScrollBar::values(int aValue, int aVisibleAmount, int aMin, int aMax) {
     int v = aValue;
 
     if (aMax < aMin)
@@ -168,7 +168,7 @@ void YScrollBar::setValues(int aValue, int aVisibleAmount, int aMin, int aMax) {
     }
 }
 
-void YScrollBar::getCoord(int &beg, int &end, int &min, int &max, int &nn) {
+void YScrollBar::coord(int &beg, int &end, int &min, int &max, int &nn) {
     int dd = (fMaximum - fMinimum);
 
     if (fOrientation == Vertical) {
@@ -209,20 +209,20 @@ void YScrollBar::getCoord(int &beg, int &end, int &min, int &max, int &nn) {
 void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/, unsigned int /*height*/) {
     int beg, end, min, max, nn;
 
-    getCoord(beg, end, min, max, nn);
+    coord(beg, end, min, max, nn);
 
     /// !!! optimize this
     if (fOrientation == Vertical) { // ============================ vertical ===
 	const int y(beg + min), h(max - min);
 	
-	g.setColor(scrollBarBg); // -------------------- background, buttons ---
+	g.color(scrollBarBg); // ----------------------- background, buttons ---
 
 	switch(wmLook) {
 	    case lookWin95:
 		g.fillRect(0, beg, width(), min);
 		g.fillRect(0, y + h + 2, width(), ::max(0, end - h - y - 1));
 		
-		g.setColor(scrollBarButton);
+		g.color(scrollBarButton);
 		g.drawBorderW(0, 0, width() - 1, beg - 1, fScrollTo != goUp);
 		g.fillRect(1, 1, width() - 3, beg - 3);
 
@@ -234,7 +234,7 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		g.fillRect(0, beg, width(), min);
 		g.fillRect(0, y + h + 2, width(), ::max(0, end - h - y - 1));
 		
-		g.setColor(scrollBarButton);
+		g.color(scrollBarButton);
 		g.draw3DRect(0, 0, width() - 1, beg - 1, fScrollTo != goUp);
 		g.fillRect(1, 1, width() - 2, beg - 2);
 
@@ -249,7 +249,7 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		g.fillRect(1, beg, width() - 2, min);
 		g.fillRect(1, y + h + 1, width() - 2, ::max(0, end - h - y));
 		
-		g.setColor(scrollBarButton);
+		g.color(scrollBarButton);
 		g.drawBorderW(1, 1, width() - 3, beg - 2, fScrollTo != goUp);
 		g.fillRect(2, 2, width() - 5, beg - 4);
 
@@ -275,7 +275,7 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		g.fillRect(0, beg, width(), min);
 		g.fillRect(0, y + h + 2, width(), end - h - y - 1);
 
-		g.setColor(scrollBarButton);
+		g.color(scrollBarButton);
 		g.drawBorderM(0, 0, width() - 1, beg - 1, fScrollTo != goUp);
 		g.fillRect(2, 2, width() - 4, beg - 4);
 		g.drawBorderM(0, end + 1, width() - 1, beg - 1, fScrollTo != goDown);
@@ -286,8 +286,8 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		break;
 	}
                                         // --------------------- upper arrow ---
-        g.setColor(fValue > fMinimum ? scrollBarActiveArrow
-                                     : scrollBarInactiveArrow);
+        g.color(fValue > fMinimum ? scrollBarActiveArrow
+                                  : scrollBarInactiveArrow);
 	switch(wmLook) {
 	    case lookWin95:
 	    case lookWarp3:
@@ -316,8 +316,8 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		break;
 	}
                                         // --------------------- lower arrow ---
-        g.setColor(fValue < fMaximum - fVisibleAmount ? scrollBarActiveArrow
-                                                      : scrollBarInactiveArrow);
+        g.color(fValue < fMaximum - fVisibleAmount ? scrollBarActiveArrow
+                                                   : scrollBarInactiveArrow);
 	switch(wmLook) {
 	    case lookWin95:
 	    case lookWarp3:
@@ -346,7 +346,7 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		break;
 	}
 
-	g.setColor(scrollBarSlider); // ----------------------------- slider ---
+	g.color(scrollBarSlider); // -------------------------------- slider ---
 
 	switch(wmLook) {
 	    case lookWin95:
@@ -365,10 +365,10 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		g.drawBorderW(1, y, width() - 3, h, true);
 		g.fillRect(2, y + 1, width() - 5, h - 2);
 		
-		g.setColor(scrollBarSlider->darker());
+		g.color(scrollBarSlider->darker());
 		for(int hy(y + h / 2 - 6); hy < (y + h / 2 + 5); hy+= 2)
 		    g.drawLine(4, hy, width() - 6, hy);
-		g.setColor(scrollBarSlider->brighter());
+		g.color(scrollBarSlider->brighter());
 		for(int hy(y + h / 2 - 5); hy < (y + h / 2 + 6); hy+= 2)
 		    g.drawLine(4, hy, width() - 6, hy);
 		break;
@@ -394,14 +394,14 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
     } else { // ================================================= horizontal ===
 	const int x(beg + min), w(max - min);
 
-	g.setColor(scrollBarBg); // -------------------- background, buttons ---
+	g.color(scrollBarBg); // ----------------------- background, buttons ---
 
 	switch(wmLook) {
 	    case lookWin95:
 		g.fillRect(beg, 0, min, height());
 		g.fillRect(x + w + 2, 0, ::max(0, end - w - x - 1), height());
 		
-		g.setColor(scrollBarButton);
+		g.color(scrollBarButton);
 		g.drawBorderW(0, 0, beg - 1, height() - 1, fScrollTo != goUp);
 		g.fillRect(1, 1, beg - 3, height() - 3);
 
@@ -413,7 +413,7 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		g.fillRect(beg, 0, min, height());
 		g.fillRect(x + w + 2, 0, ::max(0, end - w - x - 1), height());
 		
-		g.setColor(scrollBarButton);
+		g.color(scrollBarButton);
 		g.draw3DRect(0, 0, beg - 1, height() - 1, fScrollTo != goUp);
 		g.fillRect(1, 1, beg - 2, height() - 2);
 
@@ -428,7 +428,7 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		g.fillRect(beg, 1, min, height() - 2);
 		g.fillRect(x + w + 2, 1, ::max(0, end - w - x), height() - 2);
 		
-		g.setColor(scrollBarButton);
+		g.color(scrollBarButton);
 		g.drawBorderW(1, 1, beg - 2, height() - 3, fScrollTo != goUp);
 		g.fillRect(2, 2, beg - 4, height() - 5);
 
@@ -454,7 +454,7 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		g.fillRect(beg, 0, min, height());
 		g.fillRect(x + w + 2, 0, end - w - x - 1, height());
 
-		g.setColor(scrollBarButton);
+		g.color(scrollBarButton);
 		g.drawBorderM(0, 0, beg - 1, height() - 1, fScrollTo != goUp);
 		g.fillRect(2, 2, beg - 4, height() - 4);
 		g.drawBorderM(end + 1, 0, beg - 1, height() - 1, fScrollTo != goDown);
@@ -465,8 +465,8 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		break;
 	}
                                         // ---------------------- left arrow ---
-        g.setColor(fValue > fMinimum ? scrollBarActiveArrow
-                                     : scrollBarInactiveArrow);
+        g.color(fValue > fMinimum ? scrollBarActiveArrow
+                                  : scrollBarInactiveArrow);
 	switch(wmLook) {
 	    case lookWin95:
 	    case lookWarp3:
@@ -495,8 +495,8 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		break;
 	}
                                         // --------------------- right arrow ---
-        g.setColor(fValue < fMaximum - fVisibleAmount ? scrollBarActiveArrow
-                                                      : scrollBarInactiveArrow);
+        g.color(fValue < fMaximum - fVisibleAmount ? scrollBarActiveArrow
+                                                   : scrollBarInactiveArrow);
 	switch(wmLook) {
 	    case lookWin95:
 	    case lookWarp3:
@@ -526,7 +526,7 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		break;
 	}
 
-	g.setColor(scrollBarSlider); // ----------------------------- slider ---
+	g.color(scrollBarSlider); // -------------------------------- slider ---
 	
 	switch(wmLook) {
 	    case lookWin95:
@@ -545,10 +545,10 @@ void YScrollBar::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*width*/
 		g.drawBorderW(x, 1, w + 1, height() - 3, true);
 		g.fillRect(x + 1, 2, w - 1, height() - 5);
 		
-		g.setColor(scrollBarSlider->darker());
+		g.color(scrollBarSlider->darker());
 		for(int hx(x + w / 2 - 6); hx < (x + w / 2 + 5); hx+= 2)
 		    g.drawLine(hx, 4, hx, height() - 6);
-		g.setColor(scrollBarSlider->brighter());
+		g.color(scrollBarSlider->brighter());
 		for(int hx(x + w / 2 - 5); hx < (x + w / 2 + 6); hx+= 2)
 		    g.drawLine(hx, 4, hx, height() - 6);
 		
@@ -620,7 +620,7 @@ void YScrollBar::handleButton(const XButtonEvent &button) {
         return ;
 
     if (button.type == ButtonPress) {
-        fScrollTo = getOp(button.x, button.y);
+        fScrollTo = op(button.x, button.y);
         doScroll();
         if (fScrollTimer == 0)
             fScrollTimer = new YTimer(scrollBarStartDelay);
@@ -747,11 +747,11 @@ bool YScrollBar::handleTimer(YTimer *timer) {
     return true;
 }
 
-YScrollBar::ScrollOp YScrollBar::getOp(int x, int y) {
+YScrollBar::ScrollOp YScrollBar::op(int x, int y) {
     int beg, end, min, max, nn;
     ScrollOp fScrollTo;
 
-    getCoord(beg, end, min, max, nn);
+    coord(beg, end, min, max, nn);
 
     fScrollTo = goNone;
     if (fOrientation == Vertical) {
@@ -813,7 +813,7 @@ void YScrollBar::handleDNDLeave() {
 }
 
 void YScrollBar::handleDNDPosition(int x, int y) {
-    fScrollTo = getOp(x, y);
+    fScrollTo = op(x, y);
     if (fScrollTimer == 0)
         fScrollTimer = new YTimer(scrollBarStartDelay);
     if (fScrollTimer) {

@@ -39,7 +39,7 @@ public:
     unsigned popupFlags() const { return fFlags; }
 
     YPopupWindow *prevPopup() const { return fPrevPopup; }
-    void setPrevPopup(YPopupWindow *prevPopup) { fPrevPopup = prevPopup; }
+    void prevPopup(YPopupWindow *prevPopup) { fPrevPopup = prevPopup; }
 
     enum {
         pfButtonDown        = 1 << 0,

@@ -164,10 +164,10 @@ YPixmap::YPixmap(Pixmap pixmap, Pixmap mask, int w, int h,
 	fMask = createMask(fWidth, fHeight);
 	Graphics g(fMask);
 
-        g.setColor(YColor::white);
+        g.color(YColor::white);
 	g.fillRect(0, 0, fWidth, fHeight);
 
-        g.setColor(YColor::black);
+        g.color(YColor::black);
 //
 // nested rendering loop inspired by gdk-pixbuf
 //

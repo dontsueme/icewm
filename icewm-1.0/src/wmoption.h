@@ -26,8 +26,8 @@ public:
     WindowOptions();
     ~WindowOptions();
 
-    WindowOption *getWindowOption(const char *name, bool create, bool remove = false);
-    void setWinOption(const char *class_instance, const char *opt, const char *arg);
+    WindowOption *windowOption(const char *name, bool create, bool remove = false);
+    void winOption(const char *class_instance, const char *opt, const char *arg);
 
     static void combineOptions(WindowOption &cm, WindowOption &n);
 private:

@@ -27,7 +27,7 @@ public:
     virtual void handleClick(const XButtonEvent &up, int count);
     virtual void handleBeginDrag(const XButtonEvent &down, const XMotionEvent &motion);
 
-    YFrameWindow *getFrame() const { return fFrame; };
+    YFrameWindow *frame() const { return fFrame; };
 private:
     YFrameWindow *fFrame;
     int buttonDownX, buttonDownY;

@@ -505,14 +505,14 @@ public:
 
     void find_link(node *n);
 
-    void setData(node *root) {
+    void data(node *root) {
         fRoot = root;
         tx = ty = 0;
         layout();
 
-        prevItem->setEnabled(false);
-        nextItem->setEnabled(false);
-        contentsItem->setEnabled(false);
+        prevItem->enabled(false);
+        nextItem->enabled(false);
+        contentsItem->enabled(false);
 
         find_link(fRoot);
     }
@@ -526,26 +526,26 @@ public:
     node *find_node(node *n, int x, int y, node *&anchor, node::node_type type);
 
     virtual void paint(Graphics &g, int wx, int wy, unsigned int wwidth, unsigned int wheight) {
-        g.setColor(bg);
+        g.color(bg);
         g.fillRect(wx, wy, wwidth, wheight);
-        g.setColor(normalFg);
-        g.setFont(font);
+        g.color(normalFg);
+        g.font(font);
 
         draw(g, fRoot);
     }
 
     void resetScroll() {
-        fVerticalScroll->setValues(ty, height(), 0, contentHeight());
-        fVerticalScroll->setBlockIncrement(height());
-        fVerticalScroll->setUnitIncrement(font->height());
-        fHorizontalScroll->setValues(tx, width(), 0, contentWidth());
-        fHorizontalScroll->setBlockIncrement(width());
-        fHorizontalScroll->setUnitIncrement(20);
+        fVerticalScroll->values(ty, height(), 0, contentHeight());
+        fVerticalScroll->blockIncrement(height());
+        fVerticalScroll->unitIncrement(font->height());
+        fHorizontalScroll->values(tx, width(), 0, contentWidth());
+        fHorizontalScroll->blockIncrement(width());
+        fHorizontalScroll->unitIncrement(20);
         if (view)
             view->layout();
     }
 
-    void setPos(int x, int y) {
+    void pos(int x, int y) {
         if (x != tx || y != ty) {
             int dx = x - tx;
             int dy = y - ty;
@@ -558,16 +558,12 @@ public:
     }
 
     virtual void scroll(YScrollBar *sb, int delta) {
-        if (sb == fHorizontalScroll)
-            setPos(tx + delta, ty);
-        else if (sb == fVerticalScroll)
-            setPos(tx, ty + delta);
+        if (sb == fHorizontalScroll) pos(tx + delta, ty);
+        else if (sb == fVerticalScroll) pos(tx, ty + delta);
     }
     virtual void move(YScrollBar *sb, int pos) {
-        if (sb == fHorizontalScroll)
-            setPos(pos, ty);
-        else if (sb == fVerticalScroll)
-            setPos(tx, pos);
+        if (sb == fHorizontalScroll) this->pos(pos, ty);
+        else if (sb == fVerticalScroll) this->pos(tx, pos);
     }
 
     int contentWidth() {
@@ -576,7 +572,7 @@ public:
     int contentHeight() {
         return conHeight;
     }
-    YWindow *getWindow() { return this; }
+    YWindow *window() { return this; }
 
     virtual void handleClick(const XButtonEvent &up, int /*count*/);
 
@@ -630,25 +626,25 @@ private:
 HTextView::HTextView(HTListener *fL, YScrollView *v, YWindow *parent):
     YWindow(parent), fRoot(NULL), view(v), listener(fL) {
     view = v;
-    fVerticalScroll = view->getVerticalScrollBar();
+    fVerticalScroll = &view->verticalScrollBar();
     fVerticalScroll->scrollBarListener(this);
-    fHorizontalScroll = view->getHorizontalScrollBar();
+    fHorizontalScroll = &view->horizontalScrollBar();
     fHorizontalScroll->scrollBarListener(this);
-    //setBitGravity(NorthWestGravity);
+    //bitGravity(NorthWestGravity);
     tx = ty = 0;
     conWidth = conHeight = 0;
 
     prevURL = nextURL = contentsURL = 0;
 
-    //font = YFont::getFont("9x15");
-    //font = YFont::getFont("-adobe-helvetica-medium-r-normal--10-100-75-75-p-56-iso8859-1");
-    //font = YFont::getFont("-adobe-helvetica-medium-r-normal--*-140-*-*-*-*-iso8859-1");
+    //font = YFont::font("9x15");
+    //font = YFont::font("-adobe-helvetica-medium-r-normal--10-100-75-75-p-56-iso8859-1");
+    //font = YFont::font("-adobe-helvetica-medium-r-normal--*-140-*-*-*-*-iso8859-1");
     //-adobe-helvetica-bold-o-normal--11-80-100-100-p-60-iso8859-1
-    //font = YFont::getFont("-adobe-helvetica-medium-r-normal--8-80-75-75-p-46-iso8859-1");
-    //font = YFont::getFont("-adobe-helvetica-medium-r-normal--24-240-75-75-p-130-iso8859-1");
-    font = YFont::getFont("-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1");
-    //font = YFont::getFont("-adobe-helvetica-medium-r-normal--11-80-100-100-p-56-iso8859-1");
-    //font = YFont::getFont("-adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1");
+    //font = YFont::font("-adobe-helvetica-medium-r-normal--8-80-75-75-p-46-iso8859-1");
+    //font = YFont::font("-adobe-helvetica-medium-r-normal--24-240-75-75-p-130-iso8859-1");
+    font = YFont::font("-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1");
+    //font = YFont::font("-adobe-helvetica-medium-r-normal--11-80-100-100-p-56-iso8859-1");
+    //font = YFont::font("-adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1");
     normalFg = new YColor("rgb:00/00/00");
     hrFg = new YColor("rgb:80/80/80");
     linkFg = new YColor("rgb:00/00/CC");
@@ -663,14 +659,14 @@ HTextView::HTextView(HTListener *fL, YScrollView *v, YWindow *parent):
 
     menu = new YMenu();
     menu->actionListener(this);
-    menu->addItem(_("Back"), 0, _("Alt+Left"), actionNone)->setEnabled(false);
-    menu->addItem(_("Forward"), 0, _("Alt+Right"), actionNone)->setEnabled(false);
+    menu->addItem(_("Back"), 0, _("Alt+Left"), actionNone)->enabled(false);
+    menu->addItem(_("Forward"), 0, _("Alt+Right"), actionNone)->enabled(false);
     menu->addSeparator();
     prevItem = menu->addItem(_("Previous"), 0, "", actionPrev);
     nextItem = menu->addItem(_("Next"), 0, "", actionNext);
     menu->addSeparator();
     contentsItem = menu->addItem(_("Contents"), 0, "", actionContents);
-    menu->addItem(_("Index"), 0, "", actionNone)->setEnabled(false);
+    menu->addItem(_("Index"), 0, "", actionNone)->enabled(false);
     menu->addSeparator();
     menu->addItem(_("Close"), 0, _("Ctrl+Q"), actionClose);
 }
@@ -709,15 +705,15 @@ void HTextView::find_link(node *n) {
             if (rel && href && rel->value && href->value) {
                 if (strcasecmp(rel->value, "previous") == 0) {
                     prevURL = newstr(href->value);
-                    prevItem->setEnabled(true);
+                    prevItem->enabled(true);
                 }
                 if (strcasecmp(rel->value, "next") == 0) {
                     nextURL = newstr(href->value);
-                    nextItem->setEnabled(true);
+                    nextItem->enabled(true);
                 }
                 if (strcasecmp(rel->value, "contents") == 0) {
                     contentsURL = newstr(href->value);
-                    contentsItem->setEnabled(true);
+                    contentsItem->enabled(true);
                 }
             }
         }
@@ -1079,9 +1075,9 @@ void HTextView::draw(Graphics &g, node *n1) {
                 text_node *t = n->wrap;
 
 #if 0
-                g.setColor(testBg);
+                g.color(testBg);
                 g.fillRect(t->x - tx, t->y - ty, t->w, t->h);
-                g.setColor(normalFg);
+                g.color(normalFg);
 #endif
                 while (t) {
                     g.drawChars(t->text, 0, t->len, t->x - tx, t->y + font->ascent() - ty);
@@ -1091,21 +1087,21 @@ void HTextView::draw(Graphics &g, node *n1) {
             break;
 
         case node::hrule:
-            g.setColor(hrFg);
+            g.color(hrFg);
             g.drawLine(0 + n->xr - tx, n->yr + 4 - ty, width() - 1 - tx, n->yr + 4 - ty);
             g.drawLine(0 + n->xr - tx, n->yr + 5 - ty, width() - 1 - tx, n->yr + 5 - ty);
-            g.setColor(normalFg);
+            g.color(normalFg);
             break;
 
         case node::anchor:
             {
                 attribute *href = find_attribute(n, "HREF");
                 if (href && href->value)
-                    g.setColor(linkFg);
+                    g.color(linkFg);
                 if (n->container)
                     draw(g, n->container);
                 if (href)
-                    g.setColor(normalFg);
+                    g.color(normalFg);
             }
             break;
 
@@ -1124,18 +1120,18 @@ void HTextView::draw(Graphics &g, node *n1) {
 class FileView: public YWindow, public HTListener {
 public:
     FileView(char *path) {
-        setDND(true);
+        dnd(true);
         fPath = newstr(path);
 
         scroll = new YScrollView(this);
         view = new HTextView(this, scroll, this);
-        scroll->setView(view);
+        scroll->view(view);
 
         view->show();
         scroll->show();
 
-        setTitle(fPath);
-	setClassHint("browser", "IceHelp");
+        title(fPath);
+	classHint("browser", "IceHelp");
 
         YIcon * file_icon(getIcon("file"));
         small_icon = new YPixmap(*file_icon->small());
@@ -1152,7 +1148,7 @@ public:
                         32, PropModeReplace,
                         (unsigned char *)icons, 4);
 
-        setSize(640, 640);
+        size(640, 640);
 
         loadFile();
     }
@@ -1195,7 +1191,7 @@ public:
 			   const unsigned width, const unsigned height, 
 			   const bool resized) {
         YWindow::configure(x, y, width, height, resized);
-        if (resized) scroll->setGeometry(0, 0, width, height);
+        if (resized) scroll->geometry(0, 0, width, height);
     }
 
     virtual void handleClose() {
@@ -1270,7 +1266,7 @@ void FileView::loadFile() {
 	txt->txt = fPath;
 	last = add(&root, last, txt);
 
-        view->setData(root);
+        view->data(root);
         return ;
     }
     if (fp) {
@@ -1281,7 +1277,7 @@ void FileView::loadFile() {
 #ifdef DUMP
         dump_tree(0, root);
 #endif
-        view->setData(root);
+        view->data(root);
     }
     fclose(fp);
 }

@@ -2,41 +2,41 @@
 #define __YSCROLLVIEW_H
 
 #include "ywindow.h"
-
-class YScrollBar;
+#include "yscrollbar.h"
 
 class YScrollable {
 public:
     virtual int contentWidth() = 0;
     virtual int contentHeight() = 0;
 
-    virtual YWindow *getWindow() = 0; // !!! hack ?
+    virtual YWindow *window() = 0; // !!! hack ?
 };
 
 class YScrollView: public YWindow {
 public:
     YScrollView(YWindow *aParent);
-    virtual ~YScrollView();
+    virtual ~YScrollView() {}
 
-    void setView(YScrollable *l);
+    void view(YScrollable *l);
 
-    YScrollBar *getVerticalScrollBar() { return scrollVert; }
-    YScrollBar *getHorizontalScrollBar() { return scrollHoriz; }
-    YScrollable *getScrollable() { return scrollable; }
+    YScrollBar &verticalScrollBar() { return fScrollVert; }
+    YScrollBar &horizontalScrollBar() { return fScrollHoriz; }
+    YScrollable *scrollable() { return fScrollable; }
     
     void layout();
     virtual void configure(const int x, const int y, 
     			   const unsigned width, const unsigned height,
 			   const bool resized);
-    virtual void paint(Graphics &g, int x, int y, unsigned int width, unsigned int height);
+    virtual void paint(Graphics &g, int x, int y,
+                       unsigned int width, unsigned int height);
 
 protected:
-    void getGap(int &dx, int &dy);
+    void gap(int &dx, int &dy);
 
 private:
-    YScrollable *scrollable;
-    YScrollBar *scrollVert;
-    YScrollBar *scrollHoriz;
+    YScrollBar fScrollVert;
+    YScrollBar fScrollHoriz;
+    YScrollable *fScrollable;
 };
 
 #endif

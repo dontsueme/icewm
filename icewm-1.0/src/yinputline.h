@@ -19,9 +19,9 @@ public:
     YInputLine(YWindow *parent = 0, char const *historyId = NULL);
     virtual ~YInputLine();
 
-    void setText(const char *text);
-    const char *getText() const { return fText; }
-    YHistory *getHistory() const { return fHistory; }
+    void text(const char *text);
+    const char *text() const { return fText; }
+    YHistory *history() const { return fHistory; }
 
     virtual void paint(Graphics &g, int x, int y, unsigned int width, unsigned int height);
     virtual bool handleKey(const XKeyEvent &key);

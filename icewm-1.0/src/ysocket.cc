@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 
-YSingleList<YSocket> YSocket::sockets;
+YSocket::SocketList YSocket::sockets;
 
 
 YSocket::YSocket():
@@ -164,27 +164,27 @@ void YSocket::connected() {
 }
 
 void YSocket::registerSockets(fd_set & readers, fd_set & writers) {
-    for (Iterator socket(sockets); socket; ++socket) {
-        if (socket->fReading) {
-            FD_SET(socket->fSocket, &readers);
-            MSG(("waiting for data for socket %d", socket->fSocket));
+    for (SocketList::Iterator socket(sockets); socket; ++socket) {
+        if ((*socket)->fReading) {
+            FD_SET((*socket)->fSocket, &readers);
+            MSG(("waiting for data for socket %d", (*socket)->fSocket));
         }
-        if (socket->fConnecting) {
-            FD_SET(socket->fSocket, &writers);
-            MSG(("waiting for connect for socket %d", socket->fSocket));
+        if ((*socket)->fConnecting) {
+            FD_SET((*socket)->fSocket, &writers);
+            MSG(("waiting for connect for socket %d", (*socket)->fSocket));
         }
     }
 }
 
 void YSocket::handleSockets(fd_set & readers, fd_set & writers) {
-    for (Iterator socket(sockets); socket; ++socket) {
-        if (socket->fReading && FD_ISSET(socket->fSocket, &readers)) {
-            MSG(("got data for socket %d", socket->fSocket));
-            socket->readable();
+    for (SocketList::Iterator socket(sockets); socket; ++socket) {
+        if ((*socket)->fReading && FD_ISSET((*socket)->fSocket, &readers)) {
+            MSG(("got data for socket %d", (*socket)->fSocket));
+            (*socket)->readable();
         }
-        if (socket->fConnecting && FD_ISSET(socket->fSocket, &writers)) {
-            MSG(("got connect for socket %d", socket->fSocket));
-            socket->connected();
+        if ((*socket)->fConnecting && FD_ISSET((*socket)->fSocket, &writers)) {
+            MSG(("got connect for socket %d", (*socket)->fSocket));
+            (*socket)->connected();
         }
     }
 }

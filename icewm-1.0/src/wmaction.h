@@ -28,7 +28,7 @@ extern YAction *actionRollup;
 extern YAction *actionClose;
 extern YAction *actionKill;
 extern YAction *actionOccupyAllOrCurrent;
-extern YAction *actionDoNotCover;
+extern YAction *actionDontCover;
 
 extern YAction *actionWindowList;
 extern YAction *actionLogout;

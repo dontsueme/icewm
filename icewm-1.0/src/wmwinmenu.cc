@@ -24,10 +24,10 @@
 class ActivateWindowMenuItem: public YMenuItem, public YAction {
 public:
     ActivateWindowMenuItem(YFrameWindow *frame): 
-        YMenuItem(frame->getTitle(), -1, 0, this, 0),
-	fFrame(frame) {
-        if (fFrame->clientIcon())
-            setIcon(fFrame->clientIcon()->small());
+    YMenuItem(frame->title(), -1, 0, this, 0),
+    fFrame(frame) {
+        if (fFrame->updateClientIcon())
+            icon(fFrame->updateClientIcon()->small());
     }
 
     virtual void actionPerformed(YAction::Listener * /*listener*/,

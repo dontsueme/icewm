@@ -17,7 +17,7 @@ public:
     void begin();
     void end() { hide(); }    
 
-    virtual const char* getStatus() = 0;
+    virtual const char* status() = 0;
 
 protected:
     static YColor *statusFg;
@@ -30,11 +30,11 @@ public:
     MoveSizeStatus(YWindow *aParent);
     virtual ~MoveSizeStatus();
 
-    virtual const char* getStatus();
+    virtual const char* status();
     
     void begin(YFrameWindow *frame);
-    void setStatus(YFrameWindow *frame, int x, int y, int width, int height);
-    void setStatus(YFrameWindow *frame);
+    void status(YFrameWindow *frame, int x, int y, int width, int height);
+    void status(YFrameWindow *frame);
 private:
     static const char* templateFunction();
 
@@ -46,12 +46,12 @@ public:
     WorkspaceStatus(YWindow *aParent);
     virtual ~WorkspaceStatus();
 
-    virtual const char* getStatus();
+    virtual const char* status();
     void begin(long workspace);
-    virtual void setStatus(long workspace);
+    virtual void status(long workspace);
 private:
     static const char* templateFunction();
-    static const char* getStatus(const char* name);
+    static const char* status(const char* name);
 
     long workspace;    
     class YTimer *timer;

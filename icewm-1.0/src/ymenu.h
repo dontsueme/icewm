@@ -46,7 +46,7 @@ public:
     YMenuItem *item(int n) const { return fItems[n]; }
 
     bool isShared() const { return fShared; }
-    void setShared(bool shared) { fShared = shared; }
+    void shared(bool shared = true) { fShared = shared; }
 
     void actionListener(YAction::Listener *actionListener);
     YAction::Listener *actionListener() const { return fActionListener; }
@@ -76,10 +76,10 @@ private:
     static int fAutoScrollDeltaX, fAutoScrollDeltaY;
     static int fAutoScrollMouseX, fAutoScrollMouseY;
 
-    int getItemHeight(int itemNo, int &h, int &top, int &bottom, int &pad);
-    void getItemWidth(int i, int &iw, int &nw, int &pw);
-    void getOffsets(int &left, int &top, int &right, int &bottom);
-    void getArea(int &x, int &y, int &w, int &h);
+    int itemHeight(int itemNo, int &h, int &top, int &bottom, int &pad);
+    void itemWidth(int i, int &iw, int &nw, int &pw);
+    void offsets(int &left, int &top, int &right, int &bottom);
+    void area(int &x, int &y, int &w, int &h);
 
     void drawBackground(Graphics &g, int x, int y, int w, int h);
     void drawSeparator(Graphics &g, int x, int y, int w);

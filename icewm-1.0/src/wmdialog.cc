@@ -51,68 +51,68 @@ CtrlAltDelete::CtrlAltDelete(YWindow *parent): YWindow(parent) {
     if (cadBg == 0)
         cadBg = new YColor(clrDialog);
 
-    setStyle(wsOverrideRedirect);
-    setPointer(YApplication::leftPointer);
-    setToplevel(true);
+    style(wsOverrideRedirect);
+    pointer(YApplication::leftPointer);
+    toplevel(true);
  
     b = lockButton = new YActionButton(this);
-    b->setText(_("Lock _Workstation"), -2);
+    b->text(_("Lock _Workstation"), -2);
     if (b->width() > w) w = b->width();
     if (b->height() > h) h = b->height();
     b->actionListener(this);
     b->show();
 
     b = logoutButton = new YActionButton(this);
-    b->setText(_("_Logout..."), -2);
+    b->text(_("_Logout..."), -2);
     if (b->width() > w) w = b->width();
     if (b->height() > h) h = b->height();
     b->actionListener(this);
     b->show();
 
     b = cancelButton = new YActionButton(this);
-    b->setText(_("_Cancel"), -2);
+    b->text(_("_Cancel"), -2);
     if (b->width() > w) w = b->width();
     if (b->height() > h) h = b->height();
     b->actionListener(this);
     b->show();
 
     b = restartButton = new YActionButton(this);
-    b->setText(_("_Restart icewm"), -2);
+    b->text(_("_Restart icewm"), -2);
     if (b->width() > w) w = b->width();
     if (b->height() > h) h = b->height();
     b->actionListener(this);
     b->show();
 
     b = rebootButton = new YActionButton(this);
-    b->setText(_("Re_boot"), -2);
+    b->text(_("Re_boot"), -2);
     if (b->width() > w) w = b->width();
     if (b->height() > h) h = b->height();
     b->actionListener(this);
     b->show();
 
     b = shutdownButton = new YActionButton(this);
-    b->setText(_("Shut_down"), -2);
+    b->text(_("Shut_down"), -2);
     if (b->width() > w) w = b->width();
     if (b->height() > h) h = b->height();
     b->actionListener(this);
     b->show();
 
     if (!canShutdown(true))
-        rebootButton->setEnabled(false);
+        rebootButton->enabled(false);
     if (!canShutdown(false))
-        shutdownButton->setEnabled(false);
+        shutdownButton->enabled(false);
 
-    setSize(HORZ + w + MIDH + w + MIDH + w + HORZ,
-            VERT + h + MIDV + h + VERT);
-    setPosition((desktop->width() - width()) / 2,
-                (desktop->height() - height()) / 2);
+    size(HORZ + w + MIDH + w + MIDH + w + HORZ,
+         VERT + h + MIDV + h + VERT);
+    position((desktop->width() - width()) / 2,
+             (desktop->height() - height()) / 2);
 
-    lockButton->setGeometry(HORZ, VERT, w, h);
-    logoutButton->setGeometry(HORZ + w + MIDH, VERT, w, h);
-    cancelButton->setGeometry(HORZ + w + MIDH + w + MIDH, VERT, w, h);
-    restartButton->setGeometry(HORZ, VERT + h + MIDV, w, h);
-    rebootButton->setGeometry(HORZ + w + MIDH, VERT + h + MIDV, w, h);
-    shutdownButton->setGeometry(HORZ + w + MIDH + w + MIDH, VERT + h + MIDV, w, h);
+    lockButton->geometry(HORZ, VERT, w, h);
+    logoutButton->geometry(HORZ + w + MIDH, VERT, w, h);
+    cancelButton->geometry(HORZ + w + MIDH + w + MIDH, VERT, w, h);
+    restartButton->geometry(HORZ, VERT + h + MIDV, w, h);
+    rebootButton->geometry(HORZ + w + MIDH, VERT + h + MIDV, w, h);
+    shutdownButton->geometry(HORZ + w + MIDH + w + MIDH, VERT + h + MIDV, w, h);
 }
 
 CtrlAltDelete::~CtrlAltDelete() {
@@ -130,7 +130,7 @@ void CtrlAltDelete::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*widt
 #else
     YSurface surface(cadBg, logoutPixmap);
 #endif
-    g.setColor(surface.color);
+    g.color(surface.color);
     g.drawSurface(surface, 1, 1, width() - 2, height() - 2);
     g.draw3DRect(0, 0, width() - 1, height() - 1, true);
 }
@@ -183,13 +183,13 @@ void CtrlAltDelete::activate() {
     else {
         requestFocus();
         lockButton->requestFocus();
-        lockButton->setWindowFocus();
+        lockButton->windowFocus();
     }
 }
 
 void CtrlAltDelete::deactivate() {
     app->releaseEvents();
     hide();
-    manager->setFocus(manager->getFocus());
+    manager->focus(manager->focus());
 }
 #endif

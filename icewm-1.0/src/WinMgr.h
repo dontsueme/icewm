@@ -225,12 +225,12 @@
  *     XSendEvent(display, root, False, SubstructureNotifyMask, (XEvent *) &xev);
  */
 
-#define WinTrayOptionCount	3
-#define WinTrayInvalid		0xFFFFFFFFL
+#define IcewmTrayOptionCount	3
+#define IcewmTrayInvalid        0xFFFFFFFFL
 
-#define WinTrayIgnore		0L
-#define WinTrayMinimized	1L
-#define WinTrayExclusive	2L
+#define IcewmTrayIgnore		0L
+#define IcewmTrayMinimized	1L
+#define IcewmTrayExclusive	2L
 
 /* state */
 #define XA_WIN_STATE           "_WIN_STATE"
@@ -279,12 +279,12 @@
 #define WinHintsSkipTaskBar	(1 << 2)
 #define WinHintsGroupTransient	(1 << 3)
 #define WinHintsFocusOnClick	(1 << 4) /* app only accepts focus when clicked */
-#define WinHintsDoNotCover	(1 << 5) /* attempt to not cover this window */
+#define WinHintsDontCover	(1 << 5) /* attempt to not cover this window */
 #define WinHintsDockHorizontal	(1 << 6) /* docked horizontally */
 
 #define WIN_HINTS_ALL (WinHintsSkipFocus | WinHintsSkipWindowMenu |\
 		       WinHintsSkipTaskBar | WinHintsGroupTransient |\
-		       WinHintsFocusOnClick | WinHintsDoNotCover)
+		       WinHintsFocusOnClick | WinHintsDontCover)
 
 /* Type CARD32[2]
  *      additional window hints
@@ -348,13 +348,7 @@
 #define XA_ICEWM_WINOPT                 "_ICEWM_WINOPT"
 #define XA_ICEWM_GUI_EVENT              "_ICEWM_GUI_EVENT"
 #define XA_ICEWM_FONTPATH               "_ICEWM_FONTPATH"
-
-
-
-
-
-
-
+#define XA_ICEWM_PID                    "_ICEWM_PID"
 
 #ifdef CONFIG_WMSPEC_HINTS
 

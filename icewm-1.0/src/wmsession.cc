@@ -83,8 +83,8 @@ SMWindows::~SMWindows() {
 }
 
 void SMWindows::clearAllInfo() {
-    for (int i = 0; i < windowCount; i++)
-        delete windows[i];
+    for (unsigned i(0); i < windowCount; ++i) delete windows[i];
+
     FREE(windows);
     windows = 0;
     windowCount = 0;
@@ -102,51 +102,52 @@ bool SMWindows::getWindowInfo(YFrameWindow */*f*/, SMWindowInfo */*info*/) {
     return false;
 }
 
-bool SMWindows::findWindowInfo(YFrameWindow *f) {
-    f->client()->getClientLeader();
-    Window leader = f->client()->clientLeader();
-    if (leader == None)
-        return false;
-    char *cid = f->client()->getClientId(leader);
-    if (cid == 0)
-        return false;
-    for (int i = 0; i < windowCount; i++) {
-        if (strcmp(cid, windows[i]->key.clientId) == 0) {
+bool SMWindows::findWindowInfo(YFrameWindow *frame) {
+    frame->client()->updateClientLeader();
+
+    Window leader(frame->client()->clientLeader());
+    if (leader == None) return false;
+
+    char *cid(frame->client()->clientId(leader));
+    if (NULL == cid) return false;
+
+    for (unsigned i(0); i < windowCount; ++i) {
+        if (!strcmp(cid, windows[i]->key.clientId)) {
             if (windows[i]->key.windowClass &&
-                windows[i]->key.windowInstance)
-            {
-                char *klass = 0;
-                char *instance = 0;
-                XClassHint *ch = f->client()->classHint();
-                if (ch) {
-                    klass = ch->res_class;
-                    instance = ch->res_name;
+                windows[i]->key.windowInstance) {
+                XClassHint *classHint(frame->client()->classHint());
+                char *wmName(NULL), *wmClass(NULL);
+
+                if (classHint) {
+                    wmClass = classHint->res_class;
+                    wmName = classHint->res_name;
                 }
-                if (strcmp(klass, windows[i]->key.windowClass) == 0 &&
-                    strcmp(instance, windows[i]->key.windowInstance) == 0)
-                {
-                    MSG(("got c %s %s %s %d:%d:%d:%d %d %ld %d", cid, klass, instance,
-                           windows[i]->x,
-                           windows[i]->y,
-                           windows[i]->width,
-                           windows[i]->height,
-                           windows[i]->workspace,
-                           windows[i]->state,
-                           windows[i]->layer
-                          ));
-                    f->configureClient(windows[i]->x,
-                                   windows[i]->y,
-                                   windows[i]->width,
-                                   windows[i]->height);
-                    f->setLayer(windows[i]->layer);
-                    f->setWorkspace(windows[i]->workspace);
-                    f->setState(WIN_STATE_ALL, windows[i]->state);
+
+                if (!strcmp(wmClass, windows[i]->key.windowClass) &&
+                    !strcmp(wmName, windows[i]->key.windowInstance)) {
+                    MSG(("got c %s %s %s %d:%d:%d:%d %d %ld %d",
+                         cid, wmClass, wmName,
+                         windows[i]->x, windows[i]->y,
+                         windows[i]->width, windows[i]->height,
+                         windows[i]->workspace, windows[i]->state,
+                         windows[i]->layer));
+
+                    frame->configureClient(windows[i]->x,
+                                           windows[i]->y,
+                                           windows[i]->width,
+                                           windows[i]->height);
+
+                    frame->layer(windows[i]->layer);
+                    frame->workspace(windows[i]->workspace);
+                    frame->state(WIN_STATE_ALL, windows[i]->state);
+
                     XFree(cid);
                     return true;
                 }
             }
         }
     }
+
     XFree(cid);
     return false;
 }
@@ -312,71 +313,66 @@ void YWMApp::smDie() {
 }
 
 void YWMApp::smSaveYourselfPhase2() {
-    FILE *fp;
-    char *name = getsesfile();
-    YFrameWindow *f = 0;
+    char *name;
+    FILE *fp;;
     
-    if (name == 0)
-        goto end;
+    if (NULL != (name = getsesfile()) &&
+        NULL != (fp = fopen(name, "w+"))) {
+        for (YFrameWindow *frame(manager->topLayer());
+             NULL != frame; frame = frame->nextLayer()) {
+            frame->client()->updateClientLeader();
+            Window leader(frame->client()->clientLeader());
 
-    fp = fopen(name, "w+");
-    if (fp == NULL)
-        goto end;
+            //msg("window=%s", frame->client()->windowTitle());
+            if (leader != None) {
+                //msg("leader=%lX", leader);
+                char *cid(frame->client()->clientId(leader));
 
-    f = manager->topLayer();
+                if (cid) {
+                    frame->client()->updateWindowRole();
+                    const char *role(frame->client()->windowRole());
 
-    for (; f; f = f->nextLayer()) {
-        f->client()->getClientLeader();
-        Window leader = f->client()->clientLeader();
-
-        //msg("window=%s", f->client()->windowTitle());
-        if (leader != None) {
-            //msg("leader=%lX", leader);
-            char *cid = 0;
-
-            cid = f->client()->getClientId(leader);
-
-            if (cid) {
-                f->client()->getWindowRole();
-                const char *role = f->client()->windowRole();
-
-                if (role) {
-                    fprintf(fp, "r ");
-                    //%s %s ", cid, role);
-                    wr_str(fp, cid);
-                    wr_str(fp, role);
-                } else {
-                    f->client()->getClassHint();
-                    char *klass = 0;
-                    char *instance = 0;
-                    XClassHint *ch = f->client()->classHint();
-                    if (ch) {
-                        klass = ch->res_class;
-                        instance = ch->res_name;
-                    }
-
-                    if (klass && instance) {
-                        //msg("k=%s, i=%s", klass, instance);
-                        fprintf(fp, "c ");
-                        //%s %s %s ", cid, klass, instance);
+                    if (role) {
+                        fprintf(fp, "r ");
+                        //%s %s ", cid, role);
                         wr_str(fp, cid);
-                        wr_str(fp, klass);
-                        wr_str(fp, instance);
+                        wr_str(fp, role);
                     } else {
-                        XFree(cid);
-                        continue;
+                        frame->client()->updateClassHint();
+                        XClassHint *classHint(frame->client()->classHint());
+                        char *wmName(NULL), *wmClass(NULL);
+
+                        if (classHint) {
+                            wmClass = classHint->res_class;
+                            wmName = classHint->res_name;
+                        }
+
+                        if (wmClass && wmName) {
+                            //msg("k=%s, i=%s", klass, instance);
+                            fprintf(fp, "c ");
+                            //%s %s %s ", cid, klass, instance);
+                            wr_str(fp, cid);
+                            wr_str(fp, wmClass);
+                            wr_str(fp, wmName);
+                        } else {
+                            XFree(cid);
+                            continue;
+                        }
                     }
+
+                    XFree(cid);
+                    fprintf(fp, "%d:%d:%d:%d %ld %lu %ld\n",
+                            frame->x(), frame->y(),
+                            frame->client()->width(), frame->client()->height(),
+                            frame->workspace(), frame->state(), frame->layer());
                 }
-                XFree(cid);
-                fprintf(fp, "%d:%d:%d:%d %ld %lu %ld\n",
-                        f->x(), f->y(), f->client()->width(), f->client()->height(),
-                        f->getWorkspace(), f->getState(), f->getLayer());
             }
         }
+
+        fprintf(fp, "w %lu\n", manager->activeWorkspace());
+        fclose(fp);
     }
-    fprintf(fp, "w %lu\n", manager->activeWorkspace());
-    fclose(fp);
-end:
+
     YApplication::smSaveYourselfPhase2();
 }
 

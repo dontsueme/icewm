@@ -18,11 +18,11 @@ public:
     virtual void handleBeginDrag(const XButtonEvent &down, const XMotionEvent &motion);
 
     virtual void actionPerformed(YAction *action, unsigned int modifiers);
-    void setActions(YAction *action, YAction *action2 = 0);
+    void actions(YAction *action, YAction *action2 = NULL);
     virtual void updatePopup();
 
-    YPixmap *getImage(int pn) const;
-    YFrameWindow *getFrame() const { return fFrame; };
+    YPixmap *image(int pn) const;
+    YFrameWindow *frame() const { return fFrame; };
 private:
     YFrameWindow *fFrame;
     YAction *fAction;

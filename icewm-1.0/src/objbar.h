@@ -9,7 +9,9 @@
 
 class Program;
 
-class ObjectBar: public YWindow, public ObjectContainer {
+class ObjectBar:
+public YWindow,
+public ObjectContainer {
 public:
     ObjectBar(YWindow *parent);
     virtual ~ObjectBar();

@@ -221,9 +221,9 @@ YColor *YColor::brighter() { // !!! fix
 /******************************************************************************/
 
 #ifdef CONFIG_XFREETYPE
-YFont * YFont::getFont(char const * name, bool antialias) {
+YFont * YFont::font(char const * name, bool antialias) {
 #else
-YFont * YFont::getFont(char const * name, bool) {
+YFont * YFont::font(char const * name, bool) {
 #endif
     YFont * font;
 
@@ -290,7 +290,7 @@ YDimension YFont::multilineAlloc(const char *str) const {
     return alloc;
 }
 
-char * YFont::getNameElement(const char *pattern, unsigned const element) {
+char * YFont::nameElement(const char *pattern, unsigned const element) {
     unsigned h(0);
     const char *p(pattern);
 
@@ -333,7 +333,7 @@ YFontSet::YFontSet(char const * name):
     int nMissing;
     char **missing, *defString;
 
-    fFontSet = getFontSetWithGuess(name, &missing, &nMissing, &defString);
+    fFontSet = fontSetWithGuess(name, &missing, &nMissing, &defString);
 
     if (None == fFontSet) {
 	warn(_("Could not load fontset \"%s\"."), name);
@@ -378,8 +378,8 @@ void YFontSet::drawGlyphs(Graphics & graphics, int x, int y,
     		  fFontSet, graphics.handle(), x, y, str, len);
 }
 
-XFontSet YFontSet::getFontSetWithGuess(char const * pattern, char *** missing,
-				       int * nMissing, char ** defString) {
+XFontSet YFontSet::fontSetWithGuess(char const *pattern, char ***missing,
+				    int *nMissing, char **defString) {
     XFontSet fontset(XCreateFontSet(app->display(), pattern,
    				    missing, nMissing, defString));
 
@@ -405,9 +405,9 @@ XFontSet YFontSet::getFontSetWithGuess(char const * pattern, char *** missing,
 	pattern = *fontnames;
     }
 
-    char * weight(getNameElement(pattern, 3));
-    char * slant(getNameElement(pattern, 4));
-    char * pxlsz(getNameElement(pattern, 7));
+    char * weight(nameElement(pattern, 3));
+    char * slant(nameElement(pattern, 4));
+    char * pxlsz(nameElement(pattern, 7));
 
     // --- build fuzzy font pattern for better matching for various charsets ---
     if (!strcmp(weight, "*")) { delete[] weight; weight = newstr("medium"); }
@@ -863,8 +863,8 @@ void Graphics::drawStringRotated(int x, int y, char const * str) {
     }
 
     canvas.fillRect(0, 0, w, h);
-    canvas.setFont(fFont);
-    canvas.setColor(YColor::white);
+    canvas.font(fFont);
+    canvas.color(YColor::white);
     canvas.drawChars(str, 0, l, 0, fFont->ascent());
 
     XImage * horizontal(XGetImage(fDisplay, canvas.drawable(),
@@ -904,13 +904,13 @@ void Graphics::drawStringRotated(int x, int y, char const * str) {
     x += Rt::xOffset(fFont);
     y += Rt::yOffset(fFont);
 
-    setClipMask(mask.drawable());
-    setClipOrigin(x, y);
+    clipMask(mask.drawable());
+    clipOrigin(x, y);
 
     fillRect(x, y, Rt::width(w, h), Rt::height(w, h));
 
-    setClipOrigin(0, 0);
-    setClipMask(None);
+    clipOrigin(0, 0);
+    clipMask(None);
 }
 
 void Graphics::drawString90(int x, int y, char const * str) {
@@ -947,22 +947,21 @@ void Graphics::fillArc(int x, int y, int width, int height, int a1, int a2) {
 
 /******************************************************************************/
 
-void Graphics::setColor(YColor * aColor) {
-    fColor = aColor;
-    XSetForeground(fDisplay, gc, fColor->pixel());
+void Graphics::color(YColor * color) {
+    XSetForeground(fDisplay, gc, (fColor = color)->pixel());
 }
 
-void Graphics::setFont(YFont * aFont) {
-    fFont = aFont;
+void Graphics::font(YFont * aont) {
+    fFont = aont;
 }
 
-void Graphics::setLineWidth(int width) {
+void Graphics::lineWidth(int width) {
     XGCValues gcv;
     gcv.line_width = width;
     XChangeGC(fDisplay, gc, GCLineWidth, &gcv);
 }
 
-void Graphics::setPenStyle(bool dotLine) {
+void Graphics::penStyle(bool dotLine) {
     XGCValues gcv;
 
     if (dotLine) {
@@ -976,20 +975,20 @@ void Graphics::setPenStyle(bool dotLine) {
     XChangeGC(fDisplay, gc, GCLineStyle, &gcv);
 }
 
-void Graphics::setFunction(int function) {
+void Graphics::function(int function) {
     XSetFunction(fDisplay, gc, function);
 }
 
-void Graphics::setClipRects(int x, int y, XRectangle rectangles[], int n,
-			    int ordering) {
+void Graphics::clipRects(int x, int y, XRectangle rectangles[], int n,
+			 int ordering) {
     XSetClipRectangles(fDisplay, gc, x, y, rectangles, n, ordering);
 }
 
-void Graphics::setClipMask(Pixmap mask) {
+void Graphics::clipMask(Pixmap mask) {
     XSetClipMask(fDisplay, gc, mask);
 }
 
-void Graphics::setClipOrigin(int x, int y) {
+void Graphics::clipOrigin(int x, int y) {
     XSetClipOrigin(fDisplay, gc, x, y);
 }
 
@@ -1057,13 +1056,13 @@ void Graphics::draw3DRect(int x, int y, int w, int h, bool raised) {
     YColor *t(raised ? bright : dark);
     YColor *b(raised ? dark : bright);
 
-    setColor(t);
+    color(t);
     drawLine(x, y, x + w, y);
     drawLine(x, y, x, y + h);
-    setColor(b);
+    color(b);
     drawLine(x, y + h, x + w, y + h);
     drawLine(x + w, y, x + w, y + h);
-    setColor(back);
+    color(back);
     drawPoint(x + w, y);
     drawPoint(x, y + h);
 }
@@ -1074,27 +1073,27 @@ void Graphics::drawBorderW(int x, int y, int w, int h, bool raised) {
     YColor *dark(back->darker());
 
     if (raised) {
-        setColor(bright);
+        color(bright);
         drawLine(x, y, x + w - 1, y);
         drawLine(x, y, x, y + h - 1);
-        setColor(YColor::black);
+        color(YColor::black);
         drawLine(x, y + h, x + w, y + h);
         drawLine(x + w, y, x + w, y + h);
-        setColor(dark);
+        color(dark);
         drawLine(x + 1, y + h - 1, x + w - 1, y + h - 1);
         drawLine(x + w - 1, y + 1, x + w - 1, y + h - 1);
     } else {
-        setColor(bright);
+        color(bright);
         drawLine(x + 1, y + h, x + w, y + h);
         drawLine(x + w, y + 1, x + w, y + h);
-        setColor(YColor::black);
+        color(YColor::black);
         drawLine(x, y, x + w, y);
         drawLine(x, y, x, y + h);
-        setColor(dark);
+        color(dark);
         drawLine(x + 1, y + 1, x + w - 1, y + 1);
         drawLine(x + 1, y + 1, x + 1, y + h - 1);
     }
-    setColor(back);
+    color(back);
 }
 
 // doesn't move... needs two pixels on all sides for up and down
@@ -1105,33 +1104,33 @@ void Graphics::drawBorderM(int x, int y, int w, int h, bool raised) {
     YColor *dark(back->darker());
 
     if (raised) {
-        setColor(bright);
+        color(bright);
         drawLine(x + 1, y + 1, x + w, y + 1);
         drawLine(x + 1, y + 1, x + 1, y + h);
         drawLine(x + 1, y + h, x + w, y + h);
         drawLine(x + w, y + 1, x + w, y + h);
 
-        setColor(dark);
+        color(dark);
         drawLine(x, y, x + w - 1, y);
         drawLine(x, y, x, y + h);
         drawLine(x, y + h - 1, x + w - 1, y + h - 1);
         drawLine(x + w - 1, y, x + w - 1, y + h - 1);
 
         ///  how to get the color of the taskbar??
-        setColor(back);
+        color(back);
 
         drawPoint(x, y + h);
         drawPoint(x + w, y);
     } else {
-        setColor(dark);
+        color(dark);
         drawLine(x, y, x + w - 1, y);
         drawLine(x, y, x, y + h - 1);
 
-        setColor(bright);
+        color(bright);
         drawLine(x + 1, y + h, x + w, y + h);
         drawLine(x + w, y + 1, x + w, y + h);
 
-        setColor(back);
+        color(back);
         drawRect(x + 1, y + 1, x + w - 2, y + h - 2);
         //drawLine(x + 1, y + 1, x + w - 1, y + 1);
         //drawLine(x + 1, y + 1, x + 1, y + h - 1);
@@ -1150,27 +1149,27 @@ void Graphics::drawBorderG(int x, int y, int w, int h, bool raised) {
     YColor *dark(back->darker());
 
     if (raised) {
-        setColor(bright);
+        color(bright);
         drawLine(x, y, x + w - 1, y);
         drawLine(x, y, x, y + h - 1);
-        setColor(dark);
+        color(dark);
         drawLine(x + 1, y + h - 1, x + w - 1, y + h - 1);
         drawLine(x + w - 1, y + 1, x + w - 1, y + h - 1);
-        setColor(YColor::black);
+        color(YColor::black);
         drawLine(x, y + h, x + w, y + h);
         drawLine(x + w, y, x + w, y + h);
     } else {
-        setColor(bright);
+        color(bright);
         drawLine(x + 1, y + h, x + w, y + h);
         drawLine(x + w, y + 1, x + w, y + h);
-        setColor(YColor::black);
+        color(YColor::black);
         drawLine(x, y, x + w, y);
         drawLine(x, y, x, y + h);
-        setColor(dark);
+        color(dark);
         drawLine(x + 1, y + 1, x + w - 1, y + 1);
         drawLine(x + 1, y + 1, x + 1, y + h - 1);
     }
-    setColor(back);
+    color(back);
 }
 
 void Graphics::drawCenteredPixmap(int x, int y, int w, int h, YPixmap *pixmap) {
@@ -1267,7 +1266,7 @@ void Graphics::drawSurface(YSurface const & surface, int x, int y, int w, int h,
     if (surface.pixmap)
 	fillPixmap(surface.pixmap, x, y, w, h, sx, sy);
     else if (surface.color) {
-	setColor(surface.color);
+	color(surface.color);
 	fillRect(x, y, w, h);
     }
 }
@@ -1343,15 +1342,15 @@ void Graphics::drawArrow(Direction direction, int x, int y, int size,
     short const dx1(direction == Up || direction == Left ? dy0 : -dy0);
     short const dy1(direction == Up || direction == Left ? dx0 : -dx0);
 
-//    setWideLines(); // --------------------- render slow, but accurate lines ---
+//  wideLines(); // ------------------------ render slow, but accurate lines ---
 // ============================================================= inner bevel ===
     if (wmLook == lookGtk || wmLook == lookMotif) {
-	setColor(ocb);
+	color(ocb);
 	drawLine(points[2].x - dx0 - (size & 1 ? 0 : dx1),
 		 points[2].y - (size & 1 ? 0 : dy1) - dy0,
 		 points[1].x + 2 * dx1, points[1].y + 2 * dy1);
 
-	setColor(wmLook == lookMotif ? oca : ica);
+	color(wmLook == lookMotif ? oca : ica);
 	drawLine(points[0].x + dx0 - (size & 1 ? dx1 : 0),
 		 points[0].y + dy0 - (size & 1 ? dy1 : 0),
 		 points[1].x + (size & 1 ? dx0 : 0)
@@ -1359,7 +1358,7 @@ void Graphics::drawArrow(Direction direction, int x, int y, int size,
 		 points[1].y + (size & 1 ? dy0 : 0)
 		 	     + (size & 1 ? dy1 : dy1 + dy1));
 
-	if ((direction == Up || direction == Left)) setColor(ocb);
+	if ((direction == Up || direction == Left)) color(ocb);
 	drawLine(points[0].x + dx0 - dx1, points[0].y + dy0 - dy1,
 	    	 points[2].x - dx0 - dx1, points[2].y - dy0 - dy1);
     } else if (wmLook == lookWarp3) {
@@ -1372,15 +1371,15 @@ void Graphics::drawArrow(Direction direction, int x, int y, int size,
 
 // ============================================================= outer bevel ===
     if (wmLook == lookMotif || wmLook == lookGtk) {
-	setColor(wmLook == lookMotif ? ocb : icb);
+	color(wmLook == lookMotif ? ocb : icb);
 
 	drawLine(points[2].x, points[2].y, points[1].x, points[1].y);
 
-	if (wmLook == lookGtk || wmLook == lookMotif) setColor(oca);
+	if (wmLook == lookGtk || wmLook == lookMotif) color(oca);
 	drawLine(points[0].x, points[0].y, points[1].x, points[1].y);
 
 	if ((direction == Up || direction == Left))
-	    setColor(wmLook == lookMotif ? ocb : icb);
+	    color(wmLook == lookMotif ? ocb : icb);
 
     } else
         drawLines(points, 3, CoordModeOrigin);
@@ -1388,8 +1387,8 @@ void Graphics::drawArrow(Direction direction, int x, int y, int size,
     if (wmLook != lookWarp3)
 	drawLine(points[0].x, points[0].y, points[2].x, points[2].y);
 
-//    setThinLines(); // ---------- render fast, but possibly inaccurate lines ---
-    setColor(nc);
+//    thinLines(); // ---------- render fast, but possibly inaccurate lines ---
+    color(nc);
 }
 
 int Graphics::arrowSize(int size) {

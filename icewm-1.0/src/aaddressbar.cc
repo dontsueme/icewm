@@ -27,7 +27,7 @@ bool AddressBar::handleKey(const XKeyEvent &key) {
         int m = KEY_MODMASK(key.state);
 
         if (k == XK_KP_Enter || k == XK_Return) {
-            const char *text = getText();
+            const char *text = this->text();
             const char *args[7];
             int i = 0;
 

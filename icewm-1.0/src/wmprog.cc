@@ -35,12 +35,11 @@ extern bool parseKey(const char *arg, KeySym *key, unsigned int *mod);
 #include "intl.h"
 
 DObjectMenuItem::DObjectMenuItem(DObject *object):
-    YMenuItem(object->getName(), -2, 0, this, 0)
+    YMenuItem(object->name(), -2, 0, this, 0)
 {
     fObject = object;
 #ifndef LITE
-    if (object->getIcon())
-        setIcon(object->getIcon()->small());
+    if (object->icon()) icon(object->icon()->small());
 #endif
 }
 
@@ -99,8 +98,7 @@ void ObjectMenu::addContainer(char *name, YIcon *icon, ObjectContainer *containe
 #endif
 		addSubmenu(name, 0, (ObjectMenu *)container);
 #ifndef LITE
-        if (item && icon)
-            item->setIcon(icon->small());
+        if (item && icon) item->icon(icon->small());
 #endif
     }
 }
@@ -613,10 +611,10 @@ void StartMenu::refresh() {
             DFile *file = new DFile(p, 0, p);
             YMenuItem *item = add(new DObjectMenuItem(file));
             if (item && sub) {
-                item->setSubmenu(sub);
+                item->submenu(sub);
 #ifndef LITE
                 if (folder)
-                    item->setIcon(folder->small());
+                    item->icon(folder->small());
 #endif
             }
         }

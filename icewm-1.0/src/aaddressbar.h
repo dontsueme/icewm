@@ -5,7 +5,8 @@
 
 #include "yinputline.h"
 
-class AddressBar: public YInputLine {
+class AddressBar:
+public YInputLine {
 public:
     AddressBar(YWindow *parent = 0);
     virtual ~AddressBar();

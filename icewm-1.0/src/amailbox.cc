@@ -41,7 +41,7 @@ MailCheck::~MailCheck() {
     sk.close();
 }
 
-void MailCheck::setURL(char const * url) {
+void MailCheck::url(char const * url) {
     char const * validURL(*url == '/' ? strJoin("file://", url, NULL) : url);
 
     if ((fURL = validURL).scheme()) {
@@ -287,12 +287,12 @@ void MailCheck::socketDataRead(char *buf, int len) {
 
 MailBoxStatus::MailBoxStatus(const char *mailbox, YWindow *aParent): 
     YWindow(aParent), fMailBox(newstr(mailbox)), check(this) {
-    setSize(16, 16);
+    size(16, 16);
     fMailboxCheckTimer = 0;
     fState = mbxNoMail;
     if (fMailBox) {
         MSG((_("Using MailBox \"%s\"\n"), fMailBox));
-        check.setURL(fMailBox);
+        check.url(fMailBox);
 
         fMailboxCheckTimer = new YTimer(mailCheckDelay * 1000);
         if (fMailboxCheckTimer) {
@@ -334,7 +334,7 @@ void MailBoxStatus::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*widt
     
     if (pixmap == NULL || pixmap->mask()) {
 #ifdef CONFIG_GRADIENTS
-	class YPixbuf * gradient(parent()->getGradient());
+	class YPixbuf * gradient(parent()->gradient());
 
 	if (gradient)
 	    g.copyPixbuf(*gradient, x(), y(), width(), height(), 0, 0);
@@ -344,7 +344,7 @@ void MailBoxStatus::paint(Graphics &g, int /*x*/, int /*y*/, unsigned int /*widt
 	    g.fillPixmap(taskbackPixmap, 0, 0,
 			 width(), height(), this->x(), this->y());
         else {
-	    g.setColor(taskBarBg);
+	    g.color(taskBarBg);
 	    g.fillRect(0, 0, width(), height());
 	}
     }
@@ -381,7 +381,7 @@ void MailBoxStatus::handleCrossing(const XCrossingEvent &crossing) {
             if (fLastCountSize != countSize || fLastCountTime != countTime)
             fLastCountSize = countSize;
         } else {
-            setToolTip(0);
+            toolTip(NULL);
         }
 #endif
     }
@@ -402,18 +402,18 @@ void MailBoxStatus::mailChecked(MailBoxState mst, long count) {
             newMailArrived();
     }
     if (fState == mbxError)
-        setToolTip(_("Error checking mailbox."));
+        toolTip(_("Error checking mailbox."));
     else {
-        char s[128];
+        char stats[128];
         if (count != -1) {
-            snprintf(s, sizeof(s),
+            snprintf(stats, sizeof(stats),
                     count == 1 ?
                     _("%ld mail message.") :
                     _("%ld mail messages."), // too hard to do properly
                     count);
-            setToolTip(s);
+            toolTip(stats);
         } else {
-            setToolTip(0);
+            toolTip(NULL);
         }
     }
 }

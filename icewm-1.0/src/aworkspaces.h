@@ -18,9 +18,9 @@ public:
     virtual bool handleTimer(YTimer *t);
 
     virtual void actionPerformed(YAction *button, unsigned int modifiers);
-    virtual YFont * getFont();
-    virtual YColor * getColor();
-    virtual YSurface getSurface();
+    virtual YFont * font();
+    virtual YColor * color();
+    virtual YSurface surface();
 
 private:
     static YTimer *fRaiseTimer;

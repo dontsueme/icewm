@@ -59,7 +59,7 @@ public:
 
     void autoScroll(YWindow *w, bool autoScroll, const XMotionEvent *motion);
 
-    YWindow *getWindow() const { return fWindow; }
+    YWindow *window() const { return fWindow; }
     bool isScrolling() const { return fScrolling; }
 private:
     YTimer *fAutoScrollTimer;
@@ -157,7 +157,7 @@ YWindow::YWindow(YWindow *parent, Window win):
     fWinGravity(NorthWestGravity), fBitGravity(ForgetGravity),
     fEnabled(true), fToplevel(false), accel(0),
 #ifdef CONFIG_TOOLTIP
-    fToolTip(0),
+    fToolTip(NULL),
 #endif
     fDND(false), XdndDragSource(None), XdndDropTarget(None) {
     if (fHandle != None) {
@@ -174,7 +174,7 @@ YWindow::YWindow(YWindow *parent, Window win):
 YWindow::~YWindow() {
     if (fAutoScroll &&
         fAutoScroll->isScrolling() &&
-        fAutoScroll->getWindow() == this)
+        fAutoScroll->window() == this)
         fAutoScroll->autoScroll(0, false, 0);
     removeWindow();
     while (accel) {
@@ -201,15 +201,15 @@ YWindow::~YWindow() {
         destroy();
 }
 
-void YWindow::setWindowFocus() {
+void YWindow::windowFocus() {
     XSetInputFocus(app->display(), handle(), RevertToNone, CurrentTime);
 }
 
-void YWindow::setTitle(char const * title) {
+void YWindow::title(char const * title) {
     XStoreName(app->display(), handle(), title);
 }
 
-void YWindow::setClassHint(char const * rName, char const * rClass) {
+void YWindow::classHint(char const * rName, char const * rClass) {
     XClassHint wmclass;
     wmclass.res_name = (char *) rName;
     wmclass.res_class = (char *) rClass;
@@ -217,7 +217,7 @@ void YWindow::setClassHint(char const * rName, char const * rClass) {
     XSetClassHint(app->display(), handle(), &wmclass);
 }
 
-void YWindow::setStyle(unsigned long aStyle) {
+void YWindow::style(unsigned long aStyle) {
     if (fStyle != aStyle) {
         fStyle = aStyle;
 
@@ -240,18 +240,18 @@ void YWindow::setStyle(unsigned long aStyle) {
     }
 }
 
-Graphics &YWindow::getGraphics() {
+Graphics &YWindow::graphics() {
     return *(NULL == fGraphics ? fGraphics = new Graphics(*this) : fGraphics);
 }
 
 void YWindow::repaint() {
 //    if ((flags & (wfCreated | wfVisible)) == (wfCreated | wfVisible)) {
-    if (viewable()) paint(getGraphics(), 0, 0, width(), height());
+    if (viewable()) paint(graphics(), 0, 0, width(), height());
 }
 
 void YWindow::repaintFocus() {
 //    if ((flags & (wfCreated | wfVisible)) == (wfCreated | wfVisible)) {
-    if (viewable()) paintFocus(getGraphics(), 0, 0, width(), height());
+    if (viewable()) paintFocus(graphics(), 0, 0, width(), height());
 }
 
 void YWindow::create() {
@@ -445,7 +445,7 @@ void YWindow::hide() {
     }
 }
 
-void YWindow::setWinGravity(int gravity) {
+void YWindow::winGravity(int gravity) {
     if (flags & wfCreated) {
         unsigned long eventmask = CWWinGravity;
         XSetWindowAttributes attributes;
@@ -458,7 +458,7 @@ void YWindow::setWinGravity(int gravity) {
     }
 }
 
-void YWindow::setBitGravity(int gravity) {
+void YWindow::bitGravity(int gravity) {
     if (flags & wfCreated) {
         unsigned long eventmask = CWBitGravity;
         XSetWindowAttributes attributes;
@@ -628,7 +628,7 @@ void YWindow::handleEvent(const XEvent &event) {
 }
 
 void YWindow::handleExpose(const XExposeEvent &expose) {
-    Graphics &g = getGraphics();
+    Graphics &g = graphics();
     XRectangle r;
 
     r.x = expose.x;
@@ -649,7 +649,7 @@ void YWindow::handleExpose(const XExposeEvent &expose) {
 }
 
 void YWindow::handleGraphicsExpose(const XGraphicsExposeEvent &graphicsExpose) {
-    Graphics &g = getGraphics();
+    Graphics &g = graphics();
     XRectangle r;
 
     r.x = graphicsExpose.x;
@@ -799,16 +799,16 @@ void YWindow::handleMotion(const XMotionEvent &motion) {
 }
 
 #ifndef CONFIG_TOOLTIP
-void YWindow::setToolTip(const char */*tip*/) {
+void YWindow::toolTip(const char */*tip*/) {
 #else
 YTimer *YWindow::fToolTipTimer = 0;
 
-void YWindow::setToolTip(const char *tip) {
+void YWindow::toolTip(const char *tip) {
     if (fToolTip) {
         if (!tip) {
             delete fToolTip; fToolTip = 0;
         } else {
-            fToolTip->setText(tip);
+            fToolTip->text(tip);
             fToolTip->repaint();
         }
     }
@@ -816,7 +816,7 @@ void YWindow::setToolTip(const char *tip) {
         if (!fToolTip)
             fToolTip = new YToolTip();
         if (fToolTip)
-            fToolTip->setText(tip);
+            fToolTip->text(tip);
     }
 #endif
 }
@@ -923,7 +923,7 @@ bool YWindow::nullGeometry() {
     return zero;
 }
 
-void YWindow::setGeometry(int x, int y, unsigned int width, unsigned int height) {
+void YWindow::geometry(int x, int y, unsigned int width, unsigned int height) {
     const bool resized(width != fWidth || height != fHeight);
 
     if (x != fX || y != fY || resized) {
@@ -943,7 +943,7 @@ void YWindow::setGeometry(int x, int y, unsigned int width, unsigned int height)
     }
 }
 
-void YWindow::setPosition(int x, int y) {
+void YWindow::position(int x, int y) {
     if (x != fX || y != fY) {
         fX = x;
         fY = y;
@@ -955,7 +955,7 @@ void YWindow::setPosition(int x, int y) {
     }
 }
 
-void YWindow::setSize(unsigned int width, unsigned int height) {
+void YWindow::size(unsigned int width, unsigned int height) {
     if (width != fWidth || height != fHeight) {
         fWidth = width;
         fHeight = height;
@@ -998,7 +998,7 @@ void YWindow::configure(const int, const int, const unsigned, const unsigned,
 			const bool) {
 }
 
-void YWindow::setPointer(const YCursor& pointer) {
+void YWindow::pointer(const YCursor& pointer) {
     fPointer = pointer;
 
     if (flags & wfCreated) {
@@ -1009,12 +1009,12 @@ void YWindow::setPointer(const YCursor& pointer) {
     }
 }
 
-void YWindow::setGrabPointer(const YCursor& pointer) {
+void YWindow::grabPointer(const YCursor& pointer) {
     XChangeActivePointerGrab(app->display(),
     			     ButtonPressMask|PointerMotionMask|
     			     ButtonReleaseMask,
                              pointer.handle(), CurrentTime);
-			     //app->getEventTime());
+			     //app->eventTime());
 }
 
 void YWindow::grabKeyM(int keycode, unsigned int modifiers) {
@@ -1067,7 +1067,7 @@ void YWindow::donePopup(YPopupWindow * /*command*/) {
 void YWindow::handleClose() {
 }
 
-void YWindow::setEnabled(bool enable) {
+void YWindow::enabled(bool enable) {
     if (enable != fEnabled) {
         fEnabled = enable;
         repaint();
@@ -1098,8 +1098,8 @@ void YWindow::requestFocus() {
     if (parent()) {
         if (!isToplevel())
             parent()->requestFocus();
-        parent()->setFocus(this);
-        setFocus(0);///???!!! is this the right place?
+        parent()->focus(this);
+        focus(NULL);///???!!! is this the right place?
     }
 }
 
@@ -1129,7 +1129,7 @@ void YWindow::prevFocus() {
         t->changeFocus(false);
 }
 
-YWindow *YWindow::getFocusWindow() {
+YWindow *YWindow::focusWindow() {
     YWindow *w = this;
 
     while (w) {
@@ -1142,7 +1142,7 @@ YWindow *YWindow::getFocusWindow() {
 }
 
 bool YWindow::changeFocus(bool next) {
-    YWindow *cur = getFocusWindow();
+    YWindow *cur = focusWindow();
 
     if (cur == 0)
         if (next)
@@ -1202,7 +1202,7 @@ bool YWindow::changeFocus(bool next) {
     return false;
 }
 
-void YWindow::setFocus(YWindow *window) {
+void YWindow::focus(YWindow *window) {
     if (window != fFocusedWindow) {
         YWindow *oldFocus = fFocusedWindow;
 
@@ -1215,8 +1215,7 @@ void YWindow::setFocus(YWindow *window) {
     }
 }
 void YWindow::gotFocus() {
-    if (parent() && parent()->isFocused())
-        setWindowFocus();
+    if (parent() && parent()->isFocused()) windowFocus();
     repaintFocus();
 }
 
@@ -1276,7 +1275,7 @@ void YWindow::removeAccelerator(unsigned int key, unsigned int mod, YWindow *win
 
 const Atom XdndCurrentVersion = 3;
 
-void YWindow::setDND(bool enabled) {
+void YWindow::dnd(bool enabled) {
     if (fDND != enabled) {
         fDND = enabled;
 
@@ -1440,13 +1439,13 @@ void YWindow::handleSelection(const XSelectionEvent &/*selection*/) {
 void YWindow::acquireSelection(bool selection) {
     Atom sel = selection ? XA_PRIMARY : atoms.clipboard;
 
-    XSetSelectionOwner(app->display(), sel, handle(), app->getEventTime());
+    XSetSelectionOwner(app->display(), sel, handle(), app->eventTime());
 }
 
 void YWindow::clearSelection(bool selection) {
     Atom sel = selection ? XA_PRIMARY : atoms.clipboard;
 
-    XSetSelectionOwner(app->display(), sel, None, app->getEventTime());
+    XSetSelectionOwner(app->display(), sel, None, app->eventTime());
 }
 
 void YWindow::requestSelection(bool selection) {
@@ -1454,7 +1453,7 @@ void YWindow::requestSelection(bool selection) {
 
     XConvertSelection(app->display(),
                       sel, XA_STRING,
-                      sel, handle(), app->getEventTime());
+                      sel, handle(), app->eventTime());
 }
 
 YDesktop::YDesktop(YWindow *aParent, Window win):
@@ -1533,7 +1532,7 @@ unsigned int YWindow::VMod(int m) {
     return vm;
 }
 
-bool YWindow::getCharFromEvent(const XKeyEvent &key, char *c) {
+bool YWindow::charFromEvent(const XKeyEvent &key, char *c) {
     int klen;
     char keyBuf[1];
     KeySym ksym;
@@ -1558,7 +1557,7 @@ void YWindow::scrollWindow(int dx, int dy) {
         return ;
     }
 
-    Graphics &g = getGraphics();
+    Graphics &g(graphics());
     XRectangle r[2];
     int nr = 0;
 

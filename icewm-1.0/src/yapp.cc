@@ -297,7 +297,7 @@ public:
         fLen = 0;
     }
 
-    void setData(char *data, int len) {
+    void data(char *data, int len) {
         if (fData)
             delete [] fData;
         fLen = len;
@@ -481,8 +481,7 @@ YApplication::YApplication(int *argc, char ***argv, const char *displayName):
         die(1, _("Can't open display: %s. X must be running and $DISPLAY set."),
 	         displayName ? displayName : _("<none>"));
 
-    if (sync)
-        XSynchronize(display(), True);
+    if (sync) XSynchronize(display(), True);
 
 #if CONFIG_XFREETYPE
     int renderEvents, renderErrors;
@@ -612,7 +611,7 @@ int YApplication::mainLoop() {
                     } else {
                         if (xev.type == MapRequest) {
                             // !!! java seems to do this ugliness
-                            //YFrameWindow *f = getFrame(xev.xany.window);
+                            //YFrameWindow *f = frame(xev.xany.window);
                             msg("BUG? mapRequest for window %lX sent to destroyed frame %lX!",
                                 xev.xmaprequest.parent,
                                 xev.xmaprequest.window);
@@ -831,7 +830,7 @@ int YApplication::grabEvents(YWindow *win, Cursor ptr, unsigned int eventMask,
     if (NULL != fGrabWindow) return 0;
     if (NULL == win) return 0;
 
-    XSync(display(), 0);
+    sync();
     fGrabTree = grabTree;
 
     if (grabMouse) {
@@ -1140,7 +1139,7 @@ void YApplication::alert() {
 }
 
 void YApplication::runProgram(const char *str, const char *const *args) {
-    XSync(app->display(), False);
+    sync();
 
     if (fork() == 0) {
         app->resetSignals();
@@ -1170,28 +1169,20 @@ void YApplication::runCommand(const char *cmdline) {
     runProgram(argv[0], argv);
 }
 
-void YApplication::setClipboardText(char *data, int len) {
+void YApplication::clipboardText(char *data, int len) {
     if (fClip == 0)
         fClip = new YClipboard();
     if (!fClip)
         return ;
-    fClip->setData(data, len);
+    fClip->data(data, len);
 }
 
 bool YApplication::hasGNOME() {
 #ifdef CONFIG_GNOME_ROOT_PROPERTY
-    Atom GNOME_ROOT_PROPERTY(XInternAtom(display(),
-    			     CONFIG_GNOME_ROOT_PROPERTY, true));
+    Atom GNOME_ROOT_PROPERTY(internAtom(CONFIG_GNOME_ROOT_PROPERTY, true));
 
-    Atom r_type; int r_format;
-    unsigned long count, bytes_remain;
-    Window gnomeName;
-
-    return (GNOME_ROOT_PROPERTY != None &&
-	    XGetWindowProperty(display(), desktop->handle(),
-			       GNOME_ROOT_PROPERTY, 0, 1, false, XA_WINDOW,
-			       &r_type, &r_format, &count, &bytes_remain,
-			       (unsigned char **) &gnomeName) == Success);
+    return GNOME_ROOT_PROPERTY != None &&
+           Success == YWindowProperty(desktop->handle(), GNOME_ROOT_PROPERTY);
 #else // this also detects xsm as GNOME, how to detect KDE?
     return getenv("SESSION_MANAGER");
 #endif
@@ -1339,6 +1330,9 @@ void YAtoms::init() {
 #endif
 #ifdef CONFIG_GUIEVENTS
         { &icewmGuiEvent,           XA_ICEWM_GUI_EVENT                      },          
+#endif
+#ifdef CONFIG_WM_SESSION
+        { &icewmPid,                XA_ICEWM_PID                            },          
 #endif
         { &icewmFontPath,           XA_ICEWM_FONTPATH                       }
     };

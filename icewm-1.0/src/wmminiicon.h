@@ -16,7 +16,7 @@ public:
     virtual void handleCrossing(const XCrossingEvent &crossing);
     virtual void handleDrag(const XButtonEvent &down, const XMotionEvent &motion);
 
-    YFrameWindow *getFrame() const { return fFrame; };
+    YFrameWindow *frame() const { return fFrame; };
 private:
     YFrameWindow *fFrame;
     int selected;

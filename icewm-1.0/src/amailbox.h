@@ -34,7 +34,7 @@ public:
     MailCheck(MailBoxStatus *mbx);
     virtual ~MailCheck();
 
-    void setURL(const char *url);
+    void url(const char *url);
     void startCheck();
 
     virtual void socketConnected();

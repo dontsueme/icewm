@@ -13,15 +13,13 @@
 
 #include <stdio.h>
 
-YClientContainer::YClientContainer(YWindow *parent, YFrameWindow *frame)
-:YWindow(parent)
-{
-    fFrame = frame;
-    fHaveGrab = false;
-    fHaveActionGrab = false;
-
-    setStyle(wsManager);
-    setPointer(YApplication::leftPointer);
+YClientContainer::YClientContainer(YWindow *parent, YFrameWindow *frame):
+YWindow(parent),
+fFrame(frame),
+fHaveGrab(false),
+fHaveActionGrab(false) {
+    style(wsManager);
+    pointer(YApplication::leftPointer);
 }
 
 YClientContainer::~YClientContainer() {
@@ -38,13 +36,13 @@ void YClientContainer::handleButton(const XButtonEvent &button) {
         (!useMouseWheel || (button.button != 4 && button.button != 5)))
     {
         if (focusOnClickClient) {
-            if (getFrame()->isFocusable() && !getFrame()->focused())
+            if (frame()->isFocusable() && !frame()->focused())
                 firstClick = true;
             doActivate = true;
         }
         if (raiseOnClickClient) {
             doRaise = true;
-            if (getFrame()->canRaise())
+            if (frame()->canRaise())
                 firstClick = true;
         }
     }
@@ -54,10 +52,9 @@ void YClientContainer::handleButton(const XButtonEvent &button) {
 
     {
         XAllowEvents(app->display(), AsyncPointer, CurrentTime);
-        if (getFrame()->canMove()) {
-            getFrame()->startMoveSize(1, 1,
-                                      0, 0,
-                                      button.x + x(), button.y + y());
+        if (frame()->canMove()) {
+            frame()->startMoveSize(1, 1, 0, 0,
+                                   button.x + x(), button.y + y());
         }
         return ;
     }
@@ -67,13 +64,14 @@ void YClientContainer::handleButton(const XButtonEvent &button) {
         XAllowEvents(app->display(), ReplayPointer, CurrentTime);
     else
         XAllowEvents(app->display(), AsyncPointer, CurrentTime);
-    XSync(app->display(), 0);
+
+    app->sync();
+
     // ??? do this first
-    if (doActivate)
-        getFrame()->activate();
-    if (doRaise)
-        getFrame()->wmRaise();
-    return ;
+    if (doActivate) frame()->activate();
+    if (doRaise) frame()->wmRaise();
+
+    return;
 }
 
 // manage button grab on frame window to capture clicks to client window
@@ -144,36 +142,30 @@ void YClientContainer::releaseButtons() {
 void YClientContainer::handleConfigureRequest(const XConfigureRequestEvent &configureRequest) {
     MSG(("configure request in frame"));
 
-    if (getFrame() &&
-        configureRequest.window == getFrame()->client()->handle())
-    {
+    if (frame() && configureRequest.window == frame()->client()->handle()) {
         XConfigureRequestEvent cre = configureRequest;
-
-        getFrame()->configureClient(cre);
+        frame()->configureClient(cre);
     }
 }
 
 void YClientContainer::handleMapRequest(const XMapRequestEvent &mapRequest) {
-    if (mapRequest.window == getFrame()->client()->handle()) {
-        getFrame()->setState(WinStateMinimized |
-                             WinStateHidden |
-                             WinStateRollup,
-                             0);
-        getFrame()->focusOnMap();
+    if (mapRequest.window == frame()->client()->handle()) {
+        frame()->state(WinStateMinimized |
+                       WinStateHidden |
+                       WinStateRollup, 0);
+        frame()->focusOnMap();
     }
 }
 
 void YClientContainer::handleCrossing(const XCrossingEvent &crossing) {
-    if (getFrame() && pointerColormap) {
+    if (frame() && pointerColormap) {
         if (crossing.type == EnterNotify)
-            manager->setColormapWindow(getFrame());
+            manager->colormapWindow(frame());
         else if (crossing.type == LeaveNotify &&
                  crossing.detail != NotifyInferior &&
                  crossing.mode == NotifyNormal &&
-                 manager->colormapWindow() == getFrame())
-        {
-            manager->setColormapWindow(0);
-        }
+                 manager->colormapWindow() == frame())
+            manager->colormapWindow(NULL);
     }
 }
 

@@ -41,7 +41,7 @@ int init(int argc, char ** argv) {
     wmhints.initial_state = WithdrawnState;
     wmhints.icon_window = dockapp;
     wmhints.window_group = dockapp;
-    wmhints.flags = StateHint | IconWindowHint | WindowGroupHint;
+    wmhints.flags = StateHint | IconWindowHint/* | WindowGroupHint*/;
 
     XShapeCombineMask(dpy, dockapp, ShapeBounding, 0, 0, mask, ShapeSet);
     XSetWMProtocols(dpy, dockapp, &XA_WM_DELETE_WINDOW, 1);

@@ -24,12 +24,14 @@ extern YAction *workspaceActionMoveTo[MAXWORKSPACES];
 extern YAction *layerActionSet[WinLayerCount];
 
 #ifdef CONFIG_TRAY
-extern YAction *trayOptionActionSet[WinTrayOptionCount];
+extern YAction *trayOptionActionSet[IcewmTrayOptionCount];
 #endif
 
 class YWindowManager;
 class YFrameClient;
+class YClientPeer;
 class YFrameWindow;
+class YTrayWindow;
 
 class EdgeSwitch:
 public YWindow,
@@ -84,16 +86,28 @@ public:
     Window findWindow(Window root, char const * wmInstance,
     		      char const * wmClass);
 
-    YFrameWindow *findFrame(Window win);
     YFrameClient *findClient(Window win);
+    YFrameWindow *findFrame(Window win);
+#if CONFIG_KDE_TRAY_WINDOWS
+    YTrayWindow *findTrayWindow(Window win);
+#endif    
+
     YFrameWindow *manageClient(Window win, bool mapClient = false);
     void unmanageClient(Window win, bool mapClient = false,
 			bool reparent = true);
     void destroyedClient(Window win);
     YFrameWindow *mapClient(Window win);
 
-    void setFocus(YFrameWindow *f, bool canWarp = false);
-    YFrameWindow *getFocus() { return fFocusWin; }
+    YFrameWindow *manageFrame(YFrameClient *client, bool mapClient = false);
+#if CONFIG_KDE_TRAY_WINDOWS
+    void manageTrayWindow(YFrameClient *client);
+#endif    
+#ifdef CONFIG_DOCK
+    void manageDockApp(YFrameClient *client);
+#endif    
+
+    void focus(YFrameWindow *f, bool canWarp = false);
+    YFrameWindow *focus() { return fFocusWin; }
 
     void loseFocus(YFrameWindow *window);
     void loseFocus(YFrameWindow *window,
@@ -102,7 +116,7 @@ public:
     void activate(YFrameWindow *frame, bool canWarp = false);
 
     void installColormap(Colormap cmap);
-    void setColormapWindow(YFrameWindow *frame);
+    void colormapWindow(YFrameWindow *frame);
     YFrameWindow *colormapWindow() { return fColormapWindow; }
 
     void removeClientFrame(YFrameWindow *frame);
@@ -126,8 +140,8 @@ public:
     int calcCoverage(bool down, YFrameWindow *frame, int x, int y, int w, int h);
     void tryCover(bool down, YFrameWindow *frame, int x, int y, int w, int h,
                   int &px, int &py, int &cover);
-    bool getSmartPlace(bool down, YFrameWindow *frame, int &x, int &y, int w, int h);
-    void getNewPosition(YFrameWindow *frame, int &x, int &y, int w, int h);
+    bool smartPlace(bool down, YFrameWindow *frame, int &x, int &y, int w, int h);
+    void newPosition(YFrameWindow *frame, int &x, int &y, int w, int h);
     void placeWindow(YFrameWindow *frame, int x, int y, bool newClient, bool &canActivate);
 
     YFrameWindow *top(long layer) const { return fTop[layer]; }
@@ -149,6 +163,12 @@ public:
     void relocateWindows(int dx, int dy);
     void updateClientList();
 
+#if CONFIG_KDE_TRAY_WINDOWS
+    void addTrayWindow(YTrayWindow *window);
+    void removeTrayWindow(YTrayWindow *window);
+    void updateTrayList();
+#endif
+
     YMenu *createWindowMenu(YMenu *menu, long workspace);
     int windowCount(long workspace);
 #ifdef CONFIG_WINMENU
@@ -162,11 +182,11 @@ public:
     const char *workspaceName(long workspace) const { return ::workspaceNames[workspace]; }
 
     void announceWorkArea();
-    void setWinWorkspace(long workspace);
+    void winWorkspace(long workspace);
     void updateWorkArea();
     void resizeWindows();
 
-    void getIconPosition(YFrameWindow *frame, int *iconX, int *iconY);
+    void iconPosition(YFrameWindow *frame, int *iconX, int *iconY);
 
     void wmCloseSession();
     void exitAfterLastClient(bool shuttingDown);
@@ -190,11 +210,11 @@ public:
     void tilePlace(YFrameWindow *w, int tx, int ty, int tw, int th);
     void tileWindows(YFrameWindow **w, int count, bool vertical);
     void smartPlace(YFrameWindow **w, int count);
-    void getCascadePlace(YFrameWindow *frame, int &lastX, int &lastY, int &x, int &y, int w, int h);
+    void cascadePlace(YFrameWindow *frame, int &lastX, int &lastY, int &x, int &y, int w, int h);
     void cascadePlace(YFrameWindow **w, int count);
-    void setWindows(YFrameWindow **w, int count, YAction *action);
+    void windows(YFrameWindow **w, int count, YAction *action);
 
-    void getWindowsToArrange(YFrameWindow ***w, int *count);
+    void windowsToArrange(YFrameWindow ***w, int *count);
 
     void saveArrange(YFrameWindow **w, int count);
     void undoArrange();
@@ -202,18 +222,21 @@ public:
     bool haveClients();
     void setupRootProxy();
 
-    void setWorkAreaMoveWindows(bool m) { fWorkAreaMoveWindows = m; }
+    void workAreaMoveWindows(bool m) { fWorkAreaMoveWindows = m; }
 
 #ifdef CONFIG_WM_SESSION
-    void setTopLevelProcess(pid_t p);
+    void topLevelProcess(pid_t p);
     void removeLRUProcess();
 #endif
 
-    static char const * getName();
+    static char const * name();
 
 public:
     static XContext frameContext;
     static XContext clientContext;
+#if CONFIG_KDE_TRAY_WINDOWS
+    static XContext trayContext;
+#endif
 
 private:
     struct WindowPosState {
@@ -233,6 +256,11 @@ private:
     YFrameWindow *fColormapWindow;
     YProxyWindow *fRootProxy;
     YWindow *fTopWin;
+    
+#if CONFIG_KDE_TRAY_WINDOWS
+    typedef YSingleList<YTrayWindow> TrayWindowList;
+    TrayWindowList fTrayWindows;
+#endif
 
     long fActiveWorkspace;
     long fLastWorkspace;

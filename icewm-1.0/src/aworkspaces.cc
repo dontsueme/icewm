@@ -41,7 +41,7 @@ class YPixbuf *workspacebuttonactivePixbuf(NULL);
 WorkspaceButton::WorkspaceButton(long ws, YWindow *parent): YButton(parent, 0)
 {
     fWorkspace = ws;
-    //setDND(true);
+    //dnd(true);
 }
 
 void WorkspaceButton::handleClick(const XButtonEvent &up, int count) {
@@ -78,8 +78,8 @@ void WorkspaceButton::actionPerformed(YAction */*action*/, unsigned int modifier
     if (modifiers & ShiftMask) {
         manager->switchToWorkspace(fWorkspace, true);
     } else if (modifiers & app->AltMask) {
-        if (manager->getFocus())
-            manager->getFocus()->wmOccupyWorkspace(fWorkspace);
+        if (manager->focus())
+            manager->focus()->wmOccupyWorkspace(fWorkspace);
     } else {
         manager->activateWorkspace(fWorkspace);
         return;
@@ -106,8 +106,8 @@ WorkspacesPane::WorkspacesPane(YWindow *parent): YWindow(parent) {
 		YIcon::Image * image
 		    (paths.loadImage("workspace/", workspaceNames[w]));
 
-		if (image) wk->setImage(image);
-                else wk->setText(workspaceNames[w]);
+		if (image) wk->image(image);
+                else wk->text(workspaceNames[w]);
 		
 		char * wn(newstr(basename(workspaceNames[w])));
 		char * ext(strrchr(wn, '.'));
@@ -116,7 +116,7 @@ WorkspacesPane::WorkspacesPane(YWindow *parent): YWindow(parent) {
 		char * tt(strJoin(_("Workspace: "), wn, NULL));
 		delete[] wn;
 
-		wk->setToolTip(tt);
+		wk->toolTip(tt);
 		delete[] tt;
 		
                 if ((int)wk->height() + 1 > ht) ht = wk->height() + 1;
@@ -128,13 +128,13 @@ WorkspacesPane::WorkspacesPane(YWindow *parent): YWindow(parent) {
             YButton *wk = fWorkspaceButton[w];
             //leftX += 2;
             if (wk) {
-                wk->setSize(wk->width(), ht);
-                wk->setPosition(leftX, 0); // + (ht - ADD - wk->height()) / 2);
+                wk->size(wk->width(), ht);
+                wk->position(leftX, 0); // + (ht - ADD - wk->height()) / 2);
                 wk->show();
                 leftX += wk->width();
             }
         }
-        setSize(leftX, ht);
+        size(leftX, ht);
     }
 }
 
@@ -150,35 +150,35 @@ WorkspaceButton *WorkspacesPane::workspaceButton(long n) {
     return (fWorkspaceButton ? fWorkspaceButton[n] : NULL);
 }
 
-YFont * WorkspaceButton::getFont() {
+YFont * WorkspaceButton::font() {
     return isPressed()
     	? *activeWorkspaceFontName
 	  ? activeButtonFont
 	    ? activeButtonFont
-	    : activeButtonFont = YFont::getFont(activeWorkspaceFontName)
-	  : YButton::getFont()
+	    : activeButtonFont = YFont::font(activeWorkspaceFontName)
+	  : YButton::font()
     	: *normalWorkspaceFontName
 	  ? normalButtonFont
 	    ? normalButtonFont
-	    : normalButtonFont = YFont::getFont(normalWorkspaceFontName)
-	  : YButton::getFont();
+	    : normalButtonFont = YFont::font(normalWorkspaceFontName)
+	  : YButton::font();
 }
 
-YColor * WorkspaceButton::getColor() {
+YColor * WorkspaceButton::color() {
     return isPressed()
     	? *clrWorkspaceActiveButtonText
 	  ? activeButtonFg
 	    ? activeButtonFg
 	    : activeButtonFg = new YColor(clrWorkspaceActiveButtonText)
-	  : YButton::getColor()
+	  : YButton::color()
     	: *clrWorkspaceNormalButtonText
 	  ? normalButtonFg
 	    ? normalButtonFg
 	    : normalButtonFg = new YColor(clrWorkspaceNormalButtonText)
-	  : YButton::getColor();
+	  : YButton::color();
 }
 
-YSurface WorkspaceButton::getSurface() {
+YSurface WorkspaceButton::surface() {
     if (activeButtonBg == 0)
         activeButtonBg = new YColor(*clrWorkspaceActiveButton
 			? clrWorkspaceActiveButton : clrActiveButton);

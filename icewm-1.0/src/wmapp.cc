@@ -6,7 +6,6 @@
 #include "config.h"
 #include "yfull.h"
 #include "atasks.h"
-#include "atray.h"
 #include "wmapp.h"
 #include "wmaction.h"
 #include "wmmgr.h"
@@ -159,31 +158,25 @@ static void initFontPath() {
 		MSG(("Font path element %d: %s", n, newFontPath[n]));
 #endif
 
-	    char * icewmFontPath; // ---------- find death icewm's font path ---
-	    Atom r_type; int r_format;
-	    unsigned long count, bytes_remain;
 
-	    if (XGetWindowProperty(app->display(),
-				   manager->handle(),
-				   atoms.icewmFontPath,
-				   0, PATH_MAX, False, XA_STRING,
-				   &r_type, &r_format,
-				   &count, &bytes_remain,
-				   (unsigned char **) &icewmFontPath) ==
-				   Success && icewmFontPath) {
-		if (r_type == XA_STRING && r_format == 8) {
-		    for (int n(ndirs); n > 0; --n) // ---- remove death paths ---
-			if (!strcmp(icewmFontPath, newFontPath[n])) {
-			    if (n != ndirs)
-				memmove(newFontPath + n, newFontPath + n + 1,
-					(ndirs - n) * sizeof(char *));
-			    --ndirs;
-			}
-		} else
-		    warn(_("Unexpected format of ICEWM_FONT_PATH property"));
+                               // ---------- find dangling icewm's font path ---
+            YWindowProperty icewmFontPath(manager->handle(),
+                                          atoms.icewmFontPath, XA_STRING,
+                                          PATH_MAX);
 
-		XFree(icewmFontPath);
-	    }
+            if (icewmFontPath == Success && icewmFontPath.count())
+                if (icewmFontPath.format() == 8 &&
+                    icewmFontPath.type() == XA_STRING) {
+                    char const *path(icewmFontPath.template ptr<char>());
+
+                    for (int n(ndirs); n > 0; --n) // --- remove death paths ---
+                        if (!strcmp(path, newFontPath[n])) if (n != ndirs) {
+                            memmove(newFontPath + n, newFontPath + n + 1,
+				   (ndirs - n) * sizeof(char *));
+                            --ndirs;
+                        }
+                } else
+                    warn(_("Unexpected format of _ICEWM_FONT_PATH property"));
 
 #ifdef DEBUG
 	    for (int n = 0; n < ndirs + 1; ++n)
@@ -233,7 +226,7 @@ static YPixmap * renderBackground(YResourcePaths const & paths,
 	YPixmap * cBack = new YPixmap(desktop->width(), desktop->height());
 	Graphics g(*cBack);
 
-        g.setColor(color);
+        g.color(color);
         g.fillRect(0, 0, desktop->width(), desktop->height());
         g.drawPixmap(back, (desktop->width() -  back->width()) / 2,
 			   (desktop->height() - back->height()) / 2);
@@ -602,7 +595,7 @@ static void initPixmaps() {
 static void initMenus() {
 #ifdef CONFIG_WINMENU
     windowListMenu = new WindowListMenu();
-    windowListMenu->setShared(true); // !!!
+    windowListMenu->shared(); // !!!
     windowListMenu->actionListener(wmapp);
 #endif
 
@@ -610,9 +603,9 @@ static void initMenus() {
 	logoutMenu = new YMenu();
 	PRECONDITION(logoutMenu != 0);
 
-	logoutMenu->setShared(true); /// !!! get rid of this (refcount objects)
-	logoutMenu->addItem(_("_Logout"), -2, "", actionLogout)->setChecked(true);
-	logoutMenu->addItem(_("_Cancel logout"), -2, "", actionCancelLogout)->setEnabled(false);
+	logoutMenu->shared(); /// !!! get rid of this (refcount objects)
+	logoutMenu->addItem(_("_Logout"), -2, "", actionLogout)->checked(true);
+	logoutMenu->addItem(_("_Cancel logout"), -2, "", actionCancelLogout)->enabled(false);
 	logoutMenu->addSeparator();
 
 #ifndef NO_CONFIGURE_MENUS
@@ -638,11 +631,11 @@ static void initMenus() {
 
     windowMenu = new YMenu();
     assert(windowMenu != 0);
-    windowMenu->setShared(true);
+    windowMenu->shared();
 
     layerMenu = new YMenu();
     assert(layerMenu != 0);
-    layerMenu->setShared(true);
+    layerMenu->shared();
 
     layerMenu->addItem(_("_Menu"),       -2, 0, layerActionSet[WinLayerMenu]);
     layerMenu->addItem(_("_Above Dock"), -2, 0, layerActionSet[WinLayerAboveDock]);
@@ -655,17 +648,17 @@ static void initMenus() {
 #ifdef CONFIG_TRAY
     if (taskBarShowTray) {
 	trayMenu = new YMenu();
-	trayMenu->setShared(true);
+	trayMenu->shared();
 	
-	trayMenu->addItem(_("_No icon"),   -2, 0, trayOptionActionSet[WinTrayIgnore]);
-	trayMenu->addItem(_("_Minimized"), -2, 0, trayOptionActionSet[WinTrayMinimized]);
-	trayMenu->addItem(_("_Exclusive"), -2, 0, trayOptionActionSet[WinTrayExclusive]);
+	trayMenu->addItem(_("_No icon"),   -2, 0, trayOptionActionSet[IcewmTrayIgnore]);
+	trayMenu->addItem(_("_Minimized"), -2, 0, trayOptionActionSet[IcewmTrayMinimized]);
+	trayMenu->addItem(_("_Exclusive"), -2, 0, trayOptionActionSet[IcewmTrayExclusive]);
     }
 #endif
 
     moveMenu = new YMenu();
     assert(moveMenu != 0);
-    moveMenu->setShared(true);
+    moveMenu->shared();
     for (int w = 0; w < workspaceCount; w++) {
         char s[128];
         sprintf(s, "%lu. %s", (unsigned long)(w + 1), workspaceNames[w]);
@@ -693,7 +686,7 @@ static void initMenus() {
     }
 
     if (!limitByDockLayer)
-	windowMenu->addItem(_("Limit _Workarea"), -2, 0, actionDoNotCover);
+	windowMenu->addItem(_("Limit _Workarea"), -2, 0, actionDontCover);
 
 #ifdef CONFIG_TRAY
     if (trayMenu) {
@@ -749,7 +742,7 @@ int handler(Display *display, XErrorEvent *xev) {
 
 #ifdef DEBUG
 void dumpZorder(const char *oper, YFrameWindow *w, YFrameWindow *a) {
-    YFrameWindow *p = manager->top(w->getLayer());
+    YFrameWindow *p = manager->top(w->layer());
     msg("---- %s ", oper);
     while (p) {
         if (p && p->client())
@@ -762,7 +755,7 @@ void dumpZorder(const char *oper, YFrameWindow *w, YFrameWindow *a) {
 #endif
 
 void runRestart(const char *str, const char **args) {
-    XSync(app->display(), False);
+    app->sync();
     ///!!! problem with repeated SIGHUP for restart...
     app->resetSignals();
 
@@ -829,8 +822,8 @@ void YWMApp::actionPerformed(YAction *action, unsigned int /*modifiers*/) {
             if (fLogoutMsgBox == 0) {
                 YMsgBox *msgbox = new YMsgBox(YMsgBox::mbOK|YMsgBox::mbCancel);
                 fLogoutMsgBox = msgbox;
-                msgbox->setTitle(_("Confirm Logout"));
-                msgbox->setText(_("Logout will close all active applications.\nProceed?"));
+                msgbox->title(_("Confirm Logout"));
+                msgbox->text(_("Logout will close all active applications.\nProceed?"));
                 msgbox->autoSize();
                 msgbox->msgBoxListener(this);
                 msgbox->showFocused();
@@ -853,7 +846,7 @@ void YWMApp::actionPerformed(YAction *action, unsigned int /*modifiers*/) {
         static YWindow *w = 0;
         if (w == 0) w = new YWindow();
         if (w) {
-            w->setGeometry(0, 0, desktop->width(), desktop->height());
+            w->geometry(0, 0, desktop->width(), desktop->height());
             w->raise();
             w->show();
             w->hide();
@@ -869,7 +862,7 @@ void YWMApp::actionPerformed(YAction *action, unsigned int /*modifiers*/) {
         YFrameWindow **w = 0;
         int count = 0;
 
-        manager->getWindowsToArrange(&w, &count);
+        manager->windowsToArrange(&w, &count);
         if (w) {
             manager->tileWindows(w, count, action == actionTileVertical);
             delete [] w;
@@ -877,7 +870,7 @@ void YWMApp::actionPerformed(YAction *action, unsigned int /*modifiers*/) {
     } else if (action == actionArrange) {
         YFrameWindow **w = 0;
         int count = 0;
-        manager->getWindowsToArrange(&w, &count);
+        manager->windowsToArrange(&w, &count);
         if (w) {
             manager->smartPlace(w, count);
             delete [] w;
@@ -885,15 +878,15 @@ void YWMApp::actionPerformed(YAction *action, unsigned int /*modifiers*/) {
     } else if (action == actionHideAll || action == actionMinimizeAll) {
         YFrameWindow **w = 0;
         int count = 0;
-        manager->getWindowsToArrange(&w, &count);
+        manager->windowsToArrange(&w, &count);
         if (w) {
-            manager->setWindows(w, count, action);
+            manager->windows(w, count, action);
             delete [] w;
         }
     } else if (action == actionCascade) {
         YFrameWindow **w = 0;
         int count = 0;
-        manager->getWindowsToArrange(&w, &count);
+        manager->windowsToArrange(&w, &count);
         if (w) {
             manager->cascadePlace(w, count);
             delete [] w;
@@ -1214,7 +1207,7 @@ int main(int argc, char **argv) {
             else if (strcmp(argv[i], "-n") == 0)
                 configurationLoaded = 1;
             else if (strcmp(argv[i], "-v") == 0) {
-                puts(YWindowManager::getName());
+                puts(YWindowManager::name());
                 puts("Copyright 1997-2001 Marko Macek, "
                                "2001 Mathias Hasselmann");
                 configurationLoaded = 1;

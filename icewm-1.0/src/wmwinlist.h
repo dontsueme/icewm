@@ -13,16 +13,16 @@ class WindowListBox;
 
 class WindowListItem: public YListItem {
 public:
-    WindowListItem(ClientData *frame);
+    WindowListItem(YClientPeer *peer);
     virtual ~WindowListItem();
 
-    virtual int getOffset();
+    virtual int offset();
     
-    virtual const char *getText();
-    virtual YIcon *getIcon();
-    ClientData *getFrame() const { return fFrame; }
+    virtual const char *text();
+    virtual YIcon *icon();
+    YClientPeer *peer() const { return fPeer; }
 private:
-    ClientData *fFrame;
+    YClientPeer *fPeer;
 };
 
 class WindowListBox:
@@ -55,14 +55,14 @@ public:
     WindowListItem *addWindowListApp(YFrameWindow *frame);
     void removeWindowListApp(WindowListItem *item);
 
-    void repaintItem(WindowListItem *item) { list->repaintItem(item); }
+    void repaintItem(WindowListItem *item) { fList->repaintItem(item); }
     void showFocused(int x, int y);
 
-    WindowListBox *getList() const { return list; }
+    WindowListBox *list() const { return fList; }
 
 private:
-    WindowListBox *list;
-    YScrollView *scroll;
+    WindowListBox *fList;
+    YScrollView *fScroll;
 };
 
 extern WindowList *windowList;

@@ -52,7 +52,7 @@ private:
     // methods local to this class
     bool isUp();
     bool isUpIsdn();
-    void getCurrent(int *in, int *out, int *tot);
+    void current(int *in, int *out, int *tot);
     void updateStatus();
     void updateToolTip();
 

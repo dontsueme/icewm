@@ -15,8 +15,8 @@
 
 class YClientContainer;
 class MiniIcon;
-class TaskBarApp;
-class TrayApp;
+class TaskButton;
+class TrayIcon;
 class YFrameTitleBar;
 
 class YFrameWindow:
@@ -25,7 +25,7 @@ public YAction::Listener,
 public YTimer::Listener,
 public YMsgBox::Listener,
 public PopDownListener, 
-public ClientData {
+public YClientPeer {
 public:
     YFrameWindow(YWindow *parent, YFrameClient *client);
     virtual ~YFrameWindow();
@@ -92,7 +92,7 @@ public:
 #ifdef CONFIG_TRAY
     void wmSetTrayOption(long option);
 #endif
-    void wmToggleDoNotCover();
+    void wmToggleDontCover();
 
     void minimizeTransients();
     void restoreMinimizedTransients();
@@ -136,7 +136,7 @@ public:
     void constrainPositionByModifier(int &x, int &y, const XMotionEvent &motion);
     void constrainMouseToWorkspace(int &x, int &y);
 
-    void getDefaultOptions();
+    void defaultOptions();
 
     bool canSize(bool boriz = true, bool vert = true);
     bool canMove();
@@ -151,8 +151,8 @@ public:
 
     void insertFrame();
     void removeFrame();
-    void setAbove(YFrameWindow *aboveFrame); // 0 = at the bottom
-    void setBelow(YFrameWindow *belowFrame); // 0 = at the top
+    void above(YFrameWindow *aboveFrame); // 0 = at the bottom
+    void below(YFrameWindow *belowFrame); // 0 = at the top
     YFrameWindow *next() const { return fNextFrame; }
     YFrameWindow *prev() const { return fPrevFrame; }
     void next(YFrameWindow *next) { fNextFrame = next; }
@@ -231,7 +231,7 @@ public:
         fdHide          = (1 << 7),
         fdRollup        = (1 << 8),
         fdDepth         = (1 << 9)
-    } YFrameDecors;
+    } YFrameDecorations;
 
     enum YFrameOptions {
         foAllWorkspaces		= (1 << 0),
@@ -242,32 +242,32 @@ public:
         foNoFocusOnAppRaise	= (1 << 5),
         foIgnoreNoFocusHint	= (1 << 6),
         foIgnorePosition	= (1 << 7),
-        foDoNotCover		= (1 << 8)
+        foDontCover		= (1 << 8)
     };
 
     unsigned long frameFunctions() const { return fFrameFunctions; }
-    unsigned long frameDecors() const { return fFrameDecors; }
+    unsigned long frameDecorations() const { return fFrameDecorations; }
     unsigned long frameOptions() const { return fFrameOptions; }
-    void getFrameHints();
+    void updateFrameHints();
 #ifndef NO_WINDOW_OPTIONS
-    void getWindowOptions(WindowOption &opt, bool remove); /// !!! fix kludges
-    void getWindowOptions(WindowOptions *list, WindowOption &opt, bool remove);
+    void windowOptions(WindowOption &opt, bool remove); /// !!! fix kludges
+    void windowOptions(WindowOptions *list, WindowOption &opt, bool remove);
 #endif
 
     YMenu *windowMenu();
 
     unsigned int borderX() const {
         return
-            (frameDecors() & fdBorder) ?
-            ((frameDecors() & fdResize) ? wsBorderX : wsDlgBorderX) : 0;
+            (frameDecorations() & fdBorder) ?
+            ((frameDecorations() & fdResize) ? wsBorderX : wsDlgBorderX) : 0;
     }
     unsigned int borderY() const {
         return
-            (frameDecors() & fdBorder) ?
-            ((frameDecors() & fdResize) ? wsBorderY : wsDlgBorderY) : 0;
+            (frameDecorations() & fdBorder) ?
+            ((frameDecorations() & fdResize) ? wsBorderY : wsDlgBorderY) : 0;
     }
     unsigned int titleY() const {
-        return (frameDecors() & fdTitleBar) ? wsTitleBar : 0;
+        return (frameDecorations() & fdTitleBar) ? wsTitleBar : 0;
     }
     
     void layoutTitleBar();
@@ -283,7 +283,7 @@ public:
     YFrameWindow *prevLayer();
 #ifdef CONFIG_WINLIST
     WindowListItem *winListItem() const { return fWinListItem; }
-    void setWinListItem(WindowListItem *i) { fWinListItem = i; }
+    void winListItem(WindowListItem *i) { fWinListItem = i; }
 #endif
 
     void addAsTransient();
@@ -291,19 +291,19 @@ public:
     void addTransients();
     void removeTransients();
 
-    void setTransient(YFrameWindow *transient) { fTransient = transient; }
+    void transient(YFrameWindow *transient) { fTransient = transient; }
     void nextTransient(YFrameWindow *nextTransient) { fNextTransient = nextTransient; }
-    void setOwner(YFrameWindow *owner) { fOwner = owner; }
+    void owner(YFrameWindow *owner) { fOwner = owner; }
     YFrameWindow *transient() const { return fTransient; }
     YFrameWindow *nextTransient() const { return fNextTransient; }
     YFrameWindow *owner() const { return fOwner; }
 
 #ifndef LITE
-    YIcon *getClientIcon() const { return fFrameIcon; }
-    YIcon *clientIcon() const;
+    YIcon *clientIcon() const { return fFrameIcon; }
+    YIcon *updateClientIcon() const;
 #endif
 
-    void getNormalGeometry(int *x, int *y, int *w, int *h);
+    void normalGeometry(int *x, int *y, int *w, int *h);
     void updateNormalSize();
 
     void updateTitle();
@@ -317,67 +317,66 @@ public:
 
     void updateMwmHints();
     void updateProperties();
-#ifdef CONFIG_TASKBAR
+#ifdef CONFIG_TASKBAR    
     void updateTaskBar();
-#endif
+#endif    
 
-    long getWorkspace() const { return fWinWorkspace; }
-    void setWorkspace(long workspace);
-    long getLayer() const { return fWinLayer; }
-    void setLayer(long layer);
+    long workspace() const { return fWinWorkspace; }
+    void workspace(long workspace);
+    long layer() const { return fWinLayer; }
+    void layer(long layer);
 #ifdef CONFIG_TRAY
-    long getTrayOption() const { return fWinTrayOption; }
-    void setTrayOption(long option);
+    long trayOption() const { return fIcewmTrayOption; }
+    void trayOption(long option);
 #endif
-    void setDoNotCover(bool flag);
-    long getState() const { return fWinState; }
-    void setState(long mask, long state);
+    void dontCover(bool flag);
+    long state() const { return fWinState; }
+    void state(long mask, long state);
 
-    bool isMaximized() const { return (getState() & (WinStateMaximizedHoriz |
-                                                     WinStateMaximizedVert)); }
-    bool isMaximizedVert() const { return (getState() & WinStateMaximizedVert); }
-    bool isMaximizedHoriz() const { return (getState() & WinStateMaximizedHoriz); }
+    bool isMaximized() const { return (state() & (WinStateMaximizedHoriz |
+                                                  WinStateMaximizedVert)); }
+    bool isMaximizedVert() const { return (state() & WinStateMaximizedVert); }
+    bool isMaximizedHoriz() const { return (state() & WinStateMaximizedHoriz); }
     bool isMaximizedFully() const { return isMaximizedVert() && isMaximizedHoriz(); }
-    bool isMinimized() const { return (getState() & WinStateMinimized); }
-    bool isHidden() const { return (getState() & WinStateHidden); }
-    bool isRollup() const { return (getState() & WinStateRollup); }
-    bool isSticky() const { return (getState() & WinStateAllWorkspaces); }
-    //bool isHidWorkspace() { return (getState() & WinStateHidWorkspace); }
-    //bool isHidTransient() { return (getState() & WinStateHidTransient); }
+    bool isMinimized() const { return (state() & WinStateMinimized); }
+    bool isHidden() const { return (state() & WinStateHidden); }
+    bool isRollup() const { return (state() & WinStateRollup); }
+    bool isSticky() const { return (state() & WinStateAllWorkspaces); }
+    //bool isHidWorkspace() { return (state() & WinStateHidWorkspace); }
+    //bool isHidTransient() { return (state() & WinStateHidTransient); }
 
-    bool wasMinimized() const { return (getState() & WinStateWasMinimized); }
-    bool wasHidden() const { return (getState() & WinStateWasHidden); }
+    bool wasMinimized() const { return (state() & WinStateWasMinimized); }
+    bool wasHidden() const { return (state() & WinStateWasHidden); }
 
     bool isIconic() const { return isMinimized() && minimizeToDesktop && fMiniIcon; }
 
-    MiniIcon *getMiniIcon() const { return fMiniIcon; }
+    MiniIcon *miniIcon() const { return fMiniIcon; }
 
     bool isManaged() const { return fManaged; }
-    void setManaged(bool isManaged) { fManaged = isManaged; }
+    void managed(bool isManaged = true) { fManaged = isManaged; }
 
-    void setSticky(bool sticky);
+    void sticky(bool sticky);
 
-    bool visibleOn(long workspace) const {
-        return (isSticky() || getWorkspace() == workspace);
-    }
+    bool visibleOn(long ws) const { return isSticky() || ws == workspace(); }
     bool visibleNow() const { return visibleOn(manager->activeWorkspace()); }
 
     bool isModal();
     bool hasModal();
     bool isFocusable();
 
-    bool doNotCover() const { return limitByDockLayer
-    			      ? getLayer() == WinLayerDock
-    			      : frameOptions() & foDoNotCover; }
+    bool dontCover() const {
+        return limitByDockLayer ? layer() == WinLayerDock
+                                : frameOptions() & foDontCover;
+    }
 
 #ifndef LITE
-    virtual YIcon *getIcon() const { return clientIcon(); }
+    virtual YIcon *icon() const { return updateClientIcon(); }
 #endif
 
-    virtual const char *getTitle() const { return client()->windowTitle(); }
-    virtual const char *getIconTitle() const { return client()->iconTitle(); }
+    virtual const char *title() const { return client()->windowTitle(); }
+    virtual const char *iconTitle() const { return client()->iconTitle(); }
 
-    YFrameButton *getButton(char c);
+    YFrameButton *button(char c);
     void positionButton(YFrameButton *b, int &xPos, bool onRight);
     bool isButton(char c);
 
@@ -392,7 +391,7 @@ private:
 
     bool fFocused;
     unsigned long fFrameFunctions;
-    unsigned long fFrameDecors;
+    unsigned long fFrameDecorations;
     unsigned long fFrameOptions;
 
     int normalX, normalY;
@@ -428,10 +427,10 @@ private:
     int indicatorsVisible;
 
 #ifdef CONFIG_TASKBAR
-    TaskBarApp *fTaskBarApp;
+    TaskButton *fTaskButton;
 #endif
 #ifdef CONFIG_TRAY
-    TrayApp *fTrayApp;
+    TrayIcon *fTrayIcon;
 #endif
     MiniIcon *fMiniIcon;
 #ifdef CONFIG_WINLIST
@@ -449,7 +448,7 @@ private:
     long fWinWorkspace;
     long fWinLayer;
 #ifdef CONFIG_TRAY
-    long fWinTrayOption;
+    long fIcewmTrayOption;
 #endif
     long fWinState;
     long fWinStateMask;
