@@ -160,7 +160,7 @@
    | <a class=margin href="/#mail">Mailing&nbsp;List</a>
    | <a class=margin href="/#irc">IRC</a>
    | <a class=margin href="/#links">Links</a>
-   | <a class=margin href="/preview">Previews</a>
+   <!--| <a class=margin href="/preview">Previews</a-->
    | <a class=margin href="/nls.php">NLS</a> ]<br></small>
   </div><br>
 
