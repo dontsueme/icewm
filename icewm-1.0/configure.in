@@ -131,6 +131,7 @@ AC_ARG_ENABLE(i18n,
 *** the name of the locale-dependent parameter for your platform.])
       fi
       
+      ice_nl_codesets="${ice_nl_codesets} 0"
       AC_DEFINE_UNQUOTED(CONFIG_NL_CODESETS, ${ice_nl_codesets})
 
       ice_iconv_cxxflags="${CXXFLAGS}"

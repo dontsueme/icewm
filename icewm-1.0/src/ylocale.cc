@@ -43,7 +43,7 @@ YLocale::YLocale(char const * localeName) {
     multiByte = (MB_CUR_MAX > 1);
 
     char const * codeset("");
-    int const codesetItems[] = { CONFIG_NL_CODESETS, 0 };
+    int const codesetItems[] = { CONFIG_NL_CODESETS };
 
     for (int const * csi(codesetItems); *csi && 
          NULL != (codeset = nl_langinfo(*csi)) && '\0' == *codeset; ++csi);
