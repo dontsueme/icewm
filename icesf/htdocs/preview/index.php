@@ -29,8 +29,9 @@
 	  <hr noshade size=2 color="#cccccc">
 
           <div align=center>
-	    [ <?php cvsref(ChangeLog, 'icewm-1.0/icewm-1.0/CHANGES') ?> |
-	      ReleaseCriterias | RoadMap ]
+	    [ <a href="../changes.php">ChangeLog</a>
+	    | ReleaseCriterias
+	    | RoadMap ]
 	  </div>
 
 <?php include('../../libphp/tail.php') ?>
