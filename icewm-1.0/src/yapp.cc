@@ -1222,17 +1222,13 @@ void YApplication::initModifiers() {
         KeyCode hyperKeyCode = sym2code(XK_Hyper_L);
         KeyCode modeSwitchCode = sym2code(XK_Mode_switch);
 
-        // A keyboard might lack Alt_L but have Alt_R.
-        if (!altKeyCode)
-            altKeyCode = sym2code(XK_Alt_R);
-        if (!metaKeyCode)
-            metaKeyCode = sym2code(XK_Meta_R);
-        if (!superKeyCode)
-            superKeyCode = sym2code(XK_Super_R);
-        if (!hyperKeyCode)
-            hyperKeyCode = sym2code(XK_Hyper_R);
+        // A keyboard might lack Alt_L but have Alt_R...
+        if (!altKeyCode) altKeyCode = sym2code(XK_Alt_R);
+        if (!metaKeyCode) metaKeyCode = sym2code(XK_Meta_R);
+        if (!superKeyCode) superKeyCode = sym2code(XK_Super_R);
+        if (!hyperKeyCode) hyperKeyCode = sym2code(XK_Hyper_R);
 
-        KeyCode *c = xmk->modifiermap;
+        KeyCode *c(xmk->modifiermap);
 
         for (int m = 0; m < 8; m++)
             for (int k = 0; k < xmk->max_keypermod; k++, c++) {
@@ -1257,8 +1253,6 @@ void YApplication::initModifiers() {
 
 	XFreeModifiermap(xmk);
     }
-    if (MetaMask == AltMask)
-        MetaMask = 0;
 
     MSG(("alt:%d meta:%d super:%d hyper:%d mode:%d num:%d scroll:%d",
          AltMask, MetaMask, SuperMask, HyperMask, ModeSwitchMask,
@@ -1267,23 +1261,20 @@ void YApplication::initModifiers() {
     // some hacks for "broken" modifier configurations
 
     // this basically does what <0.9.13 versions did
-    if (AltMask != 0 && MetaMask == Mod1Mask) {
+    if (MetaMask == Mod1Mask) {
         MetaMask = AltMask;
         AltMask = Mod1Mask;
     }
 
-    if (AltMask == 0 && MetaMask != 0) {
-        if (MetaMask != Mod1Mask) {
-            AltMask = Mod1Mask;
-        }
-        else {
-            AltMask = MetaMask;
-            MetaMask = 0;
-        }
-    }
-
     if (AltMask == 0)
         AltMask = Mod1Mask;
+
+    if (MetaMask == AltMask)
+        MetaMask = 0;
+
+    MSG(("alt:%d meta:%d super:%d hyper:%d mode:%d num:%d scroll:%d",
+         AltMask, MetaMask, SuperMask, HyperMask, ModeSwitchMask,
+	 NumLockMask, ScrollLockMask));
 
     PRECONDITION(app->AltMask != 0);
     PRECONDITION(app->AltMask != ShiftMask);
@@ -1338,7 +1329,6 @@ void YApplication::initModifiers() {
     MSG(("alt:%d meta:%d super:%d hyper:%d win:%d mode:%d num:%d scroll:%d",
          AltMask, MetaMask, SuperMask, HyperMask, WinMask, ModeSwitchMask,
 	 NumLockMask, ScrollLockMask));
-
 }
 
 void YApplication::alert() {
