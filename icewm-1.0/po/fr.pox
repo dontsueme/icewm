@@ -5,7 +5,7 @@
 #
 msgid	""
 msgstr	"Project-Id-Version: icewm 1.0.6\n"
-	"POT-Creation-Date: 2001-10-02 01:01+0200\n"
+	"POT-Creation-Date: 2001-10-08 20:53+0200\n"
 	"PO-Revision-Date: 2000-12-15 12:13+2000\n"
 	"Last-Translator: Laurent Pouillet <laurent.pouillet@caramail.com>\n"
 	"Language-Team: French\n"
@@ -78,7 +78,7 @@ msgstr	"%ld message."
 msgid	"%ld mail messages."
 msgstr	"%ld messages."
 
-#: ../src/apppstatus.cc:142
+#: ../src/apppstatus.cc:143
 #, c-format
 msgid	"Interface %s:\n"
 	"  Current rate (in/out):\t%d %s/%d %s\n"
@@ -91,13 +91,13 @@ msgstr	"Interface réseau %s:\n"
 	"  Transféré au total (en entrée/en sortie):\t%d %s/%d %s\n"
 	"  Temps passé en ligne:\t%d:%02d:%02d%s%s"
 
-#: ../src/apppstatus.cc:152
+#: ../src/apppstatus.cc:153
 msgid	"\n"
 	"  Caller id:\t"
 msgstr	"\n"
 	"  Numéro de l'interlocuteur:\t"
 
-#: ../src/apppstatus.cc:483
+#: ../src/apppstatus.cc:484
 #, c-format
 msgid	"%s@%d: %s\n"
 msgstr	"%s@%d: %s\n"

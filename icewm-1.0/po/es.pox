@@ -3,7 +3,7 @@
 # Antonio de la Torre <adltorre@supercable.es>, 2001.
 msgid	""
 msgstr	"Project-Id-Version: IceWM 1.0.9\n"
-	"POT-Creation-Date: 2001-10-02 01:01+0200\n"
+	"POT-Creation-Date: 2001-10-08 20:53+0200\n"
 	"PO-Revision-Date: 2001-09-28 20:32+0100\n"
 	"Last-Translator: Antonio de la Torre <adltorre@supercable.es>\n"
 	"Language-Team: Spanish <es@li.org>\n"
@@ -76,7 +76,7 @@ msgstr	"mensaje de correo %ld."
 msgid	"%ld mail messages."
 msgstr	"mensajes de correo %ld."
 
-#: ../src/apppstatus.cc:142
+#: ../src/apppstatus.cc:143
 #, c-format
 msgid	"Interface %s:\n"
 	"  Current rate (in/out):\t%d %s/%d %s\n"
@@ -89,13 +89,13 @@ msgstr	"Interfase %s:\n"
 	"  Transferido (activado/desactivado):\t%d %s/%d %s\n"
 	"  Tiempo de conexión:\t%d:%02d:%02d%s%s"
 
-#: ../src/apppstatus.cc:152
+#: ../src/apppstatus.cc:153
 msgid	"\n"
 	"  Caller id:\t"
 msgstr	"\n"
 	"  id del comunicante:\t"
 
-#: ../src/apppstatus.cc:483
+#: ../src/apppstatus.cc:484
 #, c-format
 msgid	"%s@%d: %s\n"
 msgstr	"%s@%d: %s\n"

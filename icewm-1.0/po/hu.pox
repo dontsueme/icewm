@@ -4,7 +4,7 @@
 #
 msgid	""
 msgstr	"Project-Id-Version: icewm 1.0.6\n"
-	"POT-Creation-Date: 2001-10-02 01:01+0200\n"
+	"POT-Creation-Date: 2001-10-08 20:53+0200\n"
 	"PO-Revision-Date: 2001-03-13 21:34+0100\n"
 	"Last-Translator: Tamas Czinege <cete@rette.net>\n"
 	"Language-Team: Hungarian\n"
@@ -91,7 +91,7 @@ msgstr	"%ld üzenet."
 msgid	"%ld mail messages."
 msgstr	"%ld üzenet."
 
-#: ../src/apppstatus.cc:142
+#: ../src/apppstatus.cc:143
 #, c-format
 msgid	"Interface %s:\n"
 	"  Current rate (in/out):\t%d %s/%d %s\n"
@@ -100,13 +100,13 @@ msgid	"Interface %s:\n"
 	"  Online time:\t%d:%02d:%02d%s%s"
 msgstr	""
 
-#: ../src/apppstatus.cc:152
+#: ../src/apppstatus.cc:153
 msgid	"\n"
 	"  Caller id:\t"
 msgstr	""
 
 # ../src/apppstatus.cc:420
-#: ../src/apppstatus.cc:483
+#: ../src/apppstatus.cc:484
 #, c-format
 msgid	"%s@%d: %s\n"
 msgstr	"%s@%d: %s\n"

@@ -4,7 +4,7 @@
 #
 msgid	""
 msgstr	"Project-Id-Version: icewm 1.0.9\n"
-	"POT-Creation-Date: 2001-10-02 01:01+0200\n"
+	"POT-Creation-Date: 2001-10-08 20:53+0200\n"
 	"PO-Revision-Date: 2001-09-18 16:32+0200\n"
 	"Last-Translator: Fernando Brunelli <hadoo@linuxbr.com.br>\n"
 	"Language-Team: Case\n"
@@ -77,7 +77,7 @@ msgstr	"%ld mensagens recebidas."
 msgid	"%ld mail messages."
 msgstr	"%ld mensagens recebidas."
 
-#: ../src/apppstatus.cc:142
+#: ../src/apppstatus.cc:143
 #, c-format
 msgid	"Interface %s:\n"
 	"  Current rate (in/out):\t%d %s/%d %s\n"
@@ -86,12 +86,12 @@ msgid	"Interface %s:\n"
 	"  Online time:\t%d:%02d:%02d%s%s"
 msgstr	""
 
-#: ../src/apppstatus.cc:152
+#: ../src/apppstatus.cc:153
 msgid	"\n"
 	"  Caller id:\t"
 msgstr	""
 
-#: ../src/apppstatus.cc:483
+#: ../src/apppstatus.cc:484
 #, c-format
 msgid	"%s@%d: %s\n"
 msgstr	"%s@%d: %s\n"
