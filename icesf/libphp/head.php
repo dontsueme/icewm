@@ -85,7 +85,10 @@
       			     '<a href="'.BUGTRACKER.'&aid=\1">#\1</a>',
 			     trim($line));
 
-        echo $line[0] == '-' ? "\n<li>".substr($line,2) : " $line";
+	if ($line[0] == '-') $line = "\n<li>".substr($line,2);
+	if ($line[0] == "!!!\t-") $line = "\n<li><b>TODO</b>".substr($line,2);
+        
+	echo $line
       }
     }
 
