@@ -71,9 +71,9 @@ A small screenshot displaying the default look is <A HREF="screenshot.jpg">here<
 	 <td valign=top>
 	  <ul>
 	   <li><?php fileref('icewm','i386.rpm')?>
-	   <li><?php fileref('icewm-themes','i386.rpm')?>
-	   <li><?php fileref('icewm-l10n','i386.rpm')?>
-	   <li><?php fileref('icewm-menu-gnome1','i386.rpm')?>
+	   <li><?php fileref('icewm-themes','-1.i386.rpm')?>
+	   <li><?php fileref('icewm-l10n','-1.i386.rpm')?>
+	   <li><?php fileref('icewm-menu-gnome1','-1.i386.rpm')?>
 	  </ul><br>
 	 </td>
 	</tr><tr>
