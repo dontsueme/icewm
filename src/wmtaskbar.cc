@@ -617,39 +617,18 @@ void TaskBar::updateLayout(int &size_w, int &size_h) {
 #ifndef NO_CONFIGURE_MENUS
         { fObjectBar, true, 1, true, 4, 0, true },
 #endif
-        { fWorkspaces, taskBarWorkspacesLeft, 0, true, 4, 4, true },
-
-        { fCollapseButton, false, 0, true, 0, 2, true },
 #ifdef CONFIG_APPLET_CLOCK
-        { fClock, false, 1, true, 2, 2, false },
+        { fClock, false, 0, true, 0, 0, true },
 #endif
-#ifdef CONFIG_APPLET_MAILBOX
-        { fMailBoxStatus ? fMailBoxStatus[0] : 0, false, 1, true, 1, 1, false },
-/// TODO #warning "a hack"
-        { fMailBoxStatus && fMailBoxStatus[0] ? fMailBoxStatus[1] : 0, false, 1, true, 1, 1, false },
-        { fMailBoxStatus && fMailBoxStatus[0] && fMailBoxStatus[1] ? fMailBoxStatus[2] : 0, false, 1, true, 1, 1, false },
-        { fMailBoxStatus && fMailBoxStatus[0] && fMailBoxStatus[1] && fMailBoxStatus[2] ? fMailBoxStatus[3] : 0, false, 1, true, 1, 1, false },
-        { fMailBoxStatus && fMailBoxStatus[0] && fMailBoxStatus[1] && fMailBoxStatus[2] && fMailBoxStatus[3] ? fMailBoxStatus[4] : 0, false, 1, true, 1, 1, false },
-        { fMailBoxStatus && fMailBoxStatus[0] && fMailBoxStatus[1] && fMailBoxStatus[2] && fMailBoxStatus[3] && fMailBoxStatus[4] ? fMailBoxStatus[5] : 0, false, 1, true, 1, 1, false },
-#endif
+        //{ fCollapseButton, false, 0, true, 0, 2, true },
 #ifdef CONFIG_APPLET_CPU_STATUS
-        { fCPUStatus, false, 1, true, 2, 2, false },
-#endif
-#ifdef CONFIG_APPLET_NET_STATUS
-#ifdef CONFIG_APPLET_MAILBOX
-        { fNetStatus ? fNetStatus[0] : 0, false, 1, false, 1, 1, false },
-/// TODO #warning "a hack"
-        { fNetStatus && fNetStatus[0] ? fNetStatus[1] : 0, false, 1, false, 1, 1, false },
-        { fNetStatus && fNetStatus[0] && fNetStatus[1] ? fNetStatus[2] : 0, false, 1, false, 1, 1, false },
-#endif
-#endif
-#ifdef CONFIG_APPLET_APM
-        { fApm, false, 1, true, 0, 2, false },
+        { fCPUStatus, false, 1, true, 1, 1, false },
 #endif
         { fDesktopTray, false, 1, true, 1, 1, false },
 #ifdef CONFIG_TRAY
         { fWindowTray, false, 0, true, 1, 1, true },
 #endif
+        { fWorkspaces, taskBarWorkspacesLeft, 0, true, 0, 0, true },
     };
     const int wcount = sizeof(wlist)/sizeof(wlist[0]);
 

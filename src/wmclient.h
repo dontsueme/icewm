@@ -100,6 +100,9 @@ public:
     void saveSizeHints();
     void restoreSizeHints();
 
+    void setSizeHintsMaximized();
+    void setSizeHintsOriginal();
+
     unsigned long protocols() const { return fProtocols; }
     void getProtocols(bool force);
 
@@ -189,6 +192,7 @@ private:
     int haveButtonGrab;
     unsigned int fBorder;
     XSizeHints *fSizeHints;
+    int fWidthInc, fHeightInc;
     XClassHint *fClassHint;
     XWMHints *fHints;
     Colormap fColormap;
