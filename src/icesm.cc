@@ -106,6 +106,7 @@ int main(int argc, char **argv) {
 
     xapp.runIcewmbg();
     xapp.runWM();
+    sleep(2);
     xapp.runIcewmtray();
     xapp.runScript("startup");
 
