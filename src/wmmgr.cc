@@ -1384,6 +1384,24 @@ setGeo:
 
 }
 
+void YWindowManager::limitFrameSize(YFrameWindow *frame, int x, int y, int &cw, int &ch) {
+     if (limitSize && !frame->affectsWorkArea()) {
+         printf("trying to limit size\n");
+         int screen, Mw, Mh;
+         screen = manager->getScreenForRect(x, y, 1, 1);
+         manager->getWorkAreaSize(frame, &Mw, &Mh, screen);
+
+         cw = min(cw, Mw);
+         ch = min(ch, Mh);
+
+         printf("limit: %d %d %d %d\n", x, y, cw, ch);
+
+         /*ch -= this->titleYN();
+         this->client()->constrainSize(cw, ch, 0);
+         ch += this->titleYN();*/
+    }
+}
+
 YFrameWindow *YWindowManager::manageClient(Window win, bool mapClient) {
     YFrameWindow *frame(NULL);
     YFrameClient *client(NULL);
@@ -1495,18 +1513,7 @@ YFrameWindow *YWindowManager::manageClient(Window win, bool mapClient) {
 
         MSG(("mapping geometry 2 (%d:%d %dx%d)", posX, posY, posWidth, posHeight));
 
-        if (limitSize) {
-            int Mw, Mh;
-            manager->getWorkAreaSize(frame, &Mw, &Mh);
-
-            posWidth = min(posWidth, Mw);
-            posHeight = min(posHeight, Mh);
-
-/// TODO #warning "cleanup the constrainSize code, there is some duplication"
-            posHeight -= frame->titleYN();
-            frame->client()->constrainSize(posWidth, posHeight, 0);
-            posHeight += frame->titleYN();
-        }
+        limitFrameSize(frame, posX, posY, posWidth, posHeight);
 
         if (limitPosition &&
             !(client->sizeHints() &&
@@ -1943,9 +1950,9 @@ void YWindowManager::getWorkArea(YFrameWindow *frame,
     }
 }
 
-void YWindowManager::getWorkAreaSize(YFrameWindow *frame, int *Mw,int *Mh) {
+void YWindowManager::getWorkAreaSize(YFrameWindow *frame, int *Mw,int *Mh, int xiscreen) {
     int mx, my, Mx, My;
-    manager->getWorkArea(frame, &mx, &my, &Mx, &My);
+    manager->getWorkArea(frame, &mx, &my, &Mx, &My, xiscreen);
     *Mw = Mx - mx;
     *Mh = My - my;
 }

@@ -749,6 +749,8 @@ void YFrameWindow::getNewPos(const XConfigureRequestEvent &cr,
         }
     }
 
+    manager->limitFrameSize(this, cx, cy, cw, ch);
+
 #ifdef CONFIG_TASKBAR
     // update pager when windows move/resize themselves (like xmms, gmplayer, ...),
     // because this does not call YFrameWindow::endMoveSize()

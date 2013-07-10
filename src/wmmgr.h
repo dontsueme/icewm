@@ -103,7 +103,7 @@ public:
 
     void UpdateScreenSize(XEvent *event);
     void getWorkArea(YFrameWindow *frame, int *mx, int *my, int *Mx, int *My, int xiscreen = -1) const;
-    void getWorkAreaSize(YFrameWindow *frame, int *Mw,int *Mh);
+    void getWorkAreaSize(YFrameWindow *frame, int *Mw,int *Mh, int xiscreen = -1);
 
     int calcCoverage(bool down, YFrameWindow *frame, int x, int y, int w, int h);
     void tryCover(bool down, YFrameWindow *frame, int x, int y, int w, int h,
@@ -111,6 +111,7 @@ public:
     bool getSmartPlace(bool down, YFrameWindow *frame, int &x, int &y, int w, int h, int xiscreen);
     void getNewPosition(YFrameWindow *frame, int &x, int &y, int w, int h, int xiscreen);
     void placeWindow(YFrameWindow *frame, int x, int y, int cw, int ch, bool newClient, bool &canActivate);
+    void limitFrameSize(YFrameWindow *frame, int x, int y, int &cw, int &ch);
 
     YFrameWindow *top(long layer) const { return fTop[layer]; }
     void setTop(long layer, YFrameWindow *top);
