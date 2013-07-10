@@ -29,7 +29,6 @@ YFrameClient::YFrameClient(YWindow *parent, YFrameWindow *frame, Window win): YW
     fWinHints = 0;
     //fSavedFrameState =
     fSizeHints = XAllocSizeHints();
-    fWidthInc = fHeightInc = 1;
     fClassHint = XAllocClassHint();
     fTransientFor = 0;
     fClientLeader = None;
@@ -126,9 +125,6 @@ void YFrameClient::getSizeHints() {
             if (fSizeHints->height_inc == 0) fSizeHints->height_inc = 1;
         } else
             fSizeHints->width_inc = fSizeHints->height_inc = 1;
-
-       fWidthInc = fSizeHints->width_inc;
-       fHeightInc = fSizeHints->height_inc;
 
 
         if (!(fSizeHints->flags & PBaseSize)) {
@@ -914,17 +910,6 @@ void YFrameClient::saveSizeHints()
 void YFrameClient::restoreSizeHints() {
     memcpy(fSizeHints, &savedSizeHints, sizeof(XSizeHints));
 };
-
-void YFrameClient::setSizeHintsMaximized()
-{
-    fSizeHints->width_inc = 1;
-    fSizeHints->height_inc = 1;
-}
-void YFrameClient::setSizeHintsOriginal()
-{
-    fSizeHints->width_inc = fWidthInc;
-    fSizeHints->height_inc = fHeightInc;
-}
 
 
 long YFrameClient::mwmFunctions() {

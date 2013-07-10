@@ -3203,11 +3203,6 @@ void YFrameWindow::setState(long mask, long state) {
                 fMaximizeButton->setToolTip(_("Maximize"));
             }
         }
-        if (isMaximized()) {
-            client()->setSizeHintsMaximized();
-        } else {
-            client()->setSizeHintsOriginal();
-        }
     }
     if ((fOldState ^ fNewState) & WinStateMinimized) {
         MSG(("WinStateMinimized: %d", isMaximized()));
