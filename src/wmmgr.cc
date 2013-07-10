@@ -1386,7 +1386,7 @@ setGeo:
 
 void YWindowManager::limitFrameSize(YFrameWindow *frame, int x, int y, int &cw, int &ch) {
      if (limitSize && !frame->affectsWorkArea()) {
-         printf("trying to limit size\n");
+         //printf("trying to limit size\n");
          int screen, Mw, Mh;
          screen = manager->getScreenForRect(x, y, 1, 1);
          manager->getWorkAreaSize(frame, &Mw, &Mh, screen);
@@ -1394,7 +1394,7 @@ void YWindowManager::limitFrameSize(YFrameWindow *frame, int x, int y, int &cw, 
          cw = min(cw, Mw);
          ch = min(ch, Mh);
 
-         printf("limit: %d %d %d %d\n", x, y, cw, ch);
+         //printf("limit: %d %d %d %d\n", x, y, cw, ch);
 
          /*ch -= this->titleYN();
          this->client()->constrainSize(cw, ch, 0);
