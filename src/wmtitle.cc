@@ -94,6 +94,10 @@ void YFrameTitleBar::handleButton(const XButtonEvent &button) {
 }
 
 void YFrameTitleBar::handleMotion(const XMotionEvent &motion) {
+    //printf("YFrameTitleBar::handleMotion\n");
+    if (fFrame->isMaximized()) {
+        fFrame->wmRestore();
+    }
     YWindow::handleMotion(motion);
 }
 
