@@ -422,7 +422,6 @@ void YFrameWindow::outlineMove() {
     int xx(x()), yy(y());
     unsigned modifiers(0);
 
-    XGrabServer(xapp->display());
     XSync(xapp->display(), False);
 
     for(;;) {
@@ -494,7 +493,6 @@ end:
 
     XSync(xapp->display(), False);
     moveWindow(xx, yy);
-    XUngrabServer(xapp->display());
 }
 
 void YFrameWindow::outlineResize() {
@@ -506,7 +504,6 @@ void YFrameWindow::outlineResize() {
         incY = client()->sizeHints()->height_inc;
     }
 
-    XGrabServer(xapp->display());
     XSync(xapp->display(), False);
 
     for(;;) {
@@ -576,7 +573,6 @@ end:
 
     XSync(xapp->display(), False);
     setCurrentGeometryOuter(YRect(xx, yy, ww, hh));
-    XUngrabServer(xapp->display());
 }
 
 void YFrameWindow::manualPlace() {
@@ -599,7 +595,6 @@ void YFrameWindow::manualPlace() {
                           PointerMotionMask))
         return;
 
-    XGrabServer(xapp->display());
 #ifndef LITE
     statusMoveSize->begin(this);
 #endif
@@ -676,7 +671,6 @@ end:
 #endif
     moveWindow(xx, yy);
     xapp->releaseEvents();
-    XUngrabServer(xapp->display());
 }
 
 bool YFrameWindow::handleKey(const XKeyEvent &key) {
